@@ -62,7 +62,7 @@ Every command is run in this folder; `results/` is ignored by git. For `NOISE` i
    ```
 
    - `sglm_states.jl`: stored SGLM states at $h = 1/16$ and $h = 1/8$, one per unit of time after a burn-in of time
-     $100$, from 32 chains for training and 32 independent chains for validation, $525\,000$ states per chain,
+     $100$, from 32 chains for training and 32 independent chains for validation, $525 000$ states per chain,
      that is $1.68 \times 10^7$ states per set (`results/states_NOISE/`).
    - `train_phi.py` (GPU, about 2 minutes for 100 epochs): $\varphi_{\mathcal C}$ minimizing the extrapolated
      energy on the training states (see below); checkpoints in `results/checkpoint_phi_NOISE.eqx` and
@@ -89,7 +89,7 @@ Each column of `tables/table_NOISE.csv` is an estimate of $\pi(f)$ minus the exa
 | SGLM | $\pi_{1/16}(f)$ | `results/sglm_NOISE_h16.csv` |
 | explicit | $\pi_{1/16}(f) - \frac1{16} \cdot \frac12 \pi(f \psi_{\mathcal C})$ | exact coefficient, `results/exact_coefficients_gaussian.csv` |
 | extrapolation | $2\pi_{1/16}(f) - \pi_{1/8}(f)$ | `results/sglm_NOISE_h8.csv` and `_h16.csv` |
-| shift | $\pi_{1/16}(f) - \frac1{16}\, c_\varphi(f)$, $c_\varphi(f) = -(\pi_h(f \circ T) - \pi_h(f))/h$, $T(x) = x + h \nabla \varphi_{\mathcal C}(x)$ | `results/phi_NOISE.csv` |
+| shift | $\pi_{1/16}(f) - \frac1{16} c_\varphi(f)$, $c_\varphi(f) = -(\pi_h(f \circ T) - \pi_h(f))/h$, $T(x) = x + h \nabla \varphi_{\mathcal C}(x)$ | `results/phi_NOISE.csv` |
 
 The exact means and the exact coefficients use exact samples of $\pi$, which the corrections themselves do not
 use: they serve only as the reference. The column shift adds the change caused by the shift, computed on the
@@ -101,13 +101,13 @@ validation states, to the time average of the production run at $h = 1/16$.
 extrapolated energy
 
 $$
-\mathcal E_h(\varphi) = \frac12\, \pi_h\bigl(|\nabla\varphi|^2\bigr) + \frac{\pi_{2h}(\varphi) - \pi_h(\varphi)}{h},
+\mathcal E_h(\varphi) = \frac12 \pi_h\bigl(|\nabla\varphi|^2\bigr) + \frac{\pi_{2h}(\varphi) - \pi_h(\varphi)}{h},
 \qquad h = 1/16,
 $$
 
 with $\pi_h$ and $\pi_{2h}$ the empirical measures of the stored training states at $h = 1/16$ and $h = 1/8$; it uses
 neither $U$, $\nabla U$ nor $\mathcal C$. The network is an MLP $16 \to 64 \times 3 \to 1$ with tanh activations.
-Every step takes a batch of $20\,000$ states from each set, and every epoch shuffles both sets and goes through
+Every step takes a batch of $20 000$ states from each set, and every epoch shuffles both sets and goes through
 them once ($840$ steps per epoch); Adam, written out in the script, uses a cosine learning rate from $10^{-3}$ to
 $10^{-5}$ over $100$ epochs. After every epoch the log `results/train_phi_NOISE.log` gives, on the validation
 states, the Dirichlet term $D = \frac12 \pi_h(|\nabla\varphi|^2)$, the extrapolation term

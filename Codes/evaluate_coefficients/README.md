@@ -71,7 +71,7 @@ The rest of this file explains how the coefficients are computed and checked.
 
 ## Setting
 
-- **Target.** $\pi=\sum_{k=1}^5 w_k\,\mathcal N(\mu_k,\Sigma_k)$ on $\mathbb R^4$ and $U=-\log\pi$, with the
+- **Target.** $\pi=\sum_{k=1}^5 w_k \mathcal N(\mu_k,\Sigma_k)$ on $\mathbb R^4$ and $U=-\log\pi$, with the
   weights $0.34,0.25,0.19,0.13,0.09$, the means on a regular simplex of edge $4.5$ (rotated and jittered),
   and covariances of random orientation with eigenvalues in $[0.6,1.6]$ (`make_model.jl` writes
   `model.toml`). $U$ has five local minima, one near each mean, and the largest eigenvalue of
@@ -79,11 +79,11 @@ The rest of this file explains how the coefficients are computed and checked.
 - **Stochastic gradient.** $\nabla U(x)+\eta(x;\xi)$, with $\eta$ of mean $0$ and covariance $\mathcal C(x)$:
   - Gaussian noise: $\eta=\sigma_1\xi$, $\xi\sim\mathcal N(0,I_4)$, so $\mathcal C=\sigma_1^2I$, with
     $\sigma_1^2=1$;
-  - non-Gaussian noise: $\eta=\sqrt{\gamma(U(x))}\,R(x)\,\zeta$, where the $\zeta_j=E_j-1$ with
+  - non-Gaussian noise: $\eta=\sqrt{\gamma(U(x))} R(x) \zeta$, where the $\zeta_j=E_j-1$ with
     $E_j\sim\mathrm{Exp}(1)$ are i.i.d. (mean 0, variance 1, skewness 2), $R(x)$ is the rotation by
     $x_1+x_2$ in the $(x_1,x_2)$-plane and by $x_3-x_4$ in the $(x_3,x_4)$-plane, and
     $\gamma(u)=s^2\big(1+\kappa-\kappa e^{-(u-U_*)}\big)$ with $s^2=1$, $\kappa=1$,
-    $U_*=\min_kU(\mu_k)$; so $\mathcal C=\gamma(U)\,I$, from about $I$ at the deepest well to $2I$ far from
+    $U_*=\min_kU(\mu_k)$; so $\mathcal C=\gamma(U) I$, from about $I$ at the deepest well to $2I$ far from
     the wells.
     This noise is a vector added to the gradient, not the gradient of a random potential.
 - **Test functions.** Four functions with closed-form Gaussian expectations, chosen from a pool of twelve
@@ -107,35 +107,35 @@ By Corollaries `cor: bias coefficient` and `cor: sgld coefficient` of the SGLM p
 solution of the Poisson equation $-\mathcal L\phi_0=f-\pi(f)$,
 
 $$
-\lim_{h\to0}\frac{\pi_h(f)-\pi(f)}{h}=\frac12\,\pi\big(\nabla^2\phi_0:\mathcal C\big),\qquad
-\lim_{h\to0}\frac{\bar\pi_h(f)-\pi(f)}{h}=\frac12\,\pi\big(\nabla^2\phi_0:(\nabla^2U+\mathcal C)\big)
+\lim_{h\to0}\frac{\pi_h(f)-\pi(f)}{h}=\frac12 \pi\big(\nabla^2\phi_0:\mathcal C\big),\qquad
+\lim_{h\to0}\frac{\bar\pi_h(f)-\pi(f)}{h}=\frac12 \pi\big(\nabla^2\phi_0:(\nabla^2U+\mathcal C)\big)
 $$
 
 for SGLM and SGLD. The Riesz representor $\psi_{\mathcal A}$ of a matrix field $\mathcal A$ is the
 function with $\pi(\psi_{\mathcal A})=0$ and
-$\pi\big(\psi_{\mathcal A}\,(-\mathcal L\omega)\big)=\pi\big(\nabla^2\omega:\mathcal A\big)$ for every
+$\pi\big(\psi_{\mathcal A} (-\mathcal L\omega)\big)=\pi\big(\nabla^2\omega:\mathcal A\big)$ for every
 test function $\omega$; with $\omega=\phi_0$ it turns both limits into integrals against $\pi$, without
 $\phi_0$:
 
 $$
-c_{\mathrm{SGLM}}(f)=\frac12\,\pi\big(f\,\psi_{\mathcal C}\big),\qquad
-c_{\mathrm{SGLD}}(f)=\frac12\,\pi\big(f\,(\psi_{\nabla^2U}+\psi_{\mathcal C})\big).
+c_{\mathrm{SGLM}}(f)=\frac12 \pi\big(f \psi_{\mathcal C}\big),\qquad
+c_{\mathrm{SGLD}}(f)=\frac12 \pi\big(f (\psi_{\nabla^2U}+\psi_{\mathcal C})\big).
 $$
 
 ### Explicit representors
 
-Integration by parts gives $\pi(\psi\,(-\mathcal L\omega))=\pi(\nabla\psi\cdot\nabla\omega)$, so a
+Integration by parts gives $\pi(\psi (-\mathcal L\omega))=\pi(\nabla\psi\cdot\nabla\omega)$, so a
 representor is found by writing $\pi(\nabla^2\omega:\mathcal A)$ as $\pi(\nabla\omega\cdot\nabla\psi)$.
 
 - **Hessian.** As in (`eq: psi hessian`) of the paper,
   $\psi_{\nabla^2U}=\frac12|\nabla U|^2-\Delta U+\frac12\pi(\Delta U)$, the same for both noises.
-- **Isotropic covariance.** For $\mathcal C=\gamma(U)\,I$,
-  $\pi\big(\nabla^2\omega:\gamma(U)I\big)=\int\gamma(U)\,\Delta\omega\,e^{-U}dx
+- **Isotropic covariance.** For $\mathcal C=\gamma(U) I$,
+  $\pi\big(\nabla^2\omega:\gamma(U)I\big)=\int\gamma(U) \Delta\omega e^{-U}dx
   =-\int\nabla\omega\cdot\nabla\big(\gamma(U)e^{-U}\big)dx
-  =\pi\big(\nabla\omega\cdot(\gamma-\gamma')(U)\,\nabla U\big)$, and
-  $(\gamma-\gamma')(U)\,\nabla U=\nabla\big(\Gamma(U)-\gamma(U)\big)$ with $\Gamma'=\gamma$. Hence
+  =\pi\big(\nabla\omega\cdot(\gamma-\gamma')(U) \nabla U\big)$, and
+  $(\gamma-\gamma')(U) \nabla U=\nabla\big(\Gamma(U)-\gamma(U)\big)$ with $\Gamma'=\gamma$. Hence
   $\psi_{\mathcal C}=\Gamma(U)-\gamma(U)-\pi\big(\Gamma(U)-\gamma(U)\big)$:
-  - Gaussian noise, $\gamma=\sigma_1^2$: $\psi_{\mathcal C}=\sigma_1^2\,(U-\pi(U))$;
+  - Gaussian noise, $\gamma=\sigma_1^2$: $\psi_{\mathcal C}=\sigma_1^2 (U-\pi(U))$;
   - non-Gaussian noise, $\Gamma(u)=s^2\big((1+\kappa)u+\kappa e^{-(u-U_*)}\big)$:
     $\psi_{\mathcal C}=s^2\big((1+\kappa)(U-\pi(U))+2\kappa(E-\pi(E))\big)$ with $E=e^{-(U-U_*)}$.
 
@@ -148,7 +148,7 @@ representor is found by writing $\pi(\nabla^2\omega:\mathcal A)$ as $\pi(\nabla\
 
 ### Quadrature
 
-Every $\pi$-integral is $\pi(g)=\sum_kw_k\,\mathbb E\,g(\mu_k+L_kz)$, $z\sim\mathcal N(0,I_4)$, $L_k$ the
+Every $\pi$-integral is $\pi(g)=\sum_kw_k \mathbb E g(\mu_k+L_kz)$, $z\sim\mathcal N(0,I_4)$, $L_k$ the
 Cholesky factor of $\Sigma_k$, by a tensor Gauss–Hermite rule with 28, 40, 52 and 64 nodes per
 dimension. The coefficients are covariances, $c(f)=\frac12\big(\pi(f\psi)-\pi(f)\pi(\psi)\big)$, computed
 from the pieces $U$, $\frac12|\nabla U|^2-\Delta U$ and $E$, so the constants of the representors are not
@@ -191,17 +191,17 @@ against these coefficients.
 By Corollary `cor: w1 limits` of the SGLM paper,
 
 $$
-\lim_{h\to0}\frac{\mathcal W_1(\pi_h,\pi)}{h}=\frac12\,\|\psi_{\mathcal C}\,\pi\|_{\mathrm{KR}},\qquad
-\lim_{h\to0}\frac{\mathcal W_1(\bar\pi_h,\pi)}{h}=\frac12\,\|(\psi_{\nabla^2U}+\psi_{\mathcal C})\,\pi\|_{\mathrm{KR}}
+\lim_{h\to0}\frac{\mathcal W_1(\pi_h,\pi)}{h}=\frac12 \|\psi_{\mathcal C} \pi\|_{\mathrm{KR}},\qquad
+\lim_{h\to0}\frac{\mathcal W_1(\bar\pi_h,\pi)}{h}=\frac12 \|(\psi_{\nabla^2U}+\psi_{\mathcal C}) \pi\|_{\mathrm{KR}}
 $$
 
 for SGLM and SGLD, with the representors of Part 1. For each noise and each scheme the coefficient is
-therefore half the Kantorovich–Rubinstein norm of an explicit signed measure $\nu=\psi\,\pi$ on
+therefore half the Kantorovich–Rubinstein norm of an explicit signed measure $\nu=\psi \pi$ on
 $\mathbb R^4$ with $\nu(\mathbb R^4)=0$:
 
 $$
-\|\nu\|_{\mathrm{KR}}=\sup\Big\{\int v\,d\nu:\ v\ \text{1-Lipschitz}\Big\}
-=\min\Big\{\int|F|\,dx:\ \operatorname{div}F=-\nu\Big\}.
+\|\nu\|_{\mathrm{KR}}=\sup\Big\{\int v d\nu:\ v\ \text{1-Lipschitz}\Big\}
+=\min\Big\{\int|F| dx:\ \operatorname{div}F=-\nu\Big\}.
 $$
 
 The first form is the dual (a potential $v$), the second the minimal-flow form (a flux $F$ that carries
@@ -224,7 +224,7 @@ nodes per dimension).
 - **Discrete problem.** With the forward differences $(Dv)_{i,k}=(v_{i+e_k}-v_i)/\Delta$,
 
 $$
-\max_v\ \Delta^4\sum_i v_i\,\nu_i\quad\text{s.t.}\quad |(Dv)_i|\le1\ \text{for every cell }i,
+\max_v\ \Delta^4\sum_i v_i \nu_i\quad\text{s.t.}\quad |(Dv)_i|\le1\ \text{for every cell }i,
 \qquad\Longleftrightarrow\qquad
 \min_F\ \Delta^4\sum_i |F_i|\quad\text{s.t.}\quad D^{\mathsf T}F=\nu,
 $$
@@ -238,8 +238,8 @@ The discrete problem is a saddle point $\min_v\max_F\ \langle Dv,F\rangle-\sum_i
 solved by the primal–dual algorithm (PDHG, Chambolle–Pock) with diagonal step sizes:
 
 $$
-F\leftarrow\operatorname{shrink}_{\tau_F}\big(F+\tau_F\,D\bar v\big),\qquad
-v^{\mathrm{new}}=v-\tau_v\,(D^{\mathsf T}F-\nu),\qquad
+F\leftarrow\operatorname{shrink}_{\tau_F}\big(F+\tau_F D\bar v\big),\qquad
+v^{\mathrm{new}}=v-\tau_v (D^{\mathsf T}F-\nu),\qquad
 \bar v=2v^{\mathrm{new}}-v,
 $$
 

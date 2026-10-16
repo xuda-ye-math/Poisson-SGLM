@@ -65,11 +65,11 @@ The rest of this file explains how the distances and the coefficients are comput
 ## Setting
 
 - **Target.** $\pi\propto e^{-U}$ on $\mathbb R^d$, with $U(x)=u(|x|)$ and
-  $u(r)=(r^2-r)\,\dfrac{r^2}{r^2+1/4}$. The potential grows quadratically ($u''\to2$) and is not convex:
-  $u''$ ranges over $[-1.83,\,2.25]$, and $U$ has a ring of minima at $|x|\approx0.638$.
+  $u(r)=(r^2-r) \dfrac{r^2}{r^2+1/4}$. The potential grows quadratically ($u''\to2$) and is not convex:
+  $u''$ ranges over $[-1.83, 2.25]$, and $U$ has a ring of minima at $|x|\approx0.638$.
 - **Stochastic gradient.** $\nabla U(x)+\sigma\xi$ with $\xi\sim\mathcal N(0,I_d)$, so
   $\mathcal C(x)=\sigma^2I_d$.
-- **Schemes.** SGLD: $Z_{k+1}=Z_k-h(\nabla U(Z_k)+\sigma\xi_k)+\sqrt{2h}\,\chi_{k+1}$. SGLM in the Markov form
+- **Schemes.** SGLD: $Z_{k+1}=Z_k-h(\nabla U(Z_k)+\sigma\xi_k)+\sqrt{2h} \chi_{k+1}$. SGLM in the Markov form
   (`eq: sglm markov` of the paper): $Y_{k+1}=Y_k-h(\nabla U(Y_k+a\chi_k)+\sigma\xi_k)+2a\chi_k$ with
   $a=\sqrt{h/2}$, and $Z_k=Y_k+a\chi_k$, whose stationary law is $\pi_h$.
 
@@ -78,7 +78,7 @@ The rest of this file explains how the distances and the coefficients are comput
 Both chains commute with rotations, and their invariant laws are unique, so $\bar\pi_h$ and $\pi_h$ are
 rotation invariant. Between rotation-invariant laws $\mu,\nu$,
 $$
-\mathcal W_1(\mu,\nu)=\int_0^\infty\big|F_\mu(r)-F_\nu(r)\big|\,dr ,
+\mathcal W_1(\mu,\nu)=\int_0^\infty\big|F_\mu(r)-F_\nu(r)\big| dr ,
 $$
 with $F$ the distribution function of $|X|$: the function $|x|$ is 1-Lipschitz, which gives $\ge$, and
 the coupling $X=R\theta$, $Y=R'\theta$ with a common uniform direction $\theta$ and the monotone coupling
@@ -89,25 +89,25 @@ of the radii gives $\le$. The radial density of $\pi$ is $\propto r^{d-1}e^{-u(r
 Write $\mathrm{nchi}_d(x;\lambda,s)$ for the density of $|\lambda e_1+s\eta|$, $\eta\sim\mathcal N(0,I_d)$:
 $$
 \mathrm{nchi}_d(x;\lambda,s)=\frac{x}{s^2}\Big(\frac x\lambda\Big)^{d/2-1}
-e^{-(x^2+\lambda^2)/(2s^2)}\,I_{d/2-1}\Big(\frac{x\lambda}{s^2}\Big),
+e^{-(x^2+\lambda^2)/(2s^2)} I_{d/2-1}\Big(\frac{x\lambda}{s^2}\Big),
 $$
 the folded normal for $d=1$, computed in logarithms with the scaled Bessel function `besselix`.
 
 - **SGLD.** The gradient noise merges with the Brownian increment: $Z_{k+1}=Z_k-h\nabla U(Z_k)+s\chi$,
-  $s^2=2h+h^2\sigma^2$. Since $Z_k-h\nabla U(Z_k)=(r-hu'(r))\,Z_k/r$, the radius is a Markov chain with
-  the kernel $\mathrm{nchi}_d(r';\,|r-hu'(r)|,\,s)$.
+  $s^2=2h+h^2\sigma^2$. Since $Z_k-h\nabla U(Z_k)=(r-hu'(r)) Z_k/r$, the radius is a Markov chain with
+  the kernel $\mathrm{nchi}_d(r'; |r-hu'(r)|, s)$.
 - **SGLM.** Given $Y_k=y$, $|y|=r$, put $W=y+a\chi_k\sim\mathcal N(y,a^2I)$ and $F(w)=2w-h\nabla U(w)$.
-  Then $Y_{k+1}=V-h\sigma\xi_k$ with $V=F(W)-y$. The map $F$ is radial, $F(w)=f(|w|)\,w/|w|$ with
+  Then $Y_{k+1}=V-h\sigma\xi_k$ with $V=F(W)-y$. The map $F$ is radial, $F(w)=f(|w|) w/|w|$ with
   $f(\omega)=2\omega-hu'(\omega)$, and it is a diffeomorphism when $f'>0$ and $f(\omega)/\omega>0$, which
   holds for $h<2/2.25$; the code accepts $0<h\le1/2$. Hence $V$ has the density
   $$
-  p_V(v)=\frac{\varphi_a\big(F^{-1}(v+y)-y\big)}{f'(g)\,\big(f(g)/g\big)^{d-1}},\qquad g=f^{-1}(|v+y|),
+  p_V(v)=\frac{\varphi_a\big(F^{-1}(v+y)-y\big)}{f'(g) \big(f(g)/g\big)^{d-1}},\qquad g=f^{-1}(|v+y|),
   $$
   with $\varphi_a$ the density of $\mathcal N(0,a^2I_d)$. By symmetry about the axis of $y$, the density
   of $|V|$ at $t$ is the angular integral
-  $q_r(t)=|S^{d-2}|\,t^{d-1}\int_0^\pi p_V(t,\theta)\sin^{d-2}\theta\,d\theta$ ($p_V(t)+p_V(-t)$ for
-  $d=1$), and the radial kernel of $Y$ is $K(r,r')=\int q_r(t)\,\mathrm{nchi}_d(r';t,h\sigma)\,dt$.
-  The radial density of $Z=Y+a\chi$ is $\int\rho_Y(r)\,\mathrm{nchi}_d(r';r,a)\,dr$.
+  $q_r(t)=|S^{d-2}| t^{d-1}\int_0^\pi p_V(t,\theta)\sin^{d-2}\theta d\theta$ ($p_V(t)+p_V(-t)$ for
+  $d=1$), and the radial kernel of $Y$ is $K(r,r')=\int q_r(t) \mathrm{nchi}_d(r';t,h\sigma) dt$.
+  The radial density of $Z=Y+a\chi$ is $\int\rho_Y(r) \mathrm{nchi}_d(r';r,a) dr$.
 
 ## Discretization
 
@@ -115,7 +115,7 @@ the folded normal for $d=1$, computed in logarithms with the scaled Bessel funct
   $\frac12 a$ (SGLM), at most $0.1$. $R$ is where the radial density of $\pi$ has dropped by $e^{-50}$,
   widened by $\sqrt{(2+h\sigma^2)/(2(1-h))}$, the variance ratio of the Euler scheme for $u\sim r^2$; the
   computed densities are checked to be below $10^{-14}$ of their maximum on the last panel.
-- **Angular integral (SGLM).** $|V-(F(y)-y)|\le\mathrm{Lip}(F)\,a\,(\sqrt d+10)$ outside an event of
+- **Angular integral (SGLM).** $|V-(F(y)-y)|\le\mathrm{Lip}(F) a (\sqrt d+10)$ outside an event of
   probability below $e^{-50}$, so $t$ ranges over that band and $\theta$ over the cap of the sphere
   $|v|=t$ that meets the ball; the cap is integrated by a composite rule of $4\times16$ Gauss-Legendre
   nodes. $f^{-1}$ is a table lookup followed by two Newton steps.
@@ -142,15 +142,15 @@ By Corollary `cor: w1 limits`, $\mathcal W_1(\bar\pi_h,\pi)/h\to\frac12\|(\psi_{
 - $\psi_{\mathcal C}=\sigma^2\big(U-\pi(U)\big)$, the first row of Table `tab: explicit representors` with a
   constant $a=\sigma^2$;
 - $\psi_{\nabla^2U}=\frac12|\nabla U|^2-\Delta U+\frac12\pi(\Delta U)$ (`eq: psi hessian`), with
-  $|\nabla U|=|u'(r)|$ and $\Delta U=u''(r)+(d-1)\,u'(r)/r$.
+  $|\nabla U|=|u'(r)|$ and $\Delta U=u''(r)+(d-1) u'(r)/r$.
 
 For a radial $\psi$ with $\pi(\psi)=0$, the supremum over 1-Lipschitz $f$ that defines the norm may be
 taken over radial $f(x)=g(|x|)$, since averaging $f$ over rotations keeps its Lipschitz constant and
 the value of $\pi(f\psi)$. With $\rho_\pi$ the radial density of $\pi$, the norm is therefore the
 one-dimensional norm of $\psi\rho_\pi$ on $[0,\infty)$:
 $$
-\|\psi\pi\|_{\mathrm{KR}}=\sup_{\|g'\|_\infty\le1}\int_0^\infty g\,\psi\rho_\pi\,dr
-=\int_0^\infty\Big|\int_0^r\psi(s)\rho_\pi(s)\,ds\Big|\,dr .
+\|\psi\pi\|_{\mathrm{KR}}=\sup_{\|g'\|_\infty\le1}\int_0^\infty g \psi\rho_\pi dr
+=\int_0^\infty\Big|\int_0^r\psi(s)\rho_\pi(s) ds\Big| dr .
 $$
 `coefficients.jl` computes $\pi(U)$, $\pi(\Delta U)$ and this integral on $[0,R]$ with panels of width
 $0.02$ and 12 Gauss-Legendre nodes each ($R$ as in the grid above, with $h=0$), the integral of
@@ -163,7 +163,7 @@ between the roots of $G$).
 
 1. **Closed form for $u(r)=r^2/2$.** The invariant laws are $\mathcal N(0,vI)$ with
    $v=(2+h\sigma^2)/(2-h)$ (SGLD) and $v=1+h\sigma^2/(2-h)$ (SGLM), so
-   $\mathcal W_1=|\sqrt v-1|\,\mathbb E|X|$. For $d=2,4,10$, $h=2^{-1},2^{-3},2^{-5}$, $\sigma=0,1$, both
+   $\mathcal W_1=|\sqrt v-1| \mathbb E|X|$. For $d=2,4,10$, $h=2^{-1},2^{-3},2^{-5}$, $\sigma=0,1$, both
    functions agree with it to an absolute error of at most $1.3\times10^{-13}$
    ($\mathcal W_1(\pi_h,\pi)=0$ for LM).
 2. **Refinement by the factor 2** (panel width, angular nodes, smoothing sub-intervals) for the ring

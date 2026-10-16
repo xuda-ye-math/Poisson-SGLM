@@ -8,7 +8,7 @@ Second Order Discretization Error* by Xuda Ye, Yuliang Wang, Guang Lin and Cindy
 The overdamped Langevin dynamics
 
 $$
-dX_t = -\nabla U(X_t)\, dt + \sqrt{2}\, dB_t
+dX_t = -\nabla U(X_t) dt + \sqrt{2} dB_t
 $$
 
 has the invariant distribution $`\pi(x) \propto e^{-U(x)}`$. In Bayesian inference on large data sets, $`\nabla U`$
@@ -16,14 +16,14 @@ is replaced by an unbiased stochastic gradient $`\nabla \hat U(x;\xi)`$ computed
 independent $`\chi_k \sim \mathcal N(0, I_d)`$ and step size $`h`$, stochastic gradient Langevin dynamics (SGLD) is
 
 $$
-Z_{k+1} = Z_k - h\, \nabla \hat U(Z_k;\xi_k) + \sqrt{2h}\, \chi_{k+1} ,
+Z_{k+1} = Z_k - h \nabla \hat U(Z_k;\xi_k) + \sqrt{2h} \chi_{k+1} ,
 $$
 
 and the stochastic gradient Leimkuhler–Matthews (SGLM) integrator, with the same cost of one stochastic gradient
 per step, reuses each Gaussian vector in two consecutive steps:
 
 $$
-Z_{k+1} = Z_k - h\, \nabla \hat U(Z_k;\xi_k) + \sqrt{\frac h2}\, \bigl( \chi_k + \chi_{k+1} \bigr) .
+Z_{k+1} = Z_k - h \nabla \hat U(Z_k;\xi_k) + \sqrt{\frac h2} \bigl( \chi_k + \chi_{k+1} \bigr) .
 $$
 
 With the full gradient, SGLD is the Euler–Maruyama integrator, whose discretization error is of first order, and
