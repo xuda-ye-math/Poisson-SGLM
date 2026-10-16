@@ -1,0 +1,11 @@
+# Python environment for the tables and figures of this folder (the computations are in Julia 1.13.1, see
+# Project.toml and Manifest.toml). It pins the versions used for the reported results.
+name: sglm-evaluate-coefficients
+channels:
+  - conda-forge
+dependencies:
+  - python=3.14.8
+  - pip
+  - pip:
+      - numpy==2.4.6
+      - matplotlib==3.11.2

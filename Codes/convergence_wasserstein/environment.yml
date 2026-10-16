@@ -1,0 +1,10 @@
+# Python environment for the figures of this folder (the computations are in Julia 1.13.1, see Project.toml and
+# Manifest.toml). It pins the versions used for the reported results.
+name: sglm-convergence-wasserstein
+channels:
+  - conda-forge
+dependencies:
+  - python=3.14.8
+  - pip
+  - pip:
+      - matplotlib==3.11.2

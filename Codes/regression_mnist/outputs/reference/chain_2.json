@@ -1,0 +1,48 @@
+{
+  "adapted_step_size": 0.22496733935224,
+  "chain": 2,
+  "device": "cuda:6",
+  "divergence_count": 0,
+  "divergence_indices": [],
+  "imported_from_completed_run": {
+    "artifact_path": "artifacts/references/formal_stage9/4_9/chain_2.npz",
+    "artifact_sha256": "2800f3174d024149c2afb1e512ee63a5a33a1f61dc228ce2ea20ff4faa763393",
+    "completed_at": "2026-10-14T06:38:40-04:00",
+    "initial_z_sha256": "1e6fd54e52064f1fc192f87d9720c60d140af8c439d2ec590c0d0fb7004536a9",
+    "pool_values_sha256": "6f3d626c196c158e97273eb56f895f03409c2c8ad68cc361b999ce63bd915b17"
+  },
+  "maximum_tree_depth": 10,
+  "potential_evaluations": 8199308,
+  "retained": 524288,
+  "runtime_seconds": 29855.87336221058,
+  "seeds": {
+    "initial_z": {
+      "bit_generator": "PCG64DXSM",
+      "canonical_key": "{\"components\":[\"4_9\",\"chain_2\"],\"namespace\":\"stage9_formal_reference_initial_z\",\"schema_version\":1}",
+      "components": [
+        "4_9",
+        "chain_2"
+      ],
+      "namespace": "stage9_formal_reference_initial_z",
+      "schema_version": 1,
+      "seed_uint128_decimal": "98996564252430907597958932090373498966",
+      "sha256": "4a7a0b74a39af5dbaf533edebd8368569096db16796496cdafcc3bb79fb15e77"
+    },
+    "nuts": {
+      "bit_generator": "PCG64DXSM",
+      "canonical_key": "{\"components\":[\"4_9\",\"chain_2\"],\"namespace\":\"stage9_formal_reference_nuts\",\"schema_version\":1}",
+      "components": [
+        "4_9",
+        "chain_2"
+      ],
+      "namespace": "stage9_formal_reference_nuts",
+      "pyro_seed_uint32": 2641531945,
+      "schema_version": 1,
+      "seed_uint128_decimal": "58320632497004551547110053631855195135",
+      "sha256": "2be0252f1d483ca5a245be55b20473ff61b50ae94b99c6e467f082bbdc19eb88"
+    }
+  },
+  "status": "complete",
+  "target_acceptance": 0.9,
+  "warmup": 16384
+}

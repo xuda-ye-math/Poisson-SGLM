@@ -1,0 +1,15 @@
+# dot files (desktop metadata, editor and agent configuration)
+.*
+!.gitignore
+
+# generated numerical output
+results/
+*.npz
+*.npy
+*.f32
+*.f64
+*.eqx
+
+# Python
+__pycache__/
+*.pyc

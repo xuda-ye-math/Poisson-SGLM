@@ -1,0 +1,15 @@
+# Python environment of this folder: the training of phi_C and its gradient (JAX, GPU) and the tables (the other
+# computations are in Julia 1.13.1, standard library only). It pins the versions used for the reported results.
+name: sglm-bias-correction
+channels:
+  - conda-forge
+dependencies:
+  - python=3.14.8
+  - pip
+  - pip:
+      - numpy==2.4.6
+      - jax==0.11.2
+      - jaxlib==0.11.2
+      - jax-cuda13-plugin==0.11.2
+      - jax-cuda13-pjrt==0.11.2
+      - equinox==0.13.8

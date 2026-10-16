@@ -1,0 +1,19 @@
+name: sglm-mnist
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10.22
+  - numpy=1.26.4
+  - scipy=1.13.1
+  - pytorch=2.5.1
+  - torchvision=0.20.1
+  - pytorch-cuda=12.1
+  - matplotlib=3.9.2
+  - arviz=0.20.0
+  - pyyaml=6.0.2
+  - pytest=8.3.3
+  - pip
+  - pip:
+      - pyro-ppl==1.9.1
