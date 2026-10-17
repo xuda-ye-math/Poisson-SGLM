@@ -1,7 +1,8 @@
 # Stochastic gradient Leimkuhler–Matthews integrator with second order discretization error
 
-Source code for the numerical experiments of the paper *Stochastic Gradient Leimkuhler–Matthews Integrator with
-Second Order Discretization Error* by Xuda Ye, Yuliang Wang, Guang Lin and Cindy Xiangrui Kong (in preparation).
+The manuscript and the source code for the numerical experiments of the paper *Stochastic Gradient
+Leimkuhler–Matthews Integrator with Second Order Discretization Error* by Xuda Ye, Yuliang Wang, Guang Lin and
+Cindy Xiangrui Kong.
 
 ## The integrator
 
@@ -32,16 +33,17 @@ order.
 
 ## Main results
 
-- For a potential strongly convex outside a ball, the mean square error of the time averages of SGLM over $`N`$
-  steps of size $`h`$ is $`\mathcal O\bigl(\frac{1}{Nh} + \Sigma^2 h^2 + h^4\bigr)`$, where $`\Sigma`$ bounds the
-  variance of the gradient noise. The stochastic gradient error and the discretization error separate, so a larger
-  batch reduces the error at a fixed step size.
-- The coefficient of $`h`$ in the numerical bias of SGLM is explicit, in terms of the covariance of the gradient
-  noise and the solution of the Poisson equation; that of SGLD contains in addition the Hessian of the potential,
-  which no batch size removes.
-- Through Riesz representors, these coefficients determine the Wasserstein-1 errors of SGLM and SGLD to first order
-  in $`h`$, and they lead to corrections of the numerical bias of SGLM: the explicit coefficient, Richardson–Romberg
-  extrapolation, and a shifting correction of the samples trained from the samples alone.
+- For a potential strongly convex outside a ball, the mean square error (MSE) of the time averages of SGLM over
+  $`N`$ steps of size $`h`$ is $`\mathcal O\bigl(\frac{1}{Nh} + \Sigma^2 h^2 + h^4\bigr)`$, where $`\Sigma`$ bounds the
+  variance of the gradient noise. The discretization error enters this bound as $`h^4`$ and the MSE bound of SGLD as
+  $`h^2`$, while a larger batch reduces only the term $`\Sigma^2 h^2`$ in both bounds.
+- In Bayesian logistic regression on MNIST, SGLM has a smaller estimated MSE than SGLD.
+- The coefficient of $`h`$ in the numerical bias of SGLM is given explicitly by the covariance of the gradient noise
+  and the continuous Poisson equation. The coefficient for SGLD contains in addition the Hessian of the potential,
+  which comes from the discretization error.
+- Through Riesz representors, the coefficients of the numerical bias determine the coefficients of the Wasserstein-1
+  errors of SGLM and SGLD, and they lead to corrections of the numerical bias of SGLM: the explicit coefficient,
+  Richardson–Romberg extrapolation, and a shifting correction of the samples trained from the samples alone.
 
 ## Earlier work
 
@@ -49,9 +51,24 @@ The analysis builds on the discrete Poisson equation of the earlier paper *Mean 
 Runge–Kutta integrators* (X. Ye), whose manuscript and code are in the repository
 [Poisson-Overdamped](https://github.com/xuda-ye-math/Poisson-Overdamped).
 
+## The paper
+
+`Paper/` holds the manuscript:
+
+- `main.pdf`, the compiled manuscript;
+- `main.tex`, which includes `numerical.tex` (Sections 8.1 to 8.3), `mnist.tex` (Section 8.4) and `appendix.tex`
+  (the proofs) by `\input`;
+- `references.bib` and `main.bbl`, the bibliography compiled by BibTeX with the style `plainnat`;
+- `figures/`, the figures of Section 8: `bias_gaussian.pdf` and `bias_nongaussian.pdf` are written by
+  `Codes/evaluate_coefficients/plot_bias.py`, `wasserstein.pdf` and `coefficients.pdf` by
+  `Codes/convergence_wasserstein/plot_wasserstein.py` and `plot_coefficients.py`, and `mnist_mse.pdf` by
+  `Codes/regression_mnist/scripts/06_plot.py`; `digit_illustration.pdf` shows examples of the digits 4 and 9 of the
+  MNIST data set.
+
 ## Repository layout
 
 ```text
+Paper/                         The manuscript: main.pdf, its LaTeX source, bibliography and figures
 Codes/
 ├── evaluate_coefficients/     Section 8.1  Evaluating the coefficients in a 4D Gaussian mixture distribution
 ├── convergence_wasserstein/   Section 8.2  Convergence of Wasserstein-1 error in a radial distribution

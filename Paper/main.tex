@@ -1,0 +1,1174 @@
+\documentclass{article}
+
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[amsmath,thmmarks,framed]{ntheorem}
+\usepackage{authblk}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{comment}
+\definecolor{darkgreen}{rgb}{0.0,0.5,0.0}
+\usepackage[colorlinks,linkcolor=red,citecolor=darkgreen,urlcolor=blue]{hyperref}
+\hypersetup{
+  pdftitle={Stochastic Gradient Leimkuhler--Matthews Integrator with Second Order Discretization Error},
+}
+\usepackage[numbers,square,comma,sort&compress]{natbib}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{remark}{Remark}
+\newtheorem{assumption}{Assumption}
+\newenvironment{proof}[1][Proof]{\par\medskip\noindent\textit{#1.}\ }{\hfill$\square$\par\medskip}
+
+\newcommand{\Le}{\leqslant}
+\newcommand{\Ge}{\geqslant}
+\newcommand{\D}{\mathrm{d}}
+\newcommand{\MSE}{\mathrm{MSE}}
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+\newcommand{\pnorm}[1]{{\vert\kern-0.25ex\vert\kern-0.25ex\vert} #1 {\vert\kern-0.25ex\vert\kern-0.25ex\vert}}
+\newcommand{\Var}{\mathrm{Var}}
+
+\title{Stochastic Gradient Leimkuhler--Matthews Integrator \\
+	with Second Order Discretization Error}
+\author[1]{Xuda Ye}
+\author[2]{Yuliang Wang}
+\author[1]{Guang Lin}
+\author[1]{Cindy Xiangrui Kong}
+\affil[1]{Department of Mathematics, Purdue University, West Lafayette, IN 47907}
+\affil[2]{Department of Mathematics, Duke University, Durham, NC 27708}
+\date{\today}
+
+\numberwithin{equation}{section}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Stochastic gradient Langevin dynamics (SGLD) has a discretization error of first order in the step size $h$, even with the full gradient. We study the stochastic gradient Leimkuhler--Matthews (SGLM) integrator, which has the same cost as SGLD, one stochastic gradient per step, and reuses each Gaussian vector in consecutive steps. With the full gradient, SGLM is the Leimkuhler--Matthews (LM) integrator, whose discretization error for the invariant distribution is of second order. For a potential strongly convex outside a ball, we prove the bound $\mathcal O(\frac{1}{Nh} + \Sigma^2 h^2 + h^4)$ on the mean square error (MSE) of time averages of SGLM over $N$ steps, where $\Sigma$ bounds the variance of the gradient noise. The proof uses a modified class that absorbs the non-Markovian part of SGLM. The discretization error enters this bound as $h^4$ and the MSE bound of SGLD as $h^2$, while a larger batch reduces only the term $\Sigma^2 h^2$ in both bounds. In Bayesian logistic regression on MNIST, SGLM has a smaller estimated MSE than SGLD. The coefficient of $h$ in the numerical bias of SGLM is given explicitly by the covariance of the gradient noise and the continuous Poisson equation. The coefficient for SGLD contains in addition the Hessian of the potential, which comes from the discretization error. Through Riesz representors, the coefficients of the numerical bias determine the coefficients of the Wasserstein-1 errors of SGLM and SGLD.
+
+\medskip
+\noindent\textbf{Keywords:} overdamped Langevin dynamics, stochastic gradient, Leimkuhler--Matthews integrator, mean square error, discrete Poisson equation, numerical bias, Riesz representor, Wasserstein-1 distance.
+
+\smallskip
+\noindent\textbf{MSC 2020:} 65C30, 60H35, 65C40.
+\end{abstract}
+
+\section{Introduction}
+\label{sec: intro}
+
+Sampling from the Boltzmann distribution $\pi(x) \propto e^{-U(x)}$ on $\mathbb R^d$ is a central task in statistical physics \citep{lelievre2016partial, leimkuhler2015molecular} and in Bayesian inference \citep{welling2011bayesian, dalalyan2017user, durmus2017nonasymptotic}. The simplest stochastic differential equation that leaves $\pi$ invariant is the overdamped Langevin dynamics
+\begin{equation}
+    \D X_t = -\nabla U(X_t)\,\D t + \sqrt2\,\D B_t , \qquad X_0 = x \in \mathbb R^d ,
+    \label{eq: langevin}
+\end{equation}
+where $(B_t)_{t \Ge 0}$ is a standard Brownian motion in $\mathbb R^d$ and $U$ a confining potential; time averages along the solution $(X_t)_{t \Ge 0}$ approximate expectations under $\pi$ in the long-time limit \citep{roberts1996exponential, lamberton2002recursive}. A numerical integrator of \eqref{eq: langevin} with step size $h > 0$ produces samples $(Z_k)_{k \Ge 0}$ that approximate the invariant distribution $\pi$; such integrators form the basis of Langevin Monte Carlo \citep{dalalyan2017user, durmus2017nonasymptotic, cheng2018sharp, durmus2019high, vempala2019rapid, majka2020nonasymptotic}. Characterizing the accuracy of these samples is a basic question of numerical analysis.
+
+The mean square error (MSE) of time averages is a natural criterion for this accuracy. For a test function $f$, with $\pi(f) := \int_{\mathbb R^d} f\,\D\pi$, the MSE of the time average over $N$ steps is
+\begin{equation}
+    \MSE(N, h) := \mathbb E \Biggl[ \biggl| \frac1N \sum_{k=0}^{N-1} f(Z_k) - \pi(f) \biggr|^2 \Biggr] .
+    \label{eq: mse}
+\end{equation}
+The Wasserstein distance, the Kullback--Leibler (KL) divergence and the total variation distance compare the law of the samples with $\pi$, and are hard to evaluate in high dimension. The MSE instead concerns a single numerical trajectory, and accounts for both the fluctuation of the time average and the numerical bias, the deviation of its long-time limit from $\pi(f)$ \citep{mattingly2010convergence, chen2015convergence, teh2016consistency, vollmer2016exploration}.
+
+In Bayesian inference on large data sets, $\nabla U$ is replaced by an unbiased stochastic estimator $\nabla \hat U(x; \xi)$ computed from a mini-batch, with $\xi$ a random variable independent of the Brownian motion \citep{welling2011bayesian, chen2015convergence, teh2016consistency, vollmer2016exploration}. The standard sampler of this kind is stochastic gradient Langevin dynamics (SGLD) \citep{welling2011bayesian}, the Euler--Maruyama (EM) integrator \citep{kloeden1992numerical, milstein2004stochastic} of \eqref{eq: langevin} with the stochastic gradient,
+\begin{equation}
+    Z_{k+1} = Z_k - h\, \nabla \hat U(Z_k; \xi_k) + \sqrt{2h}\, \chi_{k+1} ,
+    \label{eq: sgld}
+    \tag{SGLD}
+\end{equation}
+where $(\chi_k)_{k \Ge 0}$ is a sequence of independent standard Gaussian vectors in $\mathbb R^d$ and $\xi_k$ is drawn afresh at every step. The discretization error of \eqref{eq: sgld} is of first order in $h$: its numerical bias is of order $h$ even with the full gradient (Section~\ref{subsec: related sgld}). The existing stochastic gradient integrators that preserve a second order discretization error are built on Hamiltonian Monte Carlo \citep{chen2014stochastic, ma2015complete, chen2015convergence} or on the underdamped Langevin dynamics \citep{gouraud2025hmc}, whose splitting integrators are of second order with one gradient evaluation per step \citep{monmarche2021high}; the underdamped dynamics with stochastic gradients is studied in \citep{leimkuhler2016adaptive, matthews2018langevin, paulin2025sampling, lu2025mse}.
+
+We study the \emph{stochastic gradient Leimkuhler--Matthews} (SGLM) integrator, which has the cost of \eqref{eq: sgld}, one stochastic gradient per step, and differs from it in only one respect: the Gaussian vector $\chi_{k+1}$ is replaced by the average of $\chi_k$ and $\chi_{k+1}$, so that each Gaussian vector is used twice, in consecutive steps,
+\begin{equation}
+    Z_{k+1} = Z_k - h\, \nabla \hat U(Z_k; \xi_k) + \sqrt{\frac h2}\, \bigl( \chi_k + \chi_{k+1} \bigr) .
+    \label{eq: sglm}
+    \tag{SGLM}
+\end{equation}
+With the full gradient, SGLM is the Leimkuhler--Matthews (LM) integrator \citep{leimkuhler2013rational, vilmart2015postprocessed},
+\begin{equation}
+    Z_{k+1} = Z_k - h\, \nabla U(Z_k) + \sqrt{\frac h2}\, \bigl( \chi_k + \chi_{k+1} \bigr) .
+    \label{eq: lm}
+    \tag{LM}
+\end{equation}
+The reuse of the Gaussian vector gives LM a second order discretization error for the invariant distribution $\pi$ \citep{leimkuhler2013rational, leimkuhler2014long, vilmart2015postprocessed}, although its samples $(Z_k)_{k \Ge 0}$ do not form a Markov chain and its weak error on finite time intervals is of first order. LM evaluates $\nabla U$ once per step, while almost all other integrators of \eqref{eq: langevin} with a second order discretization error are of predictor--corrector type, with at least two sequential evaluations of $\nabla U$ per step (Section~\ref{subsec: related lm}). With a stochastic gradient, each of these evaluations carries its own noise. This raises the question whether SGLM preserves the second order discretization error of LM.
+
+We provide a positive answer to this question. Our contributions are summarized as follows:
+
+\subsubsection*{1. SGLM separates the stochastic gradient error from the discretization error.} Under regularity conditions on $U$, $f$ and the stochastic gradient that require strong convexity of $U$ only outside a ball, we prove in Theorem~\ref{thm: sglm mse} the MSE bound for SGLM,
+\begin{flalign}
+	\makebox[0.33\linewidth][l]{(SGLM, variance $\Sigma$)} &
+	\MSE(N, h) \Le C \Bigl( \frac{1}{Nh} + \Sigma^2 h^2 + h^4 \Bigr) , &&
+	\label{eq: intro sg mse}
+\end{flalign}
+where $\Sigma$ bounds the variance of the stochastic gradient, and $C$ depends on the regularity constants of $U$ and $f$, the dimension $d$ and the initial value $Z_0$, but not on $N$, $h$ or $\Sigma$. In \eqref{eq: intro sg mse}, $\frac{1}{Nh}$ comes from the fluctuation of the time average, $\Sigma^2 h^2$ from the square of the stochastic gradient error, and $h^4$ from the square of the discretization error. The same separation holds for the UBU integrator with stochastic gradients (SG-UBU) \citep{lu2025mse}, and was previously known only for integrators of the underdamped dynamics \citep{lu2025mse, paulin2026theoretical}. The \eqref{eq: sgld} integrator does not have it, since its stochastic gradient error and its discretization error are both of first order in $h$. With the full gradient, $\Sigma = 0$ and \eqref{eq: intro sg mse} yields the MSE bound $\frac{1}{Nh} + h^4$ of LM. To our knowledge, this is also the first MSE bound for the LM integrator.
+
+The separation in \eqref{eq: intro sg mse} is advantageous in the mini-batch regime: if each step averages $P$ independent stochastic gradients, the variance bound $\Sigma$ is replaced by $\Sigma/P$, so the contribution of the gradient noise to the MSE becomes $\Sigma^2 h^2 / P^2$, with $C$ in \eqref{eq: intro sg mse} independent of $P$. Increasing the batch size $P$ at a fixed step size $h$ therefore reduces the stochastic gradient error. By contrast, the MSE of \eqref{eq: sgld} keeps the term $h^2$ from the square of its discretization error at every batch size, and only a smaller $h$ reduces it. Since the gradients of a batch are evaluated in parallel while the steps are sequential, SGLM with a large batch size $P$ has a smaller error than SGLD under the same cost.
+
+The proof of \eqref{eq: intro sg mse} runs on the Markovian form of \eqref{eq: sglm}, a Markov chain $(Y_k)_{k \Ge 0}$ with $Z_k = Y_k + \sqrt{h/2}\,\chi_k$. It builds on the discrete Poisson equation of our earlier work \citep{lu2025mse, ye2026mse}, combined with a modified class of test function, potential, generator and discrete Poisson solution that absorbs the non-Markovian part of the integrator, the Gaussian shift $\sqrt{h/2}\,\chi_k$.
+
+\subsubsection*{2. The coefficients of the numerical bias are explicit.} The time averages of $f$ along \eqref{eq: sglm} converge almost surely to $\pi_h(f)$, for a numerical invariant distribution $\pi_h$ independent of the initial value, and the numerical bias $\pi_h(f) - \pi(f)$ is of order $h$ with an explicit coefficient given in Corollary~\ref{cor: bias coefficient},
+\begin{flalign}
+	\makebox[0.33\linewidth][l]{(SGLM, numerical bias)} &
+	\lim_{h \to 0} \frac{\pi_h(f) - \pi(f)}{h} = \frac12\, \pi\bigl( \nabla^2 \phi_0(x) : \mathcal C(x) \bigr) , &&
+	\label{eq: intro bias coefficient}
+\end{flalign}
+where $\mathcal C(x)$ is the covariance of the gradient noise $\nabla \hat U(x;\xi) - \nabla U(x)$, $\phi_0$ solves the continuous Poisson equation \eqref{eq: continuous poisson}, $-\mathcal L \phi_0 = f - \pi(f)$ with $\mathcal L$ the generator of \eqref{eq: langevin}, and $:$ is the full contraction of two matrices. The coefficient comes entirely from the gradient noise: with the full gradient, $\mathcal C(x) = 0$ and the numerical bias of LM has no linear part. The gradient noise enters only through the local weak error of a single step, through its covariance $\mathcal C(x)$, as for SG-UBU in \citep[Section~3.4]{lu2025mse}.
+
+The discrete Poisson equation also characterizes the numerical bias of \eqref{eq: sgld}. Its time averages converge to $\bar\pi_h(f)$, with $\bar\pi_h$ the invariant distribution of SGLD, and by Corollary~\ref{cor: sgld coefficient}
+\begin{flalign}
+	\makebox[0.28\linewidth][l]{(SGLD, numerical bias)} &
+	\lim_{h \to 0} \frac{\bar\pi_h(f) - \pi(f)}{h} = \frac12\, \pi\Bigl( \nabla^2 \phi_0(x) : \bigl( \nabla^2 U(x) + \mathcal C(x) \bigr) \Bigr) , &&
+	\label{eq: intro sgld coefficient}
+\end{flalign}
+a coefficient studied formally for $d = 1$ in \citep{vollmer2016exploration}. Besides the covariance $\mathcal C(x)$, the coefficient of SGLD carries the Hessian $\nabla^2 U(x)$, which comes from the discretization error of EM. With the full gradient, $\mathcal C(x) = 0$ and \eqref{eq: intro sgld coefficient} gives the coefficient of EM; with a batch of $P$ independent stochastic gradients, the coefficient of SGLM is divided by $P$, while that of SGLD tends to the coefficient of EM as $P$ grows. In \eqref{eq: intro bias coefficient} and \eqref{eq: intro sgld coefficient}, the gradient noise and the discretization error both enter linearly through $\nabla^2 \phi_0$, so the solution $\phi_0$ of the continuous Poisson equation is an essential structure of the numerical bias of the two stochastic gradient integrators, not only a tool for upper bounds on the MSE.
+
+\subsubsection*{3. The coefficients of the Wasserstein-1 error are explicit.} The suprema of the absolute values of the coefficients \eqref{eq: intro bias coefficient} and \eqref{eq: intro sgld coefficient} over the test functions with $\norm{\nabla f}_\infty \Le 1$ are the limits of the normalized Wasserstein-1 errors $\mathcal W_1(\pi_h, \pi)/h$ and $\mathcal W_1(\bar\pi_h, \pi)/h$ as $h \to 0$ (Corollary~\ref{cor: w1 limits}):
+\begin{flalign}
+	\makebox[0.35\linewidth][l]{(SGLM, $\mathcal W_1$ coefficient)} &
+	\lim_{h \to 0} \frac{\mathcal W_1(\pi_h, \pi)}{h} = \frac12\, \norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}} , &&
+	\label{eq: intro w1 sglm} \\
+	\makebox[0.35\linewidth][l]{(SGLD, $\mathcal W_1$ coefficient)} &
+	\lim_{h \to 0} \frac{\mathcal W_1(\bar\pi_h, \pi)}{h} = \frac12\, \norm{( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, \pi}_{\mathrm{KR}} , &&
+	\label{eq: intro w1 sgld}
+\end{flalign}
+where $\psi_{\mathcal C}$ and $\psi_{\nabla^2 U}$ are the Riesz representors of $\mathcal C(x)$ and $\nabla^2 U(x)$ defined in \eqref{eq: riesz}, and $\norm{\cdot}_{\mathrm{KR}}$ is the Kantorovich--Rubinstein norm in Section~\ref{subsec: notation}. The normalized biases $(\pi_h - \pi)/h$ and $(\bar\pi_h - \pi)/h$ converge to $\frac12 \psi_{\mathcal C}\, \pi$ and $\frac12 (\psi_{\nabla^2 U} + \psi_{\mathcal C})\, \pi$ in this norm at the rate $h^{\frac12} (1 + \log\frac1h)$ (Theorem~\ref{thm: kr expansion}). SGLM does not always have a smaller coefficient of the Wasserstein-1 error than SGLD: for a gradient noise of large amplitude supported away from the minimizer of $U$, the order is reversed (Lemma~\ref{lem: w1 counterexample}). With a batch of $P$ independent stochastic gradients, $\psi_{\mathcal C}/P$ replaces $\psi_{\mathcal C}$ in both limits, with $\mathcal C(x)$ the covariance of a single stochastic gradient. For a strongly convex potential, the coefficient of SGLM is at most that of SGLD once the batch size reaches a threshold linear in $\sup_x \norm{\mathcal C(x)}$ (Theorem~\ref{thm: batch threshold}).
+
+\subsubsection*{Summary of the results}
+
+Three features distinguish these results. First, SGLM separates the stochastic gradient error from the discretization error at the cost of SGLD, so that the batch size and the step size control the two errors independently; for an integrator of the overdamped dynamics, this separation is new.
+
+Second, the results on the numerical bias are equalities, not only upper bounds. The coefficients \eqref{eq: intro bias coefficient} and \eqref{eq: intro sgld coefficient} identify the numerical biases of SGLM and SGLD, and \eqref{eq: intro w1 sglm} and \eqref{eq: intro w1 sgld} their Wasserstein-1 errors, to first order in $h$, uniformly over the Lipschitz test functions for the Wasserstein-1 errors. The mainstream coupling methods bound these errors from above without identifying their coefficients; here the coefficients are the Kantorovich--Rubinstein norms of explicit signed measures, and the shift of the invariant distribution caused by the gradient noise and by the discretization is characterized exactly.
+
+Third, the exact coefficients make the comparison of SGLM with SGLD precise. The coefficient of SGLD keeps the Hessian of the potential at every batch size, while that of SGLM is divided by the batch size. SGLM can be less accurate than SGLD at small batch sizes (Lemma~\ref{lem: w1 counterexample}), and, for a strongly convex potential, Theorem~\ref{thm: batch threshold} gives an explicit threshold of the batch size beyond which SGLM is more accurate than SGLD in the Wasserstein-1 distance, to first order in $h$. This threshold does not depend explicitly on the dimension $d$; it depends only on the eigenvalues of $\nabla^2 U(x)$ and $\mathcal C(x)$.
+
+As applications of the analysis of the coefficients, Section~\ref{sec: representors} describes three approaches to bias correction. The numerical bias of SGLM is $\frac h2\, \pi(f \psi_{\mathcal C})$ to first order in $h$, so it is removed once $\pi(f \psi_{\mathcal C})$ is computed, with the explicit representor $\psi_{\mathcal C}$ for the covariances of Table~\ref{tab: explicit representors} or by Richardson--Romberg extrapolation in the step size. The third approach, the shifting correction, replaces a sample $Z \sim \pi_h$ of SGLM by $Z + h \nabla \varphi_{\mathcal C}(Z)$, where $\varphi_{\mathcal C}$ solves \eqref{eq: shift potential}, and formally removes the first order bias coefficient for all test functions at once. The function $\varphi_{\mathcal C}$ is approximated by minimizing the energy \eqref{eq: extrapolated energy}, which requires only the samples of SGLM at the step sizes $h$ and $2h$, so the shifting correction is completely data-driven.
+
+In the numerical experiments of Section~\ref{sec: numerics}, the evaluated coefficients of the numerical bias of SGLM and SGLD in a 4D Gaussian mixture distribution approach the exact coefficients \eqref{eq: intro bias coefficient} and \eqref{eq: intro sgld coefficient} as $h$ decreases, and the evaluated coefficients of the Wasserstein-1 errors in a radial distribution approach those of \eqref{eq: intro w1 sglm} and \eqref{eq: intro w1 sgld}. In a 16D product of ring distributions, the approaches to bias correction of Section~\ref{sec: representors} reduce the numerical bias of SGLM. In Bayesian logistic regression on MNIST, SGLM has a smaller estimated MSE than SGLD with the same step size and batch size.
+
+Section~\ref{sec: related} reviews the related works. Section~\ref{sec: preliminaries} states the assumptions, the Markovian forms \eqref{eq: lm markov} and \eqref{eq: sglm markov}, and the estimates of the discrete Poisson equation. Section~\ref{sec: modified} constructs the modified class, Section~\ref{sec: local} estimates the local errors of the LM and SGLM integrators against the modified dynamics, and Section~\ref{sec: mse} states the main results. Section~\ref{sec: representors} describes the approaches to bias correction, and Section~\ref{sec: numerics} presents the numerical experiments. Section~\ref{sec: conclusion} concludes, and the proofs are in the appendices.
+
+\section{Related works}
+\label{sec: related}
+
+This section reviews the work related to \eqref{eq: lm} and \eqref{eq: sglm}. Section~\ref{subsec: related lm} reviews the integrators of \eqref{eq: langevin} with a second order discretization error and the works that analyze the LM integrator. Section~\ref{subsec: related sgld} reviews the sampling error of \eqref{eq: sgld}, and Section~\ref{subsec: related underdamped} the stochastic gradient integrators of the underdamped Langevin dynamics.
+
+\subsection{Second order integrators in the overdamped case}
+\label{subsec: related lm}
+
+Among the integrators of \eqref{eq: langevin} that evaluate $\nabla U$ alone, only a few have a discretization error of order $h^2$ for the invariant distribution. They include LM \citep{leimkuhler2013rational, vilmart2015postprocessed} and stochastic Heun \citep{milstein2004stochastic, debrabant2010runge, mannella2025numerical}. The large family of stochastic Runge--Kutta (SRK) integrators \citep{rossler2010runge, debrabant2010runge, li2019stochastic, yang2026accelerating} contains further examples, such as SRK-I/II \citep{yang2026accelerating, ye2026mse}. Beyond LM, almost all these integrators are of predictor--corrector type: the second evaluation of $\nabla U$ in a step is taken at a state computed from the first. With a stochastic gradient, each of these evaluations carries its own noise, while LM evaluates $\nabla U$ once per step and extends to stochastic gradients by replacing that single evaluation; this is the reason we study LM and its stochastic gradient form SGLM. A detailed comparison of these integrators is given in \citep{ye2026mse}. Integrators of high order for the invariant distribution that also use derivatives of $\nabla U$ have been constructed \citep{talay1990second, abdulle2014high}.
+
+The LM integrator was introduced in \citep{leimkuhler2013rational} as the high friction limit of the BAOAB splitting of the underdamped Langevin dynamics. Its second order discretization error for the invariant distribution was proved by Talay--Tubaro expansions \citep{talay1990expansion}. These expansions were derived for the weak error, whose first order coefficient decays exponentially in time \citep{leimkuhler2014long}, and for the invariant distribution of splitting integrators on the torus \citep{leimkuhler2015computation}. The second order discretization error of LM was also proved by writing the integrator as the Markovian form \eqref{eq: lm markov} followed by the Gaussian shift $\sqrt{h/2}\,\chi_k$ as a postprocessor \citep{vilmart2015postprocessed}. The postprocessor argument uses the sufficient conditions for high order on the invariant distribution of \citep{abdulle2014high}, which rest on the Talay--Tubaro expansion \citep{talay1990expansion} and on the weak backward error analysis of \citep{debussche2012weak, kopec2013weak}. In high dimension and under weak or sparse interactions among the variables, the bias of the unadjusted underdamped Langevin algorithm on marginals of a few coordinates depends on the dimension only through logarithmic factors \citep{chen2026delocalization}, extending the delocalization of bias of the unadjusted overdamped Langevin algorithm \citep{chen2026convergence}. This delocalization holds for all large friction parameters and therefore carries over to \eqref{eq: lm}.
+These works control the numerical bias of LM; none of them bounds the MSE \eqref{eq: mse} or treats stochastic gradients.
+
+The modified class of this paper serves a purpose different from that of the modified equations of \citep{abdulle2014high}, which are used to construct integrators. Here the integrator is fixed, and the modified potential of Section~\ref{sec: modified} defines the modified dynamics \eqref{eq: modified langevin}, against which the Markovian form \eqref{eq: lm markov} has a local weak error of order $h^3$. The modified class also provides the modified discrete Poisson solution, to which the MSE analysis of \citep{lu2025mse, ye2026mse} is applied. The order $h^3$ of this local weak error appears in the Talay--Tubaro expansions \citep{leimkuhler2014long, leimkuhler2015computation}, as the vanishing at equilibrium of its coefficient of order $h$, and in the postprocessor argument \citep{vilmart2015postprocessed}. The expansions in \citep{leimkuhler2014long} rely on the exponential decay in time of the derivatives of the Kolmogorov solution of Section~\ref{subsec: poisson}, for which they refer to \citep{talay1990second}. Theorem~\ref{thm: u decay} proves this decay on $\mathbb R^d$ for a potential with bounded derivatives of orders $2$ to $7$, extending \citep[Theorem~1]{ye2026mse} to derivatives of order $4$.
+
+\subsection{Sampling error analysis for SGLD}
+\label{subsec: related sgld}
+
+The \eqref{eq: sgld} integrator converges weakly to the solution of \eqref{eq: langevin} as its step size tends to zero \citep{sato2014approximation}. Its sampling error has been analyzed along the following lines, and Table~\ref{tab: sgld} collects representative bounds; see \citep{nemeth2021stochastic} for a review.
+\begin{itemize}
+	\setlength{\itemsep}{0pt}
+	\item Recurrence relations of the integrator, combined with strong or weak error estimates, give nonasymptotic bounds in Wasserstein distance \citep{dalalyan2017user, nagapetyan2017true, brosse2018promises, barkhagen2021stochastic, chau2021stochastic, zhang2023nonasymptotic, shaw2025random}. Weighted transportation cost inequalities give bounds in $\mathcal W_2$ for nonconvex potentials \citep{raginsky2017nonconvex}. Under log-concavity at infinity the variance of the stochastic gradient does not change the rate of weak convergence \citep{majka2020nonasymptotic}, and a conductance analysis gives bounds in total variation for targets that are not log-concave \citep{zou2021faster}. For targets log-concave outside a compact set, the law of the $k$-th iterate of SGLD converges geometrically in $\mathcal W_1$ to the numerical invariant distribution $\bar\pi_h$ of SGLD \citep{li2024geometric}.
+	\item The continuous Poisson equation \eqref{eq: continuous poisson} controls the error of the time averages of numerical schemes \citep{mattingly2010convergence, brosse2019tamed} and of SGLD and stochastic gradient Hamiltonian Monte Carlo, including their MSE \citep{chen2015convergence, teh2016consistency, vollmer2016exploration, xu2018global, li2023improving}. These results require its solution $\phi_0$ to have bounded or polynomially growing derivatives.
+	\item The KL divergence between the laws of SGLD and of \eqref{eq: langevin} is bounded uniformly in time \citep{li2022sharp}. Bounds in KL divergence also follow from convex optimization on the Wasserstein space \citep{durmus2019analysis} and, under a logarithmic Sobolev inequality, from the nearly Gaussian structure of the gradient noise \citep{das2023utilising}.
+	\item Variance-reduced and control-variate estimators of the gradient improve these guarantees \citep{dubey2016variance, chatterji2018theory, baker2019control, zou2019sampling, kinoshita2022improved}. The numerical bias of SGLD is reduced by Richardson--Romberg extrapolation \citep{durmus2016stochastic}, and its cost at a prescribed accuracy is reduced by multilevel Monte Carlo \citep{giles2016multilevel, giles2020multilevel}. The extrapolation, however, introduces negative weights and does not increase the accuracy of the trajectory itself. The cost of the gradient noise is quantified by oracle lower bounds \citep{chatterji2022oracle}, by the dependence of the MSE on the mini-batch size under a fixed budget \citep{chen2019convergence}, and by a comparison of SGLD with EM at a prescribed mean square accuracy \citep{majka2026computational}.
+\end{itemize}
+
+\begin{table}[htb]
+	\centering
+	\setlength{\tabcolsep}{4pt}
+	\begingroup
+	\setstretch{1.2}
+	\begin{tabular}{@{}p{48mm}p{20mm}p{80mm}@{}}
+		\toprule
+		reference & assumption & sampling error \\
+		\midrule
+		Theorem~5 \citep{dalalyan2017user} & global & $\mathcal W_2(\mu_k, \pi) \lesssim e^{-\lambda kh} + h + \Sigma^{\frac12} h^{\frac12}$ \\
+		Theorem~5, Corollary~12 \citep{nagapetyan2017true} & global & $\mathbb E |X_{kh} - Z_k|^2 \lesssim e^{-\lambda kh} + h$ \\
+		Corollary~18 \citep{durmus2019analysis} & global & $\mathrm{KL}(\bar\mu_N \| \pi) \lesssim (Nh)^{-1} + h$ \\
+		Theorem~3.8 \citep{shaw2025random} & global & $\mathcal W_2(\mu_k, \pi) \lesssim e^{-\lambda kh} + h^{\frac12}$ \\
+		Proposition~1, Theorem~1 \citep{paulin2026sgld} & global & $\mathcal W_2(\mu_k, \pi) \lesssim e^{-\lambda kh} + h$ \\
+		Proposition~10 \citep{raginsky2017nonconvex} & non-global & $\mathcal W_2(\mu_k, \pi) \lesssim (\delta^{\frac14} + h^{\frac14})\, kh + e^{-\lambda kh}$ \\
+		Theorem~4.5 \citep{zou2021faster} & non-global & $\norm{\mu_k - \pi}_{\mathrm{TV}} \lesssim e^{-\lambda kh} + h^{\frac12} + \epsilon$ \\
+		Theorem~9 \citep{vollmer2016exploration} & non-global & $\MSE(N,h) \lesssim (Nh)^{-1} + h^2$ \\
+		Theorem~3 \citep{chen2015convergence} & non-global & $\MSE(N,h) \lesssim (Nh)^{-1} + h^2$ \\
+		Corollaries~3.1 and~5.1 \citep{li2022sharp} & log-Sobolev & $\mathrm{KL}(\mu_k \| \nu_k) \lesssim h^2$, \ $\mathcal W_2(\mu_k, \pi) \lesssim e^{-\lambda kh} + h$ \\
+		Theorem~5 \citep{das2023utilising} & log-Sobolev & $\mathrm{KL}(\mu_k \| \pi) \lesssim e^{-\lambda kh} + h$ \\
+		\midrule
+		SGLM, Theorem~\ref{thm: sglm mse} & non-global & $\MSE(N,h) \lesssim (Nh)^{-1} + \Sigma^2 h^2 + h^4$ \\
+		SGLM, Corollary~\ref{cor: w1 limits} & non-global & $\lim_{h \to 0} \frac{\mathcal W_1(\pi_h, \pi)}{h} = \frac12 \norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}}$ \\
+		SGLD, Corollary~\ref{cor: w1 limits} & non-global & $\lim_{h \to 0} \frac{\mathcal W_1(\bar\pi_h, \pi)}{h} = \frac12 \norm{( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, \pi}_{\mathrm{KR}}$ \\
+		\bottomrule
+	\end{tabular}
+	\endgroup
+	\caption{Sampling error results for \eqref{eq: sgld} and for \eqref{eq: sglm}. In the assumption column, global marks a strongly convex or convex potential, non-global a dissipative potential or one convex outside a ball, and log-Sobolev a target satisfying a logarithmic Sobolev inequality; the references impose in addition conditions on the regularity, the initial distribution and the moments of the gradient noise. Here $\mu_k$ denotes the law of the $k$-th iterate of SGLD, $\bar\pi_h$ and $\pi_h$ the numerical invariant distributions of SGLD and of SGLM, $\bar\mu_N$ the average of $\mu_1, \dots, \mu_N$, and $\nu_k$ the law of the solution of \eqref{eq: langevin} at time $kh$. Further, $X_{kh}$ is the solution of \eqref{eq: langevin} coupled with the $k$-th iterate $Z_k$ of SGLD, $\delta$ the relative variance of the gradient noise in \citep{raginsky2017nonconvex}, and $\epsilon \in (0,1)$ the truncation parameter in \citep{zou2021faster}, which fixes the radius of the truncated target on which the constants of that bound depend. Finally, $\Sigma$ is the bound on the variance of the gradient noise in Assumption~\ref{ass: sg}, $\psi_{\mathcal C}$ and $\psi_{\nabla^2 U}$ the Riesz representors \eqref{eq: riesz} of its covariance $\mathcal C(x)$ in \eqref{eq: covariance} and of $\nabla^2 U(x)$, $\norm{\cdot}_{\mathrm{KR}}$ the Kantorovich--Rubinstein norm, $\mathcal W_p$ the Wasserstein distance of order $p$, and $\lambda > 0$ a rate of convergence. Other constants, depending on the dimension, the potential and the gradient noise, are suppressed.}
+	\label{tab: sgld}
+\end{table}
+
+The numerical bias of \eqref{eq: sgld} is of first order in $h$. The bias of the time average over $N$ steps is $\mathcal O\bigl( (Nh)^{-1} + h \bigr)$ \citep[Theorem~9]{vollmer2016exploration}. The uniform-in-time KL bound of \citep[Corollary~3.1]{li2022sharp}, of order $h^2$, combined with the geometric ergodicity of SGLD for a potential strongly convex outside a ball \citep{li2024geometric}, yields $\mathcal W_1(\bar\pi_h, \pi) \Le Ch$ \citep[Section~5.1]{li2022sharp}. Corollary~\ref{cor: w1 limits} gives the exact coefficients of $h$ in $\mathcal W_1(\bar\pi_h, \pi)$ and $\mathcal W_1(\pi_h, \pi)$, determined through Riesz representors by the bias coefficients of Corollaries~\ref{cor: bias coefficient} and \ref{cor: sgld coefficient}. For a strongly convex potential with a Lipschitz gradient and gradient noise that is Lipschitz in mean square, $\mathcal W_2(\bar\pi_h, \pi) \Le Ch$ when the gradient noise has a finite moment of order $4$, while under a finite moment of order $2$ only, the bound is of order $h^{\frac12}$ \citep[Theorem~1]{paulin2026sgld}. A family of spiked gradient noises shows that the order $h^{\frac12}$ cannot be improved uniformly over gradient noises of a fixed variance \citep[Lemma~1]{paulin2026sgld}. Each noise of this family has finite moments of all orders, while their moments of order $12$ are unbounded over the family; Assumption~\ref{ass: sg}, whose bound on the moment of order $12$ of the stochastic gradient has a fixed constant $M$, excludes the family as a whole. The first order term has two sources: the gradient noise and the discretization error of EM. The discretization error of EM gives a numerical bias of first order even with the full gradient \citep{talay1990expansion}; see also \citep[Section~4.1]{vollmer2016exploration}.
+
+A different line of work removes the numerical bias. The proximal sampler \citep{lee2021structured, chen2022improved}, with its restricted Gaussian oracle implemented by first order rejection sampling \citep{chen2026high}, reaches a prescribed accuracy in total variation with a number of gradient queries polylogarithmic in the inverse accuracy \citep{altschuler2024faster, chen2026high}, and stochastic gradients with subexponential tails preserve this rate for targets satisfying a log-Sobolev or a Poincar\'e inequality \citep{chen2026stochastic}. These samplers need a warm start, an approximate proximal step and a rejection step with a random number of gradient queries in each iteration, and light-tailed gradient noise: with stochastic gradients of bounded variance only, a number of queries proportional to the inverse accuracy is necessary and sufficient \citep{chen2026stochastic}. SGLD and SGLM use one stochastic gradient per step and no warm start, and their numerical bias, quantified in the present paper, can be made smaller than the fluctuation of the time average by the choice of the step size and the batch size.
+
+\subsection{Stochastic gradient integrators for underdamped Langevin dynamics}
+\label{subsec: related underdamped}
+
+The underdamped Langevin dynamics augments the position with a velocity and is discretized by splitting integrators such as BAOAB \citep{leimkuhler2013rational, leimkuhler2015molecular}, OBABO \citep{bussi2007accurate} and UBU \citep{sanz2021wasserstein, paulin2024correction}. For convex and smooth potentials, the unadjusted chain of a splitting integrator of second order with one gradient evaluation per step contracts in Wasserstein distance at a rate independent of the dimension \citep{monmarche2021high}.
+
+Stochastic gradient Hamiltonian Monte Carlo (SGHMC) adds a friction to compensate for the gradient noise \citep{chen2014stochastic}, within a general recipe for such samplers \citep{ma2015complete}. Adaptive thermostats correct for the gradient noise \citep{ding2014bayesian, leimkuhler2016adaptive, shang2015covariance}, with exponential convergence of the law \citep{leimkuhler2020hypocoercivity} and a quantified bias from mini-batching \citep{sekkat2023minibatching}. Variance reduction accelerates SGHMC \citep{li2019variance, zou2018stochastic, zou2019stochastic, chatterji2018theory, zou2021convergence}, and multilevel coupling gives unbiased estimators \citep{chada2026unbiased}. For nonconvex optimization, the complexity bounds of SGHMC can be tighter than those of \eqref{eq: sgld} \citep{gao2022global}. Wasserstein bounds are proved without log-concavity \citep{akyildiz2024nonasymptotic, chak2023reflection}, through contraction rates of stochastic gradient integrators \citep{leimkuhler2023contraction}, and with dimension-free rates for log-concave targets \citep{gouraud2025hmc}.
+
+Consider a stochastic gradient sampler such as SGHMC, with unbiased gradients and a Markov integrator whose local weak error is of order $h^{K+1}$. If the derivatives of the solution of the continuous Poisson equation \eqref{eq: continuous poisson} are bounded, the bias of its time average is of order $(Nh)^{-1} + h^K$ and its MSE of order $(Nh)^{-1} + h^{2K}$ \citep[Theorems~2 and~3]{chen2015convergence}. Applied to the Markovian form \eqref{eq: lm markov}, which has weak order $1$ \citep{ye2026mse}, this framework gives a discretization term of order $h^2$ in the MSE, whereas the modified class of Section~\ref{sec: modified} gives $h^4$. The derivative bounds that this framework requires follow from the decay \eqref{eq: u bound} of Theorem~\ref{thm: u decay}.
+
+For SG-UBU and a globally convex potential, the discrete Poisson equation bounds the MSE of the time average \citep{lu2025mse}. The numerical bias is of first order in $h$, with a coefficient proportional to the variance of the stochastic gradient. For a finite-sum potential whose components are each strongly convex, UBU combined with a symmetric forward and backward sweep over the mini-batches reaches a bias of order $h^2$ with a single mini-batch per step \citep{paulin2025sampling}. The constant of this bound grows with the number of mini-batches, and the order rests on the symmetry of the whole sweep, which lasts a time equal to $2h$ times the number of mini-batches. For SG-UBU and strongly log-concave targets, Gaussian convolution inequalities bound the Wasserstein distance between the numerical invariant distribution and $\pi$ \citep{paulin2026theoretical}. The bound is the discretization error of the UBU integrator plus a stochastic gradient error of first order in $h$, which vanishes with the full gradient.
+
+Like SG-UBU, \eqref{eq: sglm} evaluates one gradient per step and has a discretization error of second order, and the separation in \eqref{eq: intro sg mse} holds without the global convexity assumed for SG-UBU in \citep{lu2025mse}. Unlike the sweep of \citep{paulin2025sampling}, SGLM draws $\xi_k$ independently, so its numerical bias keeps the first order term \eqref{eq: intro bias coefficient} from the gradient noise. As for SG-UBU, this term comes from the gradient noise only and vanishes with the full gradient, whereas the coefficient \eqref{eq: intro sgld coefficient} of \eqref{eq: sgld} also carries the Hessian $\nabla^2 U(x)$ from the discretization error of EM. UBU and LM are analyzed differently: UBU has strong error of second order \citep{sanz2021wasserstein, paulin2024correction}, whereas the Markovian form \eqref{eq: lm markov} of LM has strong error of first order \citep{ye2026mse}. The second order discretization error of LM is recovered through the modified class of Section~\ref{sec: modified}.
+
+\section{Preliminaries}
+\label{sec: preliminaries}
+
+\subsection{Notation and assumptions}
+\label{subsec: notation}
+
+Throughout, $\langle \cdot , \cdot \rangle$ is the Euclidean inner product, $\norm{\,\cdot\,}$ the operator norm of a tensor, which for a vector is the Euclidean norm $|\cdot|$, $I_d$ is the $d \times d$ identity matrix, $A \succeq B$ means that $A - B$ is positive semidefinite, $v^{\otimes j}$ is the $j$-fold tensor power, $A : B$ the full contraction of two tensors of the same order, $\mathrm{Tr}[A]$ the trace of a square matrix $A$, and $\mathrm{Sym}\, T$ the average of a tensor $T$ over the permutations of its indices. Derivatives of $U$ contract with tensors as in \citep{ye2026mse}: for instance, for a matrix $Q$ and a vector $v$, $\nabla^3 U(x)[Q] \in \mathbb R^d$ and $\nabla^3 U(x)[v] \in \mathbb R^{d\times d}$ have entries
+\begin{equation*}
+    \bigl( \nabla^3 U(x)[Q] \bigr)_i = \sum_{j,k=1}^d \partial_i\partial_j\partial_k U(x)\, Q_{jk} , \qquad
+    \bigl( \nabla^3 U(x)[v] \bigr)_{ij} = \sum_{k=1}^d \partial_i\partial_j\partial_k U(x)\, v_k .
+\end{equation*}
+We write $\Delta U = \sum_i \partial_i^2 U$ and $\nabla \Delta U$ for its gradient, $\pi(\psi) = \int \psi\,\D\pi$, $\mathbb E^x$ for the expectation of the Langevin dynamics \eqref{eq: langevin} started at $X_0 = x$, and $\mathbb E_\xi$ and $\mathbb P_\xi$ for the expectation and the probability over the random variable $\xi$ of the stochastic gradient at fixed $x$. For a tensor-valued function $g$ and $j \Ge 0$, $\norm{\nabla^j g}_\infty := \sup_x \norm{\nabla^j g(x)}$, with $|\cdot|$ for $j = 1$; for a Lipschitz function $f$, $\norm{\nabla f}_\infty$ is its Lipschitz constant. For a random tensor $X$ and $p \Ge 1$, $\pnorm{X}_p := ( \mathbb E \norm{X}^p )^{\frac1p}$, with the Euclidean norm $|X|$ in place of $\norm{X}$ when $X$ is a vector. Most proofs do not track the dependence of the constants on the dimension $d$, so the norms used in the paper are equivalent, up to constants depending only on $d$.
+
+For a signed measure $\nu$ with $\nu(\mathbb R^d) = 0$ and $\int |x|\, |\nu|(\D x) < \infty$, the Kantorovich--Rubinstein norm is
+\begin{equation*}
+    \norm{\nu}_{\mathrm{KR}} := \sup_{\norm{\nabla f}_\infty \Le 1} \int_{\mathbb R^d} f\, \D\nu ,
+\end{equation*}
+with the supremum over the Lipschitz functions $f$ with $\norm{\nabla f}_\infty \Le 1$, so that $\mathcal W_1(\mu, \rho) = \norm{\mu - \rho}_{\mathrm{KR}}$ for probability measures $\mu$ and $\rho$ with finite first moments by the Kantorovich--Rubinstein duality. For a function $\psi$ with $\pi(\psi) = 0$ and $\pi(|x|\,|\psi|) < \infty$, $\psi\pi$ is the signed measure $\psi(x)\, \pi(\D x)$.
+
+Three conventions fix the notation of the paper. The solution of the discrete Poisson equation of \eqref{eq: langevin} is written $\phi_h$, the subscript $h$ marking its dependence on the step size. Every member of the modified class of Section~\ref{sec: modified} carries a tilde: the modified test function $\tilde f_h$, the modified potential $\tilde U_h$ with its Boltzmann distribution, the modified target $\tilde\pi_h$, the modified generator $\tilde{\mathcal L}_h$, and the modified discrete Poisson solution $\tilde\phi_h$. So do the modified dynamics $\tilde X_t$, defined together with $\tilde{\mathcal L}_h$, and its solution $\tilde Y_k(t)$ started at $Y_k$. The hat marks the stochastic gradient: $\nabla \hat U(x;\xi)$ is the estimator and $U(x)$ the exact potential, and $\hat{\mathcal F}_k$ and $\hat{\mathbb E}_k$ in \eqref{eq: sg filtration} are the filtration and the conditional expectation of \eqref{eq: sglm markov}. Table~\ref{tab: notation} lists the objects of \eqref{eq: langevin} next to their modified counterparts.
+
+\begin{table}[htbp]
+\centering
+\caption{Notation of the original objects and of their modified counterparts.}
+\label{tab: notation}
+\begin{tabular}{lllll}
+\toprule
+ & \multicolumn{2}{c}{original} & \multicolumn{2}{c}{modified} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+object & symbol & definition & symbol & definition \\
+\midrule
+test function & $f$ & Assumption~\ref{ass: f} & $\tilde f_h$ & \eqref{eq: heat shift} \\
+potential & $U$ & Assumption~\ref{ass: U} & $\tilde U_h$ & \eqref{eq: modified potential} \\
+Langevin dynamics & $X_t$ & \eqref{eq: langevin} & $\tilde X_t$, $\tilde Y_k(t)$ & \eqref{eq: modified langevin} \\
+generator & $\mathcal L$ & \eqref{eq: generator} & $\tilde{\mathcal L}_h$ & \eqref{eq: modified generator} \\
+invariant distribution & $\pi$ & $\pi \propto e^{-U}$ & $\tilde\pi_h$ & $\tilde\pi_h \propto e^{-\tilde U_h}$, \eqref{eq: modified potential} \\
+discrete Poisson solution & $\phi_h$ & \eqref{eq: discrete poisson solution} & $\tilde\phi_h$ & \eqref{eq: modified poisson} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For the full gradient \eqref{eq: lm} integrator, we make the following two assumptions on the potential $U$ and the test function $f$. Strong convexity of $U$ is required only outside a bounded ball.
+
+\begin{assumption}
+	\label{ass: U}
+	$U \in C^7(\mathbb R^d)$ satisfies
+	\begin{equation*}
+		|\nabla U(0)| \Le M , \qquad \max_{2 \Le i \Le 7}\, \norm{\nabla^i U(x)} \Le M , \qquad \forall x \in \mathbb R^d ,
+	\end{equation*}
+	and there are constants $m > 0$ and $R \Ge 0$ such that $\nabla^2 U(x) \succeq m I_d$ for $|x| \Ge R$.
+\end{assumption}
+
+\begin{assumption}
+	\label{ass: f}
+	$f \in C^4(\mathbb R^d)$ satisfies
+	\begin{equation*}
+		\max_{1 \Le j \Le 4}\, \norm{\nabla^j f(x)} \Le L , \qquad \forall x \in \mathbb R^d .
+	\end{equation*}
+\end{assumption}
+
+For SGLM, additional boundedness conditions are required for the stochastic gradient $\nabla \hat U(x;\xi)$.
+
+\begin{assumption}
+	\label{ass: sg}
+	The estimator is unbiased and its $L^{12}$ norm with respect to $\xi$ grows linearly,
+	\begin{equation*}
+		\mathbb E_\xi\big[\nabla \hat U(x;\xi)\big] = \nabla U(x), \qquad
+		\Big( \mathbb E_\xi \big[ |\nabla \hat U(x;\xi)|^{12} \big] \Big)^{\frac{1}{12}} \Le M \bigl( 1 + |x| \bigr) , \qquad
+		\forall x \in \mathbb R^d ,
+	\end{equation*}
+	$\hat U(\cdot;\xi) \in C^2(\mathbb R^d)$ for every $\xi$ with $(x,\xi) \mapsto \nabla^2 \hat U(x;\xi)$ measurable, and its Hessian has a second moment bound, uniform on unit balls,
+	\begin{equation*}
+		\mathbb E_\xi \bigg[ \sup_{|x'-x| \Le 1} \norm{\nabla^2 \hat U(x';\xi)}^2 \bigg] \Le M^2 , \qquad
+		\forall x \in \mathbb R^d ,
+	\end{equation*}
+	with $M$ the constant of Assumption~\ref{ass: U}, and its variance is bounded by a constant $\Sigma \Le M^2$,
+	\begin{equation*}
+		\mathbb E_\xi \big[ |\nabla \hat U(x;\xi) - \nabla U(x)|^2 \big] \Le \Sigma , \qquad
+		\forall x \in \mathbb R^d .
+	\end{equation*}
+\end{assumption}
+
+The constraint $\Sigma \Le M^2$ in Assumption~\ref{ass: sg} is imposed for the convenience of analysis. The bound on the Hessian of $\hat U$ in Assumption~\ref{ass: sg} ensures the uniqueness of the invariant distribution of \eqref{eq: sglm markov}, as required by Harris's ergodic theorem \citep{hairer2008yet}. A stronger condition is the almost sure uniform bound $\norm{\nabla^2 \hat U(x;\xi)} \Le M$ for all $x \in \mathbb R^d$ and almost every $\xi$. Although Assumption~\ref{ass: sg} requires the potential form, $\nabla \hat U(x;\xi)$ does not need to be a gradient: the proofs use only the boundedness of its derivative $\nabla^2 \hat U(x;\xi)$.
+
+From here on, the letter $C$ denotes a positive constant depending only on $m$, $M$, $R$ and $d$, but not on $h$, $N$, $P$, $\Sigma$ or the initial state, and it changes from line to line. The letter $h_0$ denotes an upper bound in $(0,1]$ on the step size $h$, depending only on $m$, $M$, $R$ and $d$. In each statement, $h_0$ is the smallest of the bounds its proof uses, and every statement below holds for $h \in (0,h_0]$.
+
+Although this paper focuses on SGLM, the proofs are carried out mainly for the full gradient LM, and the stochastic gradient case follows directly in most places. When we speak of the LM integrators in the plural, the statement covers both the full gradient and the stochastic gradient cases.
+
+\subsection{Markovian form of the LM integrator}
+
+Although the \eqref{eq: lm} integrator is non-Markovian, it can be written in a Markovian form for the convenience of analysis. Let $(B_t)_{t \Ge 0}$ be a standard Brownian motion in $\mathbb R^d$, the one driving \eqref{eq: langevin}, and realize the Gaussian vectors as its increments over the steps,
+\begin{equation*}
+	\chi_k = \frac1{\sqrt{h}}\big(B_{(k+1)h} - B_{kh}\big), \qquad k \Ge 0 .
+\end{equation*}
+Let $\mathcal F_k$ be the sigma algebra generated by the Brownian motion up to the time $kh$, the past before the step $k$, and $\mathbb E_k$ the conditional expectation given that past,
+\begin{equation}
+	\mathcal F_k := \sigma\bigl( B_s : 0 \Le s \Le kh \bigr) , \qquad
+	\mathbb E_k[\,\cdot\,] := \mathbb E\bigl[\,\cdot\, \big| \mathcal F_{k}\bigr] ,
+	\label{eq: filtration}
+\end{equation}
+so that $\chi_k$ is $\mathcal F_{k+1}$-measurable and independent of $\mathcal F_{k}$. We construct a Markov chain $(Y_k)_{k\Ge0}$ by
+\begin{equation}
+	Y_{k+1} = Y_k - h\, \nabla U\Big(Y_k + \sqrt{\frac h2}\, \chi_k\Big) + \sqrt{2h}\, \chi_k .
+	\label{eq: lm markov}
+	\tag{LM'}
+\end{equation}
+Then $Z_k = Y_k + \sqrt{h/2}\, \chi_k$ satisfies \eqref{eq: lm}, so the LM integrator is equivalent to \eqref{eq: lm markov}, the form in which it is analyzed as a postprocessed integrator in \citep{vilmart2015postprocessed}; here $Y_k$ is $\mathcal F_{k}$-measurable and $Z_k$ is $\mathcal F_{k+1}$-measurable. Similarly, the \eqref{eq: sglm} integrator is equivalent to
+\begin{equation}
+	Y_{k+1} = Y_k - h\, \nabla \hat U\Big(Y_k + \sqrt{\frac h2}\, \chi_k; \xi_k\Big) + \sqrt{2h}\, \chi_k ,
+	\label{eq: sglm markov}
+	\tag{SGLM'}
+\end{equation}
+where the random variables $\xi_k$ are independent and identically distributed and independent of $(B_t)_{t \Ge 0}$.
+For \eqref{eq: sglm markov} the past before the step $k$ also contains $\xi_0, \dots, \xi_{k-1}$, and we define 
+\begin{equation}
+	\hat{\mathcal F}_k := \sigma\bigl( B_s ,\ \xi_j : 0 \Le s \Le kh ,\ 0 \Le j \Le k-1 \bigr) , \qquad
+	\hat{\mathbb E}_k[\,\cdot\,] := \mathbb E\bigl[\,\cdot\, \big| \hat{\mathcal F}_{k}\bigr] ,
+	\label{eq: sg filtration}
+\end{equation}
+so that $\chi_k$ and $\xi_k$ are independent of $\hat{\mathcal F}_k$, and $Y_k$ is $\hat{\mathcal F}_{k}$-measurable and $Z_k$ is $\hat{\mathcal F}_{k+1}$-measurable.
+
+Since $\chi_k$ is determined by the Brownian motion on $[kh,(k+1)h]$, we call \eqref{eq: lm markov} and \eqref{eq: sglm markov} the Markovian forms of LM and SGLM. The analysis through the discrete Poisson equation is carried out on the Markovian form $(Y_k)_{k \Ge 0}$, not on the original form $(Z_k)_{k \Ge 0}$, and their connection is made by the modified class of Section~\ref{sec: modified}. The Markovian form \eqref{eq: lm markov} has strong and weak order $1$ \citep{ye2026mse}, hence the second order discretization error of LM comes entirely from the Gaussian shift $\sqrt{h/2}\, \chi_k$ between $Y_k$ and $Z_k$.
+
+\subsection{Elliptic estimates of the discrete Poisson equation}
+\label{subsec: poisson}
+
+The generator of the overdamped Langevin dynamics \eqref{eq: langevin} is
+\begin{equation}
+    \mathcal L \psi = \Delta \psi - \nabla U \cdot \nabla \psi ,
+    \label{eq: generator}
+\end{equation}
+and $e^{t\mathcal L}$, $t \Ge 0$, is its semigroup, $e^{t\mathcal L} f(x) = \mathbb E^x[f(X_t)]$, where $X_t$ solves \eqref{eq: langevin} with $X_0 = x$. The Dirichlet form of $\mathcal L$ \citep{bakry2014analysis} gives the integration by parts
+\begin{equation}
+    \pi(g_1\, \mathcal L g_2) = -\pi(\nabla g_1 \cdot \nabla g_2)
+    \label{eq: generator ibp}
+\end{equation}
+for $g_1, g_2 \in C^2(\mathbb R^d)$ whose derivatives of orders $0$ to $2$ grow at most polynomially.
+
+For the test function $f$ of Assumption~\ref{ass: f}, the Kolmogorov solution $u(x,t) := e^{t\mathcal L} f(x) - \pi(f)$ solves the parabolic equation $\partial_t u = \mathcal L u$ with $u(\cdot,0) = f - \pi(f)$. By the exponential convergence of $u(x,t)$ established in Theorem~\ref{thm: u decay} below, the discrete Poisson solution \citep{lu2025mse, ye2026mse}
+\begin{equation}
+    \phi_h(x) := h \sum_{k=0}^{\infty} u(x,kh) = h\, \bigl( \mathcal I - e^{h\mathcal L} \bigr)^{-1} \bigl( f(x) - \pi(f) \bigr) ,
+    \label{eq: discrete poisson solution}
+\end{equation}
+with $\mathcal I$ the identity operator, is well defined and, by telescoping the series with $e^{h\mathcal L} u(\cdot, kh) = u(\cdot, (k+1)h)$ and the exponential decay \eqref{eq: u bound} of $u$, satisfies the discrete Poisson equation
+\begin{equation}
+    \frac{\phi_h(x) - (e^{h\mathcal L} \phi_h)(x)}{h} = f(x) - \pi(f) , \qquad x \in \mathbb R^d .
+    \label{eq: discrete poisson}
+\end{equation}
+As $h \to 0$, \eqref{eq: discrete poisson} formally becomes the continuous Poisson equation
+\begin{equation}
+    -\mathcal L \phi_0(x) = f(x) - \pi(f) , \qquad x \in \mathbb R^d ,
+    \label{eq: continuous poisson}
+\end{equation}
+studied in \citep{mattingly2010convergence, vollmer2016exploration, brosse2019tamed}. By \eqref{eq: u bound} of Theorem~\ref{thm: u decay} below, $\phi_0 = \int_0^\infty u(\cdot, t)\, \D t$ solves \eqref{eq: continuous poisson}, with derivatives of orders $1$ to $4$ bounded by $C L$ by \eqref{eq: continuous poisson bound}. Among the functions with a bounded gradient, \eqref{eq: continuous poisson} determines $\phi_0$ up to an additive constant, as the proof of Corollary~\ref{cor: bias coefficient} shows; only $\nabla^2 \phi_0$ enters the results below, so the constant is immaterial.
+
+\begin{theorem}
+\label{thm: u decay}
+    Let Assumptions~\ref{ass: U} and \ref{ass: f} hold. There are $\lambda > 0$ and $C$, depending only on $m$, $M$, $R$ and $d$, such that for all $x \in \mathbb R^d$ and $t \Ge 0$,
+    \begin{equation}
+        |u(x,t)| \Le C L\, (1 + |x|)\, e^{-\lambda t} , \qquad
+        \max_{1 \Le j \Le 4}\, \norm{\nabla^j u(x,t)} \Le C L\, e^{-\lambda t} .
+        \label{eq: u bound}
+    \end{equation}
+    Consequently, for every $h \in (0,\lambda^{-1}]$ the discrete Poisson solution \eqref{eq: discrete poisson solution} satisfies
+    \begin{equation}
+        \max_{1 \Le j \Le 4}\, \norm{\nabla^j \phi_h(x)} \Le C L , \qquad \forall x \in \mathbb R^d .
+        \label{eq: poisson bound}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{app: elliptic}.)}
+\end{theorem}
+
+Theorem~\ref{thm: u decay} requires one order of derivative of $u$ more than Theorem 1 of \citep{ye2026mse}, and its proof is almost the same; the details are given in Appendix~\ref{app: elliptic}. The proof uses the derivatives of $U$ up to order $5$ only, although Assumption~\ref{ass: U} provides bounds up to order $7$; the $2$ extra orders are consumed by the modified potential of Section~\ref{subsec: modified}, whose construction loses $2$ derivatives. Corollary~\ref{cor: modified poisson} applies it to the modified potential $\tilde U_h$ and the modified test function $\tilde f_h$, whose discrete Poisson solution is written $\tilde\phi_h$.
+
+\section{Modified class for the LM integrator}
+\label{sec: modified}
+
+The MSE \eqref{eq: mse} averages the test function along the samples $(Z_k)_{k \Ge 0}$ of the \eqref{eq: lm} integrator, while the analysis runs on the Markovian form \eqref{eq: lm markov}. The Gaussian shift between the two is absorbed by the \emph{modified class}: a modified test function $\tilde f_h$, a modified potential $\tilde U_h$ with its modified generator $\tilde{\mathcal L}_h$, and a modified discrete Poisson solution $\tilde\phi_h$. The modified class is local: its construction does not involve the long-time behavior. Section~\ref{subsec: modified test function} defines the modified test function $\tilde f_h$ as the heat flow of $f$, which splits the MSE into the time average error of the Markovian form and a bias against a reference measure. Section~\ref{subsec: modified} defines the modified potential $\tilde U_h$ by the correction that makes the bias of order $h^2$, cut off far from the origin so that the bounds of Assumption~\ref{ass: U} up to order $5$ hold uniformly in $h$, with $2M$ and $\frac m2$ in place of $M$ and $m$. Section~\ref{subsec: modified bias} proves that the bias against the modified target $\tilde\pi_h$ is of order $h^2$. Section~\ref{subsec: modified poisson} defines the modified generator $\tilde{\mathcal L}_h$ and the modified discrete Poisson solution $\tilde\phi_h$.
+
+\subsection{Modified test function $\tilde f_h$}
+\label{subsec: modified test function}
+
+The positions $Z_k$ and $Y_k$ in \eqref{eq: lm} and \eqref{eq: lm markov} differ by the Gaussian shift $\sqrt{h/2}\, \chi_k \sim \mathcal N(0, \frac h2 I_d)$, which is independent of $\mathcal F_{k}$. The conditional mean of $f(Z_k)$ given $\mathcal F_{k}$ is therefore the heat semigroup applied to $f$ at time $\frac h4$, evaluated at $Y_k$. This motivates the definition of the \emph{modified test function}
+\begin{equation}
+	\tilde f_h(y) := (e^{\frac h4\Delta }f)(y) = 
+	\mathbb E\biggl[ f\Bigl( y + \sqrt{\frac h2}\, \chi \Bigr) \biggr] , \quad \chi \sim \mathcal N(0, I_d) ,
+	\label{eq: heat shift}
+\end{equation}
+for which $\mathbb E_k\bigl[ f(Z_k) \bigr] = \tilde f_h(Y_k)$. Since $\tilde f_h$ is an average of translates of $f$, every derivative of $\tilde f_h$ is the same average of the corresponding derivative of $f$, and $\tilde f_h$ satisfies Assumption~\ref{ass: f} with the same constant $L$ for every $h$. Expanding $f$ about $y$ to the order $4$ along $\sqrt{h/2}\, \chi$,
+\begin{equation*}
+	f\Bigl( y + \sqrt{\frac h2}\, \chi \Bigr) = f(y) + \sqrt{\frac h2}\, \nabla f(y) \cdot \chi + \frac h4\, \nabla^2 f(y)[\chi, \chi] + \frac16 \Bigl( \frac h2 \Bigr)^{\frac32} \nabla^3 f(y)\bigl[ \chi^{\otimes 3} \bigr] + \varrho_4^{\chi}(y) , \quad |\varrho_4^{\chi}(y)| \Le \frac{L}{24} \Bigl( \frac h2 \Bigr)^2 |\chi|^4 .
+\end{equation*}
+Under the expectation the terms of odd order in $\chi$ vanish, hence
+\begin{equation}
+    \Bigl| \tilde f_h(y) - f(y) - \frac h4\, \Delta f(y) \Bigr| \Le \frac{L}{24}\, \Bigl( \frac h2 \Bigr)^2\, \mathbb E |\chi|^4 \Le C L h^2 , \qquad \forall y \in \mathbb R^d,
+    \label{eq: shift expansion}
+\end{equation}
+where $\Delta f = \mathrm{Tr}[\nabla^2 f] = \sum_{i=1}^d \partial_i^2 f$.
+The modified test function $\tilde f_h$ absorbs the Gaussian shift, so that the analysis runs on the positions $Y_k$ of the Markovian form \eqref{eq: lm markov} and not on the non-Markovian form \eqref{eq: lm}.
+
+The modified test function $\tilde f_h(Y_k)$ is an unbiased estimate of $f(Z_k)$ under $\mathcal F_{k}$. Define the difference $\mathfrak M_k := f(Z_k) - \tilde f_h(Y_k)$; then $\mathbb E_k[\mathfrak M_k] = 0$ by \eqref{eq: heat shift}, and since $f$ is $L$-Lipschitz,
+\begin{equation}
+    \mathbb E_k\bigl[ \mathfrak M_k^2 \bigr] \Le \mathbb E_k\Bigl[ \bigl| f(Z_k) - f(Y_k) \bigr|^2 \Bigr] \Le L^2\, \frac h2\, \mathbb E |\chi|^2 = \frac{d h}{2}\, L^2 .
+    \label{eq: martingale variance}
+\end{equation}
+The $\mathfrak M_k$ are $\mathcal F_{k+1}$-measurable martingale differences, so their sum has additive variance. For every probability measure $\rho$ on $\mathbb R^d$ with a finite first moment, inserting $f(Z_k) = \tilde f_h(Y_k) + \mathfrak M_k$ into the MSE \eqref{eq: mse}, applying Cauchy's inequality to the three resulting terms and then the additive variance with \eqref{eq: martingale variance} gives
+\begin{equation}
+\begin{aligned}
+    \MSE(N,h)
+    &= \mathbb E \Biggl[ \biggl| \frac1N \sum_{k=0}^{N-1} \bigl( \tilde f_h(Y_k) - \rho(\tilde f_h) \bigr) + \bigl( \rho(\tilde f_h) - \pi(f) \bigr) + \frac1N \sum_{k=0}^{N-1} \mathfrak M_k \biggr|^2 \Biggr] \\
+    &\Le 3\, \mathbb E \Biggl[ \biggl| \underbrace{\frac1N \sum_{k=0}^{N-1} \bigl( \tilde f_h(Y_k) - \rho(\tilde f_h) \bigr)}_{\text{time average error}} \biggr|^2 \Biggr] + 3\, \bigl( \underbrace{\rho(\tilde f_h) - \pi(f)}_{\text{modified bias}} \bigr)^2 + \frac{3 d L^2}{2}\, \frac{h}{N} .
+\end{aligned}
+    \label{eq: mse split}
+\end{equation}
+The term $\frac{3 d L^2}{2}\, \frac hN$ of \eqref{eq: mse split} is absorbed into $\frac{1}{Nh}$, so it remains to estimate the time average error and the modified bias. The measure $\rho$ is to be chosen so that the modified bias and the discretization part of the time average error are of order $h^2$.
+
+The measure $\rho$ cannot simply be $\pi$. With $\rho = \pi$, the expansion \eqref{eq: shift expansion} gives
+\begin{equation*}
+	\pi(\tilde f_h) - \pi(f) = \frac h4\, \pi(\Delta f) + \mathcal O(L h^2) ,
+\end{equation*}
+whose leading coefficient $\pi(\Delta f)$ is in general nonzero. The choice of $\rho$ has to compensate for the Laplacian term, so that the modified bias $\rho(\tilde f_h) - \pi(f)$ is of order $h^2$.
+
+\subsection{Modified potential $\tilde U_h$}
+\label{subsec: modified}
+
+We aim to find a distribution $\rho$ such that the modified bias $\rho(\tilde f_h) - \pi(f)$ is of order $h^2$. Since $\tilde f_h = f + \frac h4 \Delta f + \mathcal O(h^2)$ by \eqref{eq: shift expansion}, we consider the ansatz
+\begin{equation}
+	\rho \propto \exp\Bigl( - U - \frac h4\, V \Bigr) ,
+	\label{eq: ansatz}
+\end{equation}
+where $V$ is a function to be determined and the coefficient $\frac h4$ matches that of $\Delta f$ in \eqref{eq: shift expansion}. We derive $V = |\nabla U|^2 - \Delta U$ by a perturbation analysis. The perturbed potential $U + \frac h4 V$, once made rigorous by a cutoff far from the origin, is the \emph{modified potential} $\tilde U_h$, and its Boltzmann distribution $\tilde\pi_h \propto \exp(-\tilde U_h)$ is the \emph{modified target}. Finally, we prove the modified bias estimate $\tilde\pi_h(\tilde f_h) - \pi(f) = \mathcal O(h^2)$.
+
+\subsubsection*{Derivation of $V$ by perturbation}
+
+For a test function $\psi$, the ansatz \eqref{eq: ansatz} gives
+\begin{equation*}
+\rho(\psi) = \frac{\pi( \psi e^{-\frac h4 V} ) }{ \pi( e^{-\frac h4 V})} = \frac{\int_{\mathbb R^d} \psi e^{-U-\frac h4V}\D x}{\int_{\mathbb R^d} e^{-U-\frac h4V}\D x}.
+\end{equation*}
+Expanding $e^{-\frac h4 V} = 1 - \frac h4 V + \mathcal O(h^2)$ in the numerator and in the denominator of $\rho(\psi)$, we obtain
+\begin{equation}
+    \rho(\psi) = \pi(\psi) - \frac h4 \bigl( \pi(\psi V) - \pi(\psi)\, \pi(V) \bigr) + \mathcal O(h^2) ,
+    \label{eq: rho expansion}
+\end{equation}
+the term of order $h$ being $-\frac h4$ times the covariance of $\psi$ and $V$ under $\pi$. Taking $\psi = \tilde f_h$ in \eqref{eq: rho expansion} and inserting the expansion \eqref{eq: shift expansion} of the modified test function,
+\begin{equation}
+    \rho(\tilde f_h) - \pi(f) = \frac h4 \Bigl( \pi(\Delta f) - \pi(f V) + \pi(f)\, \pi(V) \Bigr) + \mathcal O( h^2) .
+    \label{eq: bias order h}
+\end{equation}
+The modified bias is therefore of order $h^2$ exactly when the term of order $h$ in \eqref{eq: bias order h} vanishes,
+\begin{equation}
+    \pi(\Delta f) = \pi(f V) - \pi(f)\, \pi(V) .
+    \label{eq: V condition}
+\end{equation}
+We look for a single $V$ satisfying \eqref{eq: V condition} for every $f$. The integration by parts \eqref{eq: generator ibp}, first with $g_1 = 1$ and $g_2 = f$ and then with $g_1 = f$ and $g_2 = U$, gives
+\begin{equation}
+    \pi(\Delta f) = \pi\bigl( \nabla f \cdot \nabla U \bigr) = \pi\bigl( f\, |\nabla U|^2 - f\, \Delta U \bigr) .
+    \label{eq: integration by parts}
+\end{equation}
+Hence we select the potential function
+\begin{equation}
+    V := |\nabla U|^2 - \Delta U = -\mathcal L U ,
+    \label{eq: V}
+\end{equation}
+for which $\pi(V) = -\pi(\mathcal L U) = 0$ by the invariance of $\pi$.
+This computation is formal, and the cutoff introduced below changes the measure \eqref{eq: ansatz}; Lemma~\ref{lem: shifted bias} proves the bias estimate for the modified target.
+
+\subsubsection*{Cutoff in the modified potential}
+
+The naive construction $U + \frac h4 V$ of the modified potential does not satisfy Assumption~\ref{ass: U}, because the derivatives of $|\nabla U|^2$ grow with $|x|$. Since Theorem~\ref{thm: u decay} must be applied to the modified potential with constants independent of $h$, the modification is cut off far from the origin. Fix a smooth cutoff function $\theta \in C^\infty(\mathbb R^d)$ with $0 \Le \theta \Le 1$, $\theta = 1$ on $\{|x| \Le 1\}$ and $\theta = 0$ on $\{|x| \Ge 2\}$. With $\delta \in (0,1]$ fixed by \eqref{eq: delta bound} in the proof of Lemma~\ref{lem: modified class} below, we define the modified potential by
+\begin{equation}
+    \tilde U_h := U + \frac h4\, V\, \theta_h , \qquad \theta_h(x) := \theta\Bigl( \frac{h x}{\delta} \Bigr) ,
+    \label{eq: modified potential}
+\end{equation}
+so that $\tilde U_h = U + \frac h4 V$ on the ball $\{|x| \Le \delta/h\}$ and $\tilde U_h = U$ on $\{|x| \Ge 2\delta/h\}$. In particular, since $0 \Le \theta_h \Le 1$ and $|V(y)| \Le C(1 + |y|)^2$ by Assumption~\ref{ass: U},
+\begin{equation}
+    |\tilde U_h(x) - U(x)| \Le \frac h4 \max_{|y| \Le 2\delta/h} |V(y)| \Le \frac{C}{h} , \qquad x \in \mathbb R^d .
+    \label{eq: modified potential difference}
+\end{equation}
+The modified target $\tilde\pi_h \propto e^{-\tilde U_h}$ is therefore a perturbation of $\pi$ by a bounded potential, although the bound \eqref{eq: modified potential difference} is not uniform in $h$. The derivatives of $\tilde U_h - U$ of orders $1$ to $5$, however, are bounded uniformly in $x$ and $h$: by \eqref{eq: modified class} in Lemma~\ref{lem: modified class} below they are at most $C h (1 + |x|)$, and they vanish for $|x| > 2\delta/h$.
+
+\begin{lemma}
+\label{lem: modified class}
+    Let Assumption~\ref{ass: U} hold. There are $\delta \in (0,1]$ and $h_0 \in (0, \delta]$ such that for every $h \in (0,h_0]$, the modified potential $\tilde U_h \in C^5(\mathbb R^d)$ satisfies
+    \begin{equation}
+        |\nabla \tilde U_h(0)| \Le 2M , \qquad \max_{2 \Le i \Le 5}\, \norm{\nabla^i \tilde U_h(x)} \Le 2M , \qquad \forall x \in \mathbb R^d ,
+        \label{eq: modified class bounds}
+    \end{equation}
+    the convexity condition $\nabla^2 \tilde U_h(x) \succeq \frac m2 I_d$ for $|x| \Ge R$, and
+    \begin{equation}
+        \max_{1 \Le i \Le 5}\, \norm{\nabla^i \tilde U_h(x) - \nabla^i U(x)} \Le C h \bigl( 1 + |x| \bigr) , \qquad \forall x \in \mathbb R^d .
+        \label{eq: modified class}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: modified class proof}.)}
+\end{lemma}
+
+Theorem~\ref{thm: u decay} therefore applies to $\tilde U_h$, since its proof uses the bounds of Assumption~\ref{ass: U} up to order $5$ only (Appendix~\ref{app: elliptic}). The constants, in particular the rate $\lambda$, depend only on $m$, $M$, $R$ and $d$, not on $h$. In the rest of the paper, the number $\delta$ is fixed by Lemma~\ref{lem: modified class} and absorbed into the constant $C$.
+
+\subsection{Estimation of the modified bias $\tilde\pi_h(\tilde f_h) - \pi(f)$}
+\label{subsec: modified bias}
+
+The cancellation \eqref{eq: V condition} between the heat flow of the test function and the modification of the potential holds for the modified target $\tilde\pi_h$ as it does for the ansatz \eqref{eq: ansatz}, since the cutoff acts only where $\pi$ has exponentially small mass. Lemma~\ref{lem: shifted bias} carries the perturbation argument that produced $V$ over to the modified target.
+
+\begin{lemma}
+\label{lem: shifted bias}
+    Let Assumption~\ref{ass: U} hold. For every $h \in (0,h_0]$ and every $f \in C^1(\mathbb R^d)$ with $\norm{\nabla f}_\infty < \infty$,
+    \begin{equation}
+        \bigl| \tilde\pi_h(\tilde f_h) - \pi(f) \bigr| \Le C h^2 \norm{\nabla f}_\infty .
+        \label{eq: shifted bias}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: shifted bias proof}.)}
+\end{lemma}
+
+\begin{remark}
+The Gaussian potential $U = \frac12 |x|^2$, taken without the cutoff, illustrates the modification. Here $V = |x|^2 - d$, so the modified potential equals $(1 + \frac h2) \frac{|x|^2}{2}$ up to an additive constant and $\tilde\pi_h$ has variance $(1 + \frac h2)^{-1}$ in each coordinate. The chain becomes $Y_{k+1} = (1-h) Y_k + \sqrt{2h}\,(1 - \frac h2)\, \chi_k$, whose stationary variance $1 - \frac h2$ agrees with that of $\tilde\pi_h$ up to $\mathcal O(h^2)$. The shifted variable $Z_k = Y_k + \sqrt{h/2}\, \chi_k$ has stationary variance $1$, in agreement with the exactness of \eqref{eq: lm} for Gaussian targets established in \citep[Remark~4.1]{vilmart2015postprocessed}.
+\end{remark}
+
+\subsection{Modified discrete Poisson equation $\tilde\phi_h$}
+\label{subsec: modified poisson}
+
+Let the \emph{modified dynamics} be the overdamped Langevin dynamics driven by the potential $\tilde U_h$,
+\begin{equation}
+    \D \tilde X_t = -\nabla \tilde U_h(\tilde X_t)\,\D t + \sqrt2\,\D B_t ,
+    \label{eq: modified langevin}
+\end{equation}
+with the \emph{modified generator}
+\begin{equation}
+    \tilde{\mathcal L}_h \psi = \Delta \psi - \nabla \tilde U_h \cdot \nabla \psi ,
+    \label{eq: modified generator}
+\end{equation}
+and its semigroup $e^{t\tilde{\mathcal L}_h}$. The invariant distribution of \eqref{eq: modified langevin} is the modified target $\tilde\pi_h$. The time average error in \eqref{eq: mse split} with $\rho = \tilde\pi_h$ is analyzed through the discrete Poisson equation of the modified generator \eqref{eq: modified generator}. Let $\tilde\phi_h$ be the discrete Poisson solution \eqref{eq: discrete poisson solution} with $\tilde{\mathcal L}_h$, $\tilde\pi_h$ and $\tilde f_h$ in place of $\mathcal L$, $\pi$ and $f$, so that
+\begin{equation}
+    \frac{\tilde\phi_h(x) - (e^{h\tilde{\mathcal L}_h} \tilde\phi_h)(x)}{h} = \tilde f_h(x) - \tilde\pi_h(\tilde f_h) , \qquad x \in \mathbb R^d .
+    \label{eq: modified poisson}
+\end{equation}
+
+\begin{corollary}
+\label{cor: modified poisson}
+    Let Assumptions~\ref{ass: U} and \ref{ass: f} hold. For every $h \in (0,h_0]$, $\tilde\phi_h$ is well defined and
+    \begin{equation}
+        \max_{1 \Le j \Le 4}\, \norm{\nabla^j \tilde\phi_h(x)} \Le C L , \qquad \forall x \in \mathbb R^d .
+        \label{eq: modified poisson bound}
+    \end{equation}
+\end{corollary}
+
+Corollary~\ref{cor: modified poisson} is Theorem~\ref{thm: u decay} applied to the modified class. By Lemma~\ref{lem: modified class}, $\tilde U_h$ satisfies the bounds that the proof of Theorem~\ref{thm: u decay} uses, and $\tilde f_h$ satisfies Assumption~\ref{ass: f} with the constant $L$. The constants in \eqref{eq: modified poisson bound} therefore depend only on $m$, $M$, $R$ and $d$, and the threshold $h_0$ includes $\lambda^{-1}$.
+
+\section{Local error of the LM integrators}
+\label{sec: local}
+
+This section compares one step of the Markovian form \eqref{eq: lm markov} with one step of the modified dynamics \eqref{eq: modified langevin}, and derives from this comparison the local weak error used in the MSE analysis. Section~\ref{subsec: bias cutoff} bounds the moments of the chain uniformly in time, so that the conditional one-step estimates can be averaged over the chain. It then bounds the sizes of a step and matches the moments of orders $1$ to $3$ of the chain and of the modified dynamics, with a mismatch of order $h^3$. Section~\ref{subsec: weak expansion} turns the matching into the local weak error of the LM integrator, and of the SGLM integrator, whose gradient noise adds an explicit term of order $h^2$ and a remainder of order $h^3$.
+
+Taking $\rho = \tilde\pi_h$ in \eqref{eq: mse split}, Lemma~\ref{lem: shifted bias} bounds the modified bias by $C L h^2$, and the MSE satisfies
+\begin{equation}
+    \MSE(N,h) \Le 3\, \mathbb E \Biggl[ \biggl| \underbrace{\frac1N \sum_{k=0}^{N-1} \bigl( \tilde f_h(Y_k) - \tilde\pi_h(\tilde f_h) \bigr)}_{\text{time average error}} \biggr|^2 \Biggr] + C L^2 \Big(h^4 + \frac{dh}{N}\Big).
+    \label{eq: mse split modified}
+\end{equation}
+The time average error is centered at $\tilde\pi_h(\tilde f_h)$, so it is controlled through the discrete Poisson equation of a dynamics that preserves $\tilde\pi_h$. This is the modified dynamics \eqref{eq: modified langevin}, whose discrete Poisson solution $\tilde\phi_h$ in \eqref{eq: modified poisson} has the right side $\tilde f_h - \tilde\pi_h(\tilde f_h)$. The discrete Poisson solution transfers local errors into the time average error \citep{lu2025mse, ye2026mse}. The local error studied in this section is therefore the error of one step of the Markovian form \eqref{eq: lm markov} against one step of the modified dynamics from the same state.
+
+Since the chains \eqref{eq: lm markov} and \eqref{eq: sglm markov} are time-homogeneous, statements about a single step are made at the index $0$ and apply at any $k$; Lemmas~\ref{lem: moments}, \ref{lem: weak} and \ref{lem: sg weak} are stated at the index $k$, in the form the MSE analysis uses. One step of the chain is
+\begin{equation}
+    Y_1 - Y_0 = \sqrt{2h}\, \chi_0 - h\, \nabla U(Z_0) , \qquad Z_0 = Y_0 + \sqrt{\frac h2}\, \chi_0 ,
+    \label{eq: chain step}
+\end{equation}
+where $\chi_0 \sim \mathcal N(0, I_d)$ is independent of $\mathcal F_0$. For each $k\Ge0$, let $(\tilde Y_k(t))_{t \Ge 0}$ solve the modified dynamics \eqref{eq: modified langevin} from $\tilde Y_k(0) = Y_k$, driven by $(B_{kh+t} - B_{kh})_{t \Ge 0}$, whose increment over $[0,h]$ is $\sqrt h\,\chi_k$, so that $\mathbb E_k[\psi(\tilde Y_k(h))] = (e^{h\tilde{\mathcal L}_h} \psi)(Y_k)$. The local error of one step of the chain against the modified dynamics is $Y_1 - \tilde Y_0(h)$.
+
+\subsection{Moment bounds and moment matching}
+\label{subsec: bias cutoff}
+
+The MSE analysis squares the polynomial weight of the local weak errors of Section~\ref{subsec: weak expansion}, and therefore needs moments of order $12$ of the chain, uniformly in time. The following lemma provides them. Its proof is standard and follows the Lyapunov function arguments in \citep{ye2026mse}, with Lemma~\ref{lem: modified class} for the modified dynamics.
+
+\begin{lemma}
+\label{lem: moments}
+    Let Assumption~\ref{ass: U} hold. There are $h_0 > 0$ and $C$ such that for the chain \eqref{eq: lm markov}, every $h \in (0,h_0]$ and every $k \Ge 0$,
+    \begin{equation}
+        \mathbb E |Y_k|^{12} \Le C \bigl( 1 + |Y_0| \bigr)^{12} , \qquad
+        \max\bigl\{ \mathbb E |\tilde Y_k(h) - Y_k|^{12} ,\; \mathbb E |Y_{k+1} - Y_k|^{12} \bigr\} \Le C h^{6} \bigl( 1 + |Y_0| \bigr)^{12} .
+        \label{eq: moment bounds}
+    \end{equation}
+    If Assumption~\ref{ass: sg} additionally holds, the same moment bounds hold for the chain \eqref{eq: sglm markov}, with the same $h_0$ and $C$. \emph{(Proof in Appendix~\ref{sec: moments proof}.)}
+\end{lemma}
+
+The next lemma bounds the size of one step of the chain and of the modified dynamics, and the size of the local error between them; these sizes control the remainders of all the expansions below.
+
+\begin{lemma}
+\label{lem: sizes}
+    Let Assumption~\ref{ass: U} hold. Then, for the chain \eqref{eq: lm markov} and every $s \in [0,h]$,
+    \begin{equation}
+        \pnorm{Y_1 - Y_0}_4 \Le C \sqrt h \bigl( 1 + |Y_0| \bigr) , \quad
+        \pnorm{\tilde Y_0(s) - Y_0}_4 \Le C \sqrt h \bigl( 1 + |Y_0| \bigr) , \quad
+        \pnorm{Y_1 - \tilde Y_0(h)}_4 \Le C h^{\frac32} \bigl( 1 + |Y_0| \bigr) ,
+        \label{eq: sizes}
+    \end{equation}
+    where $\pnorm{\cdot}_4$ is taken under $\mathbb E_0$. \emph{(Proof in Appendix~\ref{sec: sizes proof}.)}
+\end{lemma}
+
+The moments of one step of the modified dynamics and of the chain are expanded in Lemmas~\ref{lem: exact moments} and \ref{lem: step moments} of Appendix~\ref{app: local}. Compared with the exact dynamics \eqref{eq: langevin}, the chain matches the moments of orders $2$ and $3$ to $\mathcal O(h^3)$ but misses the mean by $\frac{h^2}{4}\nabla V$, with $V$ as in \eqref{eq: V}; the drift correction of the modified dynamics removes exactly this mismatch. The cutoff keeps the cancellation on the ball $\{|Y_0| \Le \delta/h\}$, and outside the ball the remaining mismatch is again of order $h^3$, because $h|Y_0|/\delta \Ge 1$ there.
+
+\begin{lemma}
+\label{lem: moment matching}
+    Let Assumption~\ref{ass: U} hold. Then, for the chain \eqref{eq: lm markov},
+    \begin{equation}
+        \Bigl\| \mathbb E_0\bigl[ (Y_1 - Y_0)^{\otimes j} \bigr] - \mathbb E_0\bigl[ (\tilde Y_0(h) - Y_0)^{\otimes j} \bigr] \Bigr\| \Le C h^3 \bigl( 1 + |Y_0| \bigr)^{6} , \qquad j = 1, 2, 3 .
+        \label{eq: moment matching}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: matching proof}.)}
+\end{lemma}
+
+\subsection{Local weak error expansion}
+\label{subsec: weak expansion}
+
+The local weak error of the LM integrator on a test function $G$ is $\mathbb E_0\bigl[ G(Y_1) - G(\tilde Y_0(h)) \bigr]$, and the MSE analysis takes $G = \tilde\phi_h$. Because the local error is of size $h^{\frac32}$, against $h^2$ for the SRK integrators of \citep{ye2026mse}, $G$ is expanded along a step to the order $3$: the terms of orders $1$ to $3$ are matched by Lemma~\ref{lem: moment matching}, and the remainder is controlled by Lemma~\ref{lem: sizes}. This is why Assumption~\ref{ass: f} asks for $4$ derivatives of $f$.
+
+\begin{lemma}
+\label{lem: weak}
+    Let Assumption~\ref{ass: U} hold and let $G \in C^4(\mathbb R^d)$ have bounded derivatives of orders $1$ to $4$. Then, for the chain \eqref{eq: lm markov} and every $k \Ge 0$,
+    \begin{equation}
+        \Bigl| \mathbb E_k \bigl[ G(Y_{k+1}) - G(\tilde Y_k(h)) \bigr] \Bigr|
+        \Le C h^3 \sum_{j=1}^{4} \norm{\nabla^j G}_\infty\, \bigl( 1 + |Y_k| \bigr)^{6} .
+        \label{eq: weak}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: weak proof}.)}
+\end{lemma}
+
+With the stochastic gradient, the gradient noise at $x$ has the covariance
+\begin{equation}
+    \mathcal C(x) := \mathbb E_\xi\Bigl[ \bigl( \nabla \hat U(x;\xi) - \nabla U(x) \bigr) \otimes \bigl( \nabla \hat U(x;\xi) - \nabla U(x) \bigr) \Bigr] , \qquad \mathrm{Tr}\bigl[ \mathcal C(x) \bigr] \Le \Sigma ,
+    \label{eq: covariance}
+\end{equation}
+where the bound on the trace is Assumption~\ref{ass: sg}. One step of \eqref{eq: sglm markov} adds to the step \eqref{eq: chain step} the gradient noise at $Z_0$, multiplied by $-h$. Given $\hat{\mathcal F}_0$ and $\chi_0$ this noise has mean $0$, so the mean of the step is unchanged, while its moment of order $2$ gains $h^2\, \hat{\mathbb E}_0[\mathcal C(Z_0)]$, as for \eqref{eq: sgld}.
+
+Lemma~\ref{lem: sg weak} keeps this gain as an explicit term of order $h^2$, bounded through \eqref{eq: trace bound} by $\frac{\Sigma h^2}{2}\, \norm{\nabla^2 G}_\infty$, against the order $h^3$ of \eqref{eq: weak}; the rest of the gradient noise also contributes only a remainder of order $h^3$.
+
+\begin{lemma}
+\label{lem: sg weak}
+    Let Assumptions~\ref{ass: U} and \ref{ass: sg} hold and let $G \in C^4(\mathbb R^d)$ have bounded derivatives of orders $1$ to $4$. Then, for the chain \eqref{eq: sglm markov} and every $k \Ge 0$,
+    \begin{equation}
+        \qquad \biggl| \hat{\mathbb E}_k \bigl[ G(Y_{k+1}) - G(\tilde Y_k(h)) \bigr] - \frac{h^2}{2}\, \nabla^2 G(Y_k) : \hat{\mathbb E}_k\bigl[ \mathcal C(Z_k) \bigr] \biggr| \\
+        \Le C h^3 \sum_{j=1}^{4} \norm{\nabla^j G}_\infty\, \bigl( 1 + |Y_k| \bigr)^{6} .
+    \label{eq: sg weak}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: sg weak proof}.)}
+\end{lemma}
+
+\section{Main results on the LM integrators}
+\label{sec: mse}
+
+This section states the main results: the MSE bounds for the samples of the \eqref{eq: lm} and \eqref{eq: sglm} integrators in Section~\ref{subsec: mse analysis}, the numerical bias of SGLM in Section~\ref{subsec: numerical bias}, its comparison with the numerical bias of \eqref{eq: sgld} in Section~\ref{subsec: sgld}, and the explicit coefficients of $h$ in $\mathcal W_1(\pi_h, \pi)$ and $\mathcal W_1(\bar\pi_h, \pi)$, given by the Riesz representors, with their comparison over the batch size, in Section~\ref{subsec: w1}. Their proofs are in Appendices~\ref{app: mse}, \ref{app: bias}, \ref{app: sgld} and \ref{app: w1}.
+
+\subsection{MSE analysis of SGLM}
+\label{subsec: mse analysis}
+
+The samples of the \eqref{eq: lm} and \eqref{eq: sglm} integrators start from a given $Z_0 \in \mathbb R^d$. The analysis below runs on the Markovian form from a given $Y_0$, with $Z_k = Y_k + \sqrt{h/2}\,\chi_k$ for every $k \Ge 0$; Appendix~\ref{app: mse} applies it to the samples from $Z_0$ by starting the Markovian form at $Y_1 = Z_0 - h\nabla U(Z_0) + \sqrt{h/2}\,\chi_0$, with $\nabla \hat U(Z_0;\xi_0)$ in place of $\nabla U(Z_0)$ for SGLM, so that $Z_k = Y_k + \sqrt{h/2}\,\chi_k$ for every $k \Ge 1$.
+
+With $\rho = \tilde\pi_h$, the MSE satisfies \eqref{eq: mse split modified}, and it remains to bound its time average error. Telescoping $\tilde\phi_h(Y_{k+1}) - \tilde\phi_h(Y_k)$ along the chain of the Markovian form, with the solution $\tilde\phi_h$ of \eqref{eq: modified poisson}, gives the time-averaged error formula of \citep{lu2025mse, ye2026mse},
+\begin{equation}
+    \frac1N \sum_{k=0}^{N-1} \bigl( \tilde f_h(Y_k) - \tilde\pi_h(\tilde f_h) \bigr)
+    = \frac{\tilde\phi_h(Y_0) - \tilde\phi_h(Y_N)}{Nh} + \frac1N \sum_{k=0}^{N-1} \Upsilon_k + \frac1N \sum_{k=0}^{N-1} \Psi_k ,
+    \label{eq: time average formula}
+\end{equation}
+with the discretization term and the martingale difference
+\begin{equation}
+    \Upsilon_k := \frac{\tilde\phi_h(Y_{k+1}) - \tilde\phi_h(\tilde Y_k(h))}{h} , \qquad
+    \Psi_k := \frac{\tilde\phi_h(\tilde Y_k(h)) - \tilde\phi_h(Y_k)}{h} + \tilde f_h(Y_k) - \tilde\pi_h(\tilde f_h) .
+    \label{eq: Upsilon Psi}
+\end{equation}
+The conditional mean of $\Upsilon_k$, under $\mathbb E_k$ for \eqref{eq: lm} and $\hat{\mathbb E}_k$ for \eqref{eq: sglm}, is the local weak error of Lemmas~\ref{lem: weak} and \ref{lem: sg weak} with $G = \tilde\phi_h$, divided by $h$; the lemmas apply because \eqref{eq: modified poisson bound} bounds the derivatives of $\tilde\phi_h$ of orders $1$ to $4$ by $C L$. The term $\Psi_k$ has conditional mean $0$ by \eqref{eq: modified poisson}.
+
+\begin{theorem}
+\label{thm: lm mse}
+    Let Assumptions~\ref{ass: U} and \ref{ass: f} hold, and let $(Z_k)_{k \Ge 0}$ be the samples of \eqref{eq: lm} from a given $Z_0 \in \mathbb R^d$. Then, for every $h \in (0,h_0]$ and every $N \Ge 1$,
+    \begin{equation}
+        \MSE(N,h) \Le C L^2 \biggl[ \bigl( 1 + |Z_0| \bigr)^2 \frac{1}{Nh} + \bigl( 1 + |Z_0| \bigr)^{12} h^4 \biggr] .
+        \label{eq: lm mse}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: lm mse proof}.)}
+\end{theorem}
+
+The term $\frac{1}{Nh}$ is the order of the variance of a time average over a trajectory of length $Nh$, and $h^4$ is the square of the bias of order $h^2$ of \eqref{eq: lm}, which comes from Lemma~\ref{lem: shifted bias} and \eqref{eq: weak}. Balancing them gives, for $N \Ge h_0^{-5}$, the step $h = N^{-\frac15} \Le h_0$ and $\MSE(N,h) \Le C L^2 (1+|Z_0|)^{12} N^{-\frac45}$.
+
+For the stochastic gradient, the explicit term of Lemma~\ref{lem: sg weak}, divided by $h$, adds to the conditional mean of $\Upsilon_k$ a term of order $\Sigma h$, whose square gives the order $\Sigma^2 h^2$ in \eqref{eq: sglm mse}.
+
+\begin{theorem}
+\label{thm: sglm mse}
+    Let Assumptions~\ref{ass: U}, \ref{ass: f} and \ref{ass: sg} hold, and let $(Z_k)_{k \Ge 0}$ be the samples of \eqref{eq: sglm} from a given $Z_0 \in \mathbb R^d$. Then, for every $h \in (0,h_0]$ and every $N \Ge 1$,
+    \begin{equation}
+        \MSE(N,h) \Le C L^2 \biggl[ \bigl( 1 + |Z_0| \bigr)^2 \Bigl( \frac{1}{Nh} + \Sigma^2 h^2 \Bigr) + \bigl( 1 + |Z_0| \bigr)^{12} h^4 \biggr] .
+        \label{eq: sglm mse}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: sglm mse proof}.)}
+\end{theorem}
+
+With a batch of $P$ independent stochastic gradients, the chain \eqref{eq: sglm} reads
+\begin{equation*}
+    Z_{k+1} = Z_k - \frac hP \sum_{p=1}^{P} \nabla \hat U\bigl(Z_k; \xi_k^{(p)}\bigr) + \sqrt{\frac h2}\, \bigl( \chi_k + \chi_{k+1} \bigr) ,
+\end{equation*}
+with $\xi_k^{(1)}, \dots, \xi_k^{(P)}$ independent and drawn afresh at every step. By Minkowski's inequality, the averaged estimator keeps the bound $M(1 + |x|)$ on its $L^{12}$ norm and the bound on its Hessian, uniformly in $P$, and its variance is at most $\Sigma/P$, so it satisfies Assumption~\ref{ass: sg} with $\Sigma/P$ in place of $\Sigma$; the proof of Theorem~\ref{thm: sglm mse} is unchanged, and \eqref{eq: sglm mse} holds with $\Sigma^2 h^2 / P^2$ in place of $\Sigma^2 h^2$. A batch of size $P \asymp h^{-1}$ therefore recovers the order $h^4$ of \eqref{eq: lm mse}.
+
+\subsection{Numerical bias estimate of SGLM}
+\label{subsec: numerical bias}
+
+The MSE bounds control the time average along one trajectory. This subsection identifies the long-time limit of that average for \eqref{eq: sglm}, and its distance to $\pi$, the numerical bias. The Markovian form \eqref{eq: sglm markov} is ergodic by Harris's ergodic theorem \citep{hairer2008yet}, applied with the drift condition behind Lemma~\ref{lem: moments} and a minorization that uses the Hessian bound of Assumption~\ref{ass: sg}.
+
+\begin{lemma}
+\label{lem: invariant}
+    Let Assumptions~\ref{ass: U} and \ref{ass: sg} hold. For every $h \in (0,h_0]$, \eqref{eq: sglm markov} has a unique invariant distribution $\mu_h$, with $\mu_h(|y|^{12}) \Le C$. Let $\pi_h := \mu_h * \mathcal N(0, \frac h2 I_d)$. Then, for every $f$ satisfying Assumption~\ref{ass: f} and every given $Z_0 \in \mathbb R^d$, the samples of \eqref{eq: sglm} satisfy
+    \begin{equation}
+        \lim_{N \to \infty} \frac1N \sum_{k=0}^{N-1} f(Z_k) = \pi_h(f) \qquad \text{almost surely} .
+        \label{eq: ergodic limit}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: invariant proof}.)}
+\end{lemma}
+
+The measure $\pi_h$ is determined by the chain \eqref{eq: sglm markov} alone, through $\mu_h$, and does not depend on the initial value $Z_0$. Since \eqref{eq: sglm} is not Markovian, it has no invariant distribution in the usual sense; by \eqref{eq: ergodic limit}, the measure $\pi_h$ can be viewed as the numerical invariant distribution of SGLM.
+
+The next theorem expands the numerical bias $\pi_h(f) - \pi(f)$ to the order $h$, with a coefficient given by $\tilde\phi_h$ and the covariance of the gradient noise, defined in \eqref{eq: covariance} as
+\begin{equation*}
+    \mathcal C(x) = \mathbb E_\xi\Bigl[ \bigl( \nabla \hat U(x;\xi) - \nabla U(x) \bigr) \otimes \bigl( \nabla \hat U(x;\xi) - \nabla U(x) \bigr) \Bigr] , \qquad x \in \mathbb R^d .
+\end{equation*}
+The bias estimate follows the same strategy as that of SG-UBU in \citep[Section~3.4]{lu2025mse}. Since $\mathcal C(x)$ is positive semidefinite, Assumption~\ref{ass: sg} gives $\norm{\mathcal C(x)} \Le \mathrm{Tr}\bigl[ \mathcal C(x) \bigr] \Le \Sigma$.
+
+\begin{theorem}
+\label{thm: numerical bias}
+    Let Assumptions~\ref{ass: U}, \ref{ass: f} and \ref{ass: sg} hold. For every $h \in (0,h_0]$, with $Y_0 \sim \mu_h$, $\chi_0 \sim \mathcal N(0,I_d)$ independent of $Y_0$, and $Z_0 = Y_0 + \sqrt{h/2}\,\chi_0$, so that $Z_0 \sim \pi_h$, the numerical invariant distribution of \eqref{eq: sglm},
+    \begin{equation}
+        \Bigl| \pi_h(f) - \pi(f) - \frac h2\, \mathbb E\bigl[ \nabla^2 \tilde\phi_h(Y_0) : \mathcal C(Z_0) \bigr] \Bigr| \Le C L h^2 .
+        \label{eq: numerical bias}
+    \end{equation}
+    In particular, $|\pi_h(f) - \pi(f)| \Le C L ( \Sigma h + h^2 )$. \emph{(Proof in Appendix~\ref{sec: numerical bias proof}.)}
+\end{theorem}
+
+The bound $C L (\Sigma h + h^2)$ of Theorem~\ref{thm: numerical bias} follows from the uniform bound \eqref{eq: modified poisson bound} on the modified discrete Poisson solution $\tilde\phi_h$, together with $\norm{\mathcal C(x)} \Le \Sigma$. As $h \to 0$, the coefficient $\frac12\, \mathbb E\bigl[ \nabla^2 \tilde\phi_h(Y_0) : \mathcal C(Z_0) \bigr]$ of $h$ in \eqref{eq: numerical bias} converges to an expression in the solution $\phi_0$ of the continuous Poisson equation \eqref{eq: continuous poisson}.
+
+\begin{corollary}
+\label{cor: bias coefficient}
+    Let Assumptions~\ref{ass: U}, \ref{ass: f} and \ref{ass: sg} hold. Then, for \eqref{eq: sglm},
+    \begin{equation}
+        \lim_{h \to 0} \frac{\pi_h(f) - \pi(f)}{h} = \frac12\, \pi\bigl( \nabla^2 \phi_0(x) : \mathcal C(x) \bigr) .
+        \label{eq: bias coefficient}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: bias coefficient proof}.)}
+\end{corollary}
+
+Corollary~\ref{cor: bias coefficient} gives a rigorous characterization of the linear part of the numerical bias of \eqref{eq: sglm}: its coefficient of order $h$ comes entirely from the covariance $\mathcal C(x)$ of the stochastic gradient, and vanishes with the full gradient. This is intrinsically different from \eqref{eq: sgld}, whose numerical bias carries a first order discretization error even with the full gradient, so that its coefficient of order $h$ remains nonzero for some test functions as the variance of the stochastic gradient tends to zero (Corollary~\ref{cor: w1 limits}). For SG-UBU, the corresponding limit is identified only formally in \citep{lu2025mse}; for SGLM, Corollary~\ref{cor: bias coefficient} makes the coefficient explicit and proves the limit.
+
+Linear response theory \citep{kubo1957statistical, hairer2010simple} explains the coefficient \eqref{eq: bias coefficient} formally. To first order in $h$, the gradient noise of \eqref{eq: sglm} adds the diffusion $\frac h2\, \mathcal C : \nabla^2$ to the generator \eqref{eq: generator}, and the invariant distribution responds to this perturbation by $\frac h2\, \pi(\nabla^2 \phi_0 : \mathcal C)$ for the test function $f$. The invariant distributions of Langevin integrators are viewed in the same way, as perturbations of $\pi$ depending on the step size, in \citep{leimkuhler2015computation}. With the solution of the continuous Poisson equation \eqref{eq: continuous poisson} written as $\phi_0 = \int_0^\infty e^{t\mathcal L} \bigl( f - \pi(f) \bigr) \D t$, two integrations by parts give the Green--Kubo form \citep{green1954markoff, kubo1957statistical} of the coefficient,
+\begin{equation*}
+    \frac12\, \pi\bigl( \nabla^2 \phi_0 : \mathcal C \bigr) = \frac12 \int_0^\infty \pi\Bigl( \pi^{-1}
+     \nabla^2 : (\mathcal C \pi)\; e^{t\mathcal L} \bigl( f - \pi(f) \bigr) \Bigr) \D t , \qquad \nabla^2 : (\mathcal C \pi) = \sum_{i,j=1}^d \partial_i \partial_j \bigl( \mathcal C_{ij}\, \pi \bigr) ,
+\end{equation*}
+that is, the time integral of the correlation between $\pi^{-1} \nabla^2 : (\mathcal C \pi)$ at the initial value and $f$ at the time $t$, along \eqref{eq: langevin} started from $\pi$.
+
+\subsection{Numerical bias comparison with SGLD}
+\label{subsec: sgld}
+
+The MSE analysis through the discrete Poisson equation applies to \eqref{eq: sgld} without extra effort: the samples of SGLD form a Markov chain, so no modified class is needed, and the time-averaged error formula \eqref{eq: time average formula} holds with $Z_k$, $f$, $\pi(f)$, the discrete Poisson solution $\phi_h$ of \eqref{eq: discrete poisson solution} and the solution $X_h$ of \eqref{eq: langevin} from $X_0 = Z_k$ in place of $Y_k$, $\tilde f_h$, $\tilde\pi_h(\tilde f_h)$, $\tilde\phi_h$ and $\tilde Y_k(h)$. For the samples of SGLD from a given $Z_0 \in \mathbb R^d$, it gives
+\begin{equation}
+    \MSE(N,h) = \mathcal O\Bigl( \frac{1}{Nh} + \Sigma^2 h^2 + h^2 \Bigr) ,
+    \label{eq: sgld mse}
+\end{equation}
+with the constant depending also on $L$ and $Z_0$. The term $\Sigma^2 h^2$ comes from the gradient noise, as in \eqref{eq: sglm mse}, and the last term $h^2$ from the discretization error of EM, where \eqref{eq: sglm mse} has $h^4$. Since $\Sigma \Le M^2$, \eqref{eq: sgld mse} reduces to $\MSE(N,h) = \mathcal O\bigl( (Nh)^{-1} + h^2 \bigr)$, the bound already proved through the continuous Poisson equation \eqref{eq: continuous poisson} \citep[Theorem~9]{vollmer2016exploration}, \citep[Theorem~3]{chen2015convergence}, and we do not restate its proof.
+
+The arguments of Lemma~\ref{lem: invariant}, based on Harris's ergodic theorem, show that \eqref{eq: sgld} has a unique invariant distribution $\bar\pi_h$, with $\bar\pi_h(|x|^{12}) \Le C$, and that the time averages of $f$ along SGLD converge almost surely to $\bar\pi_h(f)$ (Lemma~\ref{lem: sgld invariant} in Appendix~\ref{app: sgld}). The invariant distribution $\bar\pi_h$ differs from the numerical invariant distribution $\pi_h$ of \eqref{eq: sglm} in the coefficient of order $h$ of the numerical bias. In the next theorem, this coefficient carries, besides the covariance $\mathcal C(x)$ of the gradient noise, the one-step error of EM against \eqref{eq: langevin}, through $\nabla^2 U\, \nabla U - \nabla \Delta U$ in the mean of the step and the Hessian $\nabla^2 U$ in its moment of order $2$.
+
+\begin{theorem}
+\label{thm: sgld bias}
+    Let Assumptions~\ref{ass: U}, \ref{ass: f} and \ref{ass: sg} hold. For every $h \in (0,h_0]$, with $Z_0 \sim \bar\pi_h$, the invariant distribution of \eqref{eq: sgld},
+    \begin{equation}
+    \begin{aligned}
+        & \biggl| \bar\pi_h(f) - \pi(f) - \frac h2\, \mathbb E\Bigl[ \nabla^2 \phi_h(Z_0) : \bigl( 2\nabla^2 U(Z_0) + \mathcal C(Z_0) \bigr) \Bigr] \\
+        & \quad + \frac h2\, \mathbb E\Bigl[ \nabla \phi_h(Z_0) \cdot \bigl( \nabla^2 U(Z_0)\, \nabla U(Z_0) - \nabla \Delta U(Z_0) \bigr) \Bigr] \biggr| \Le C L h^2 .
+    \end{aligned}
+        \label{eq: sgld bias}
+    \end{equation}
+    In particular, $|\bar\pi_h(f) - \pi(f)| \Le C L h$. \emph{(Proof in Appendix~\ref{sec: sgld bias proof}.)}
+\end{theorem}
+
+As $h \to 0$, the coefficient of $h$ in \eqref{eq: sgld bias} converges to an expression in the solution $\phi_0$ of \eqref{eq: continuous poisson}, in which only the Hessian $\nabla^2 \phi_0$ remains.
+
+\begin{corollary}
+\label{cor: sgld coefficient}
+    Let Assumptions~\ref{ass: U}, \ref{ass: f} and \ref{ass: sg} hold. Then, for \eqref{eq: sgld},
+    \begin{equation}
+        \lim_{h \to 0} \frac{\bar\pi_h(f) - \pi(f)}{h} = \frac12\, \pi\Bigl( \nabla^2 \phi_0(x) : \bigl( \nabla^2 U(x) + \mathcal C(x) \bigr) \Bigr) .
+        \label{eq: sgld coefficient}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: sgld coefficient proof}.)}
+\end{corollary}
+
+Corollary~\ref{cor: sgld coefficient} is not entirely new: the coefficient of order $h$ of the numerical bias of \eqref{eq: sgld} has been studied formally in \citep[Section~4.1]{vollmer2016exploration}, for $d = 1$ and under the assumption that the chain is ergodic, where the gradient noise adds to the coefficient of EM a term in the variance of the stochastic gradient, and the modified SGLD of \citep[Section~4.2]{vollmer2016exploration} removes this term. Corollary~\ref{cor: sgld coefficient} proves the limit in $\mathbb R^d$ and writes the coefficient in terms of the solution $\phi_0$ of \eqref{eq: continuous poisson}. The \eqref{eq: sglm} integrator treats the discretization bias in a different and clean way: it preserves the second order discretization error of the LM integrator, so its coefficient \eqref{eq: bias coefficient} carries the gradient noise only.
+
+\begin{remark}
+Corollary~\ref{cor: sgld coefficient} also requires the stochastic gradient to have a finite moment of high order, as in Assumption~\ref{ass: sg}. For \eqref{eq: sgld} with a strongly convex potential, \citep[Theorem~1]{paulin2026sgld} bounds the numerical bias in $\mathcal W_2$ by a term of order $h$ if the moment of order $4$ of the gradient noise under $\pi$ is finite; if only the moment of order $2$ is finite, the bound could deteriorate to the order $h^{\frac12}$.
+% and a spiked gradient noise of fixed variance shows that this order cannot be improved uniformly over such noises \citep[Lemma~1]{paulin2026sgld}, so that a coefficient of order $h$ no longer makes sense under $W_2$.
+\end{remark}
+
+The coefficients \eqref{eq: bias coefficient} of \eqref{eq: sglm} and \eqref{eq: sgld coefficient} of \eqref{eq: sgld} differ by $\frac12\, \pi\bigl( \nabla^2 \phi_0(x) : \nabla^2 U(x) \bigr)$, the contribution of the discretization error of EM. This term does not depend on the gradient noise: it is the coefficient of SGLD with the full gradient, and it remains at every batch size. The coefficient of SGLM, by contrast, vanishes with $\mathcal C(x)$, and with a batch of $P$ independent stochastic gradients, whose average has the covariance $\mathcal C(x)/P$, it is divided by $P$. For a given test function, the two coefficients are not ordered in absolute value, since $\nabla^2 \phi_0$ is indefinite in general and the terms in $\nabla^2 U(x)$ and in $\mathcal C(x)$ can have opposite signs. Section~\ref{subsec: w1} compares the suprema of their absolute values over the test functions with $\norm{\nabla f}_\infty \Le 1$, and Lemma~\ref{lem: w1 counterexample} gives a gradient noise for which even the supremum of the absolute value of the coefficient of SGLD over these test functions is smaller than that of SGLM.
+
+The expectation in \eqref{eq: sgld bias} contains the gradient $\nabla \phi_h$, through the error of EM in the mean of the step, while the limit \eqref{eq: sgld coefficient} of Corollary~\ref{cor: sgld coefficient} contains the Hessian $\nabla^2 \phi_0$ only. The two forms are connected by an integration by parts that holds under $\pi$ and is not available under $\bar\pi_h$. By \eqref{eq: generator}, for each component $i$,
+\begin{equation*}
+    \mathcal L(\partial_i U) = \Delta \partial_i U - \nabla U \cdot \nabla \partial_i U = \bigl( \nabla \Delta U - \nabla^2 U\, \nabla U \bigr)_i ,
+\end{equation*}
+so the vector multiplying $\nabla \phi_h$ in \eqref{eq: sgld bias} is, componentwise, minus the generator applied to $\nabla U$,
+\begin{equation}
+    \nabla^2 U\, \nabla U - \nabla \Delta U = -\mathcal L \nabla U .
+    \label{eq: mean error generator}
+\end{equation}
+For every $\psi \in C^3(\mathbb R^d)$ with bounded derivatives of orders $1$ to $3$, \eqref{eq: generator ibp} with $g_1 = \partial_i \psi$ and $g_2 = \partial_i U$, summed over $i$, and \eqref{eq: mean error generator} give
+\begin{equation}
+\begin{aligned}
+    & \pi\Bigl( \nabla \psi(x) \cdot \bigl( \nabla^2 U(x)\, \nabla U(x) - \nabla \Delta U(x) \bigr) \Bigr) = -\sum_{i=1}^{d} \pi\bigl( \partial_i \psi(x)\, \mathcal L \partial_i U(x) \bigr) \\
+    & \quad = \sum_{i=1}^{d} \pi\bigl( \nabla \partial_i \psi(x) \cdot \nabla \partial_i U(x) \bigr) = \pi\bigl( \nabla^2 \psi(x) : \nabla^2 U(x) \bigr) .
+\end{aligned}
+    \label{eq: sgld integration by parts}
+\end{equation}
+
+At a fixed step size, the expectation in \eqref{eq: sgld bias} is taken under $\bar\pi_h$, while \eqref{eq: sgld integration by parts} with $\psi = \phi_h$ holds under $\pi$. Moving the terms of order $h$ from $\bar\pi_h$ to $\pi$ within the remainder $C L h^2$ requires Theorem~\ref{thm: sgld bias} for a test function built from $\nabla \phi_h$ and $\nabla^2 \phi_h$, whose derivatives of orders $1$ to $4$ involve the derivatives of $\phi_h$ up to order $6$, beyond the order $4$ of Theorem~\ref{thm: u decay}. The gradient $\nabla \phi_h$ therefore stays in \eqref{eq: sgld bias}.
+
+As $h \to 0$, $\bar\pi_h$ converges weakly to $\pi$ with moments bounded uniformly in $h$, and $\nabla \phi_h$ and $\nabla^2 \phi_h$ converge to $\nabla \phi_0$ and $\nabla^2 \phi_0$ uniformly on compact sets, so the expectation in \eqref{eq: sgld bias} converges to the same expression under $\pi$. There \eqref{eq: sgld integration by parts} with $\psi = \phi_0$ applies, and the term in $\nabla \phi_0$ cancels half of the term in $2 \nabla^2 U$. Theorem~\ref{thm: sgld bias} thus holds at every step size $h \in (0,h_0]$ with a remainder of order $h^2$ but keeps both $\nabla \phi_h$ and $\nabla^2 \phi_h$, while the Hessian form of the coefficient in Corollary~\ref{cor: sgld coefficient} is reached only in the limit $h \to 0$, without a rate.
+
+The gap between Theorem~\ref{thm: sgld bias} and Corollary~\ref{cor: sgld coefficient} also reveals a feature of the discrete Poisson equation. The solution $\phi_h$ of \eqref{eq: discrete poisson} compares one step of \eqref{eq: sgld} with one step of \eqref{eq: langevin}, so only the differences of their moments enter, and the derivatives of $\phi_h$ up to order $4$ suffice for the nonasymptotic bound \eqref{eq: sgld bias}. The solution $\phi_0$ of \eqref{eq: continuous poisson} compares one step of SGLD with the generator $\mathcal L$ instead: the coefficient of order $h$ then involves the derivatives of $\phi_0$ up to order $4$, and a remainder of order $h^2$ requires those up to order $6$, beyond Theorem~\ref{thm: u decay}. With $\phi_0$ alone, the terms that do not cancel at a fixed step size are therefore hard to characterize under the present assumptions.
+
+\subsection{Explicit coefficient in Wasserstein-1 error}
+\label{subsec: w1}
+
+The coefficients \eqref{eq: bias coefficient} and \eqref{eq: sgld coefficient} depend on the test function $f$ through $\nabla^2 \phi_0$. The suprema of their absolute values over the test functions with $\norm{\nabla f}_\infty \Le 1$ are the limits of $\mathcal W_1(\pi_h, \pi)/h$ and $\mathcal W_1(\bar\pi_h, \pi)/h$ as $h \to 0$ (Corollary~\ref{cor: w1 limits}). To evaluate these suprema, both coefficients are written as $\pi(f \psi)$, with a function $\psi$ that does not depend on $f$. The construction of $\psi$ uses the Poincar\'e inequality of $\pi$.
+
+\begin{lemma}
+\label{lem: poincare}
+    Let Assumption~\ref{ass: U} hold. There is a constant $C_P$, depending only on $m$, $M$, $R$ and $d$, such that
+    \begin{equation}
+        \pi\bigl( (g - \pi(g))^2 \bigr) \Le C_P\, \pi\bigl( |\nabla g|^2 \bigr)
+        \label{eq: poincare}
+    \end{equation}
+    for every $g \in C^1(\mathbb R^d)$ with a bounded gradient.\\[4pt]
+    \emph{(Directly derived from \citep[Corollary~1.6 and Theorem~1.4]{bakry2008simple}; see Appendix~\ref{sec: riesz well-posedness} for further discussion.)}
+\end{lemma}
+
+For a bounded measurable function $\mathcal A : \mathbb R^d \to \mathbb R^{d \times d}$ such that $\mathcal A(x)$ is a symmetric matrix for every $x \in \mathbb R^d$, define the Riesz representor of $\mathcal A$ as the function $\psi_{\mathcal A} \in L^2(\pi)$ with $\pi(\psi_{\mathcal A}) = 0$ and
+\begin{equation}
+    \pi\bigl( \psi_{\mathcal A}(x)\, (-\mathcal L \omega)(x) \bigr) = \pi\bigl( \nabla^2 \omega(x) : \mathcal A(x) \bigr)
+    \label{eq: riesz}
+\end{equation}
+for every $\omega \in C^4(\mathbb R^d)$ with bounded derivatives of orders $1$ to $4$. The next theorem shows that the Riesz representor is well defined.
+
+\begin{theorem}
+\label{thm: riesz}
+    Let Assumption~\ref{ass: U} hold, and let $\mathcal A : \mathbb R^d \to \mathbb R^{d \times d}$ be bounded and measurable, with $\mathcal A(x)$ a symmetric matrix for every $x \in \mathbb R^d$. There is a unique $\psi_{\mathcal A} \in L^2(\pi)$ with $\pi(\psi_{\mathcal A}) = 0$ that satisfies \eqref{eq: riesz} for every $\omega \in C^4(\mathbb R^d)$ with bounded derivatives of orders $1$ to $4$, the map $\mathcal A \mapsto \psi_{\mathcal A}$ is linear, and
+    \begin{equation}
+        \pi\bigl( \psi_{\mathcal A}^2 \bigr) \Le d\, (1 + M C_P) \norm{\mathcal A}_\infty^2 ,
+        \label{eq: riesz bound}
+    \end{equation}
+    with $C_P$ the constant of Lemma~\ref{lem: poincare}.
+    \emph{(Proof in Appendix~\ref{sec: riesz well-posedness}.)}
+\end{theorem}
+
+For $f$ satisfying Assumption~\ref{ass: f}, \eqref{eq: riesz} with $\omega = \phi_0$ gives $\pi(\nabla^2 \phi_0 : \mathcal A) = \pi(f \psi_{\mathcal A})$, so the coefficients \eqref{eq: bias coefficient} and \eqref{eq: sgld coefficient} read
+\begin{equation}
+    \lim_{h \to 0} \frac{\pi_h(f) - \pi(f)}{h} = \frac12\, \pi( f \psi_{\mathcal C} ) , \qquad
+    \lim_{h \to 0} \frac{\bar\pi_h(f) - \pi(f)}{h} = \frac12\, \pi\bigl( f\, ( \psi_{\nabla^2 U} + \psi_{\mathcal C} ) \bigr) .
+    \label{eq: coefficients riesz}
+\end{equation}
+
+The representor of the Hessian $\nabla^2 U$ is explicit. The vector $\nabla^2 U\, \nabla U - \nabla \Delta U$ in \eqref{eq: mean error generator} is the gradient of $\frac12 |\nabla U|^2 - \Delta U$, so \eqref{eq: sgld integration by parts} and \eqref{eq: generator ibp} give
+\begin{equation*}
+    \pi\bigl( \nabla^2 \omega : \nabla^2 U \bigr) = \pi\Bigl( \nabla \omega \cdot \nabla \Bigl( \frac12 |\nabla U|^2 - \Delta U \Bigr) \Bigr) = \pi\Bigl( \Bigl( \frac12 |\nabla U|^2 - \Delta U \Bigr) (-\mathcal L \omega) \Bigr) .
+\end{equation*}
+Since $\pi(\mathcal L \omega) = 0$, the mean of $\frac12 |\nabla U|^2 - \Delta U$ may be subtracted; it equals $-\frac12 \pi(\Delta U)$, since $\pi(\mathcal L U) = 0$ gives $\pi(|\nabla U|^2) = \pi(\Delta U)$. Hence \eqref{eq: riesz} holds for $\mathcal A = \nabla^2 U$ with
+\begin{equation}
+    \psi_{\nabla^2 U}(x) = \frac12\, |\nabla U(x)|^2 - \Delta U(x) + \frac12\, \pi(\Delta U) .
+    \label{eq: psi hessian}
+\end{equation}
+
+Through the representors, the normalized biases $(\pi_h - \pi)/h$ and $(\bar\pi_h - \pi)/h$ converge to the signed measures $\frac12 \psi_{\mathcal C}\, \pi$ and $\frac12 (\psi_{\nabla^2 U} + \psi_{\mathcal C})\, \pi$ in the Kantorovich--Rubinstein norm, at the rate $h^{\frac12} (1 + \log\frac1h)$.
+
+\begin{theorem}
+\label{thm: kr expansion}
+    Let Assumptions~\ref{ass: U} and \ref{ass: sg} hold. Then, for every $h \in (0,h_0]$, the numerical invariant distribution $\pi_h$ of \eqref{eq: sglm} and the invariant distribution $\bar\pi_h$ of \eqref{eq: sgld} satisfy
+    \begin{align}
+        & \Bigl\| \pi_h - \pi - \frac h2\, \psi_{\mathcal C}\, \pi \Bigr\|_{\mathrm{KR}} \Le C h^{\frac32} \Bigl( 1 + \log\frac1h \Bigr) ,
+        \label{eq: kr sglm} \\
+        & \Bigl\| \bar\pi_h - \pi - \frac h2\, ( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, \pi \Bigr\|_{\mathrm{KR}} \Le C h^{\frac32} \Bigl( 1 + \log\frac1h \Bigr) .
+        \label{eq: kr sgld}
+    \end{align}
+    \emph{(Proof in Appendix~\ref{sec: kr expansion proof}.)}
+\end{theorem}
+
+Since $\mathcal W_1(\pi_h, \pi) = \norm{\pi_h - \pi}_{\mathrm{KR}}$ and $\mathcal W_1(\bar\pi_h, \pi) = \norm{\bar\pi_h - \pi}_{\mathrm{KR}}$, the triangle inequality for $\norm{\cdot}_{\mathrm{KR}}$ and Theorem~\ref{thm: kr expansion} give, for every $h \in (0,h_0]$,
+\begin{equation}
+    \biggl| \mathcal W_1(\pi_h, \pi) - \frac h2\, \norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}} \biggr|
+    + \biggl| \mathcal W_1(\bar\pi_h, \pi) - \frac h2\, \norm{( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, \pi}_{\mathrm{KR}} \biggr|
+    \Le C h^{\frac32} \Bigl( 1 + \log\frac1h \Bigr) .
+    \label{eq: w1 limits}
+\end{equation}
+The bound \eqref{eq: w1 limits} determines the Wasserstein-1 errors to first order in $h$, but it is not guaranteed to be sharp in the discretization error: its remainder is only of order $h^{\frac32}$, up to the factor $1 + \log\frac1h$. Enhancing this order to $h^2$ is left for future studies; Remark~\ref{rem: h2} discusses the globally strongly convex case.
+
+\begin{remark}
+\label{rem: h2}
+When $U$ is globally strongly convex, that is, $R = 0$ in Assumption~\ref{ass: U}, and the covariance $\mathcal C(x)$ is smooth, we expect the remainder of \eqref{eq: kr sglm}, \eqref{eq: kr sgld} and \eqref{eq: w1 limits} to improve to $C h^2$. The factor $h^{\frac12} (1 + \log\frac1h)$ is lost where a step of the chain acts on a Lipschitz test function and where $\psi_{\mathcal C}$ is only known to lie in $L^2(\pi)$. Under global strong convexity, the derivatives of the solution of \eqref{eq: langevin} with respect to its initial point decay at the rate $e^{-mt}$, so $\psi_{\mathcal C}$, like the explicit $\psi_{\nabla^2 U}$ of \eqref{eq: psi hessian}, should be smooth with polynomially growing derivatives. The steps of the chain can then be applied to the smooth measures $\psi_{\mathcal C}\, \pi$ and $\psi_{\nabla^2 U}\, \pi$ instead of the test function, and each of these losses would become a factor $h$.
+\end{remark}
+
+Since the remainder in \eqref{eq: w1 limits} is $o(h)$, dividing \eqref{eq: w1 limits} by $h$ and letting $h \to 0$ gives the explicit limits of $\mathcal W_1(\pi_h, \pi)/h$ and $\mathcal W_1(\bar\pi_h, \pi)/h$.
+
+\begin{corollary}
+\label{cor: w1 limits}
+    Let Assumptions~\ref{ass: U} and \ref{ass: sg} hold. Then the numerical invariant distribution $\pi_h$ of \eqref{eq: sglm} and the invariant distribution $\bar\pi_h$ of \eqref{eq: sgld} satisfy
+    \begin{equation*}
+        \lim_{h \to 0} \frac{\mathcal W_1(\pi_h, \pi)}{h} = \frac12\, \norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}} , \qquad
+        \lim_{h \to 0} \frac{\mathcal W_1(\bar\pi_h, \pi)}{h} = \frac12\, \norm{( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, \pi}_{\mathrm{KR}} .
+    \end{equation*}
+    Moreover, $\norm{\psi_{\nabla^2 U}\, \pi}_{\mathrm{KR}} > 0$, and $\norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}} > 0$ if $\mathcal C(x)$ does not vanish identically. \emph{(Proof in Appendix~\ref{sec: w1 limits proof}.)}
+\end{corollary}
+
+Corollary~\ref{cor: w1 limits} is nontrivial: it gives an accurate characterization of the coefficient of $h$ in the Wasserstein-1 error, as an equality. This makes it distinct from the mainstream coupling methods of numerical analysis, which bound the Wasserstein-1 error from above without identifying its coefficient. Although the representor $\psi_{\mathcal C}$ is difficult to evaluate in practice, Corollary~\ref{cor: w1 limits} and \eqref{eq: w1 limits} are the decisive answer to how much SGLM and SGLD shift the invariant distribution: up to the remainder $C h^{\frac32} (1 + \log\frac1h)$ of \eqref{eq: w1 limits}, the shift in the Wasserstein-1 distance is $\frac h2\, \norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}}$ for SGLM and $\frac h2\, \norm{( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, \pi}_{\mathrm{KR}}$ for SGLD.
+
+Corollary~\ref{cor: w1 limits} thus compares SGLM with SGLD through the representors: the limit of $\mathcal W_1(\pi_h, \pi)/h$ is at most that of $\mathcal W_1(\bar\pi_h, \pi)/h$ exactly when
+\begin{equation}
+    \norm{( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, \pi}_{\mathrm{KR}} \Ge \norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}} .
+    \label{eq: w1 comparison}
+\end{equation}
+This inequality fails in general: Lemma~\ref{lem: w1 counterexample} gives a gradient noise of large amplitude, supported away from the minimizer of $U$, that violates it.
+
+\begin{lemma}
+\label{lem: w1 counterexample}
+    Let $d = 1$, $U(x) = \frac12 x^2$ and $\nabla \hat U(x;\xi) = x + 10\, \xi\, a(x)$, where $\xi$ takes the values $1$ and $-1$ with probability $\frac12$ each and
+    \begin{equation}
+        a(x) := \exp\Bigl( 1 - \frac{1}{1 - 4 (|x| - 2)^2} \Bigr) \quad \text{if } \bigl| |x| - 2 \bigr| < \frac12 , \qquad a(x) := 0 \quad \text{otherwise} .
+        \label{eq: shell noise}
+    \end{equation}
+    Then Assumptions~\ref{ass: U} and \ref{ass: sg} hold, and
+    \begin{equation*}
+        \frac12\, \norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}} \approx 1.230 > 1.115 \approx \frac12\, \norm{( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, \pi}_{\mathrm{KR}} ,
+    \end{equation*}
+    so \eqref{eq: w1 comparison} fails. \emph{(Proof in Appendix~\ref{sec: w1 counterexample proof}.)}
+\end{lemma}
+
+With a batch of $P$ independent stochastic gradients, $\mathcal C(x)/P$ replaces the covariance $\mathcal C(x)$ of a single stochastic gradient. As $P$ grows, the limit of $\mathcal W_1(\pi_h, \pi)/h$ tends to $0$, while that of $\mathcal W_1(\bar\pi_h, \pi)/h$ tends to $\frac12 \norm{\psi_{\nabla^2 U}\, \pi}_{\mathrm{KR}} > 0$; for a strongly convex potential, \eqref{eq: w1 comparison} holds once $P$ reaches an explicit threshold.
+
+\begin{theorem}
+\label{thm: batch threshold}
+    Let Assumptions~\ref{ass: U} with $R = 0$ and \ref{ass: sg} hold, so that $\nabla^2 U(x) \succeq m I_d$ for every $x \in \mathbb R^d$, and let $\mathcal C(x)$ be the covariance of a single stochastic gradient. Then, for every batch size $P$ satisfying
+    \begin{equation}
+        P \Ge \frac{9\, \norm{\nabla^2 U}_\infty\, \norm{\mathcal C}_\infty}{m^2} = \frac{9}{m^2} \sup_{x\in\mathbb R^d} \norm{\nabla^2U(x)} \sup_{x\in\mathbb R^d} \norm{\mathcal C(x)},
+        \label{eq: batch threshold}
+    \end{equation}
+    the limit of $\mathcal W_1(\pi_h, \pi)/h$ for SGLM with a batch of size $P$ is at most that of $\mathcal W_1(\bar\pi_h, \pi)/h$ for SGLD with the same batch, which by Corollary~\ref{cor: w1 limits}, with $\psi_{\mathcal C}/P$ in place of $\psi_{\mathcal C}$, reads
+    \begin{equation}
+        \Big\|\Big( \psi_{\nabla^2 U} + \frac1P\psi_{\mathcal C} \Big) \pi\Big\|_{\mathrm{KR}} \Ge \frac1P\, \norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}} .
+        \label{eq: w1 comparison batch}
+    \end{equation}
+    \emph{(Proof in Appendix~\ref{sec: batch threshold proof}.)}
+\end{theorem}
+
+The norm $\norm{\cdot}$ in \eqref{eq: batch threshold} is the operator norm of Section~\ref{subsec: notation}, so the lower bound of $P$ does not depend explicitly on the dimension $d$; it depends only on the eigenvalues of $\nabla^2 U(x)$ and $\mathcal C(x)$. This is also the only result of the paper in which the dependence on the dimension is accounted for.
+
+\section{Bias correction via the Riesz representors}
+\label{sec: representors}
+
+By \eqref{eq: coefficients riesz}, the numerical bias $\pi_h(f) - \pi(f)$ of SGLM equals $\frac h2\, \pi(f \psi_{\mathcal C})$ to first order in $h$, so it is removed once $\pi(f \psi_{\mathcal C})$ is computed. Subtracting $\frac h2\, \pi(f \psi_{\mathcal C})$ from $\pi_h(f)$ requires the value of $\pi(f \psi_{\mathcal C})$ for the given test function $f$, not the representor $\psi_{\mathcal C}$ itself. This section describes three approaches to bias correction. For the covariances of Section~\ref{subsec: explicit representors}, $\pi(f \psi_{\mathcal C})$ is computed with the explicit representor $\psi_{\mathcal C}$. The Richardson--Romberg extrapolation of Section~\ref{subsec: extrapolation} requires only the time averages at the step sizes $h$ and $2h$. The shifting correction of Section~\ref{subsec: shifting} improves the samples themselves by solving the function $\varphi_{\mathcal C}$ from a variational form. Section~\ref{subsec: kr computation} describes the computation of the Kantorovich--Rubinstein norms that give the coefficients of the Wasserstein-1 errors. The three approaches also apply to SGLD, with $\bar\pi_h$ and $\psi_{\nabla^2 U} + \psi_{\mathcal C}$ in place of $\pi_h$ and $\psi_{\mathcal C}$ by \eqref{eq: coefficients riesz}, where $\psi_{\nabla^2 U}$ is explicit by \eqref{eq: psi hessian}; we focus on SGLM for simplicity.
+
+\subsection{Covariances with an explicit representor}
+\label{subsec: explicit representors}
+
+Under Assumptions~\ref{ass: U} and \ref{ass: sg}, define the vector function $b_{\mathcal C}(x)$ by
+\begin{equation}
+    b_{\mathcal C}(x) := \mathcal C(x)\, \nabla U(x) - \operatorname{div} \mathcal C(x) ,
+    \label{eq: representor field}
+\end{equation}
+with $(\operatorname{div} \mathcal C)_j = \sum_{i=1}^d \partial_i \mathcal C_{ij}$. An integration by parts against $\pi \propto e^{-U}$ gives, for $\omega$ as in \eqref{eq: riesz},
+\begin{equation}
+    \pi\bigl( \nabla^2 \omega : \mathcal C \bigr) = \pi\bigl( \nabla \omega \cdot b_{\mathcal C} \bigr) .
+    \label{eq: representor ibp}
+\end{equation}
+When $b_{\mathcal C} = \nabla g$ for a function $g$ whose derivatives grow at most polynomially, \eqref{eq: generator ibp} and the uniqueness in Theorem~\ref{thm: riesz} give $\psi_{\mathcal C} = g - \pi(g)$. Table~\ref{tab: explicit representors} lists covariances and potentials for which $b_{\mathcal C}$ is a gradient.
+
+\begin{table}[htb]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+covariance $\mathcal C(x)$ & potential $U$ & representor $\psi_{\mathcal C}(x)$, up to a constant \\
+\midrule
+$a\bigl( U(x) \bigr)\, I_d$ & any & $\displaystyle \int_0^{U(x)} a(s)\, \D s - a\bigl( U(x) \bigr)$ \\[2.5ex]
+$\mathcal C(x) \in \mathbb R$, $d = 1$ & any & $\displaystyle \int_0^{x} \mathcal C(y)\, U'(y)\, \D y - \mathcal C(x)$ \\[2.5ex]
+$\mathrm{diag}\bigl( c_1(x_1), \dots, c_d(x_d) \bigr)$ & $\displaystyle U(x) = \sum_{i=1}^d U_i(x_i)$ & $\displaystyle \sum_{i=1}^d \Bigl( \int_0^{x_i} c_i(y)\, U_i'(y)\, \D y - c_i(x_i) \Bigr)$ \\[2.5ex]
+$a_1(|x|)\, I_d + a_2(|x|)\, \frac{x \otimes x}{|x|^2}$ & $U(x) = u(|x|)$ & $\displaystyle \int_0^{|x|} \Bigl( (a_1 + a_2)(r)\, u'(r) - \frac{(d-1)\, a_2(r)}{r} \Bigr) \D r - (a_1 + a_2)(|x|)$ \\
+\bottomrule
+\end{tabular}
+\caption{Covariances whose Riesz representor $\psi_{\mathcal C}$ is explicit, with $\psi_{\mathcal C}$ given up to the additive constant fixed by $\pi(\psi_{\mathcal C}) = 0$. The functions $a$, $a_1$, $a_2$ and $c_1, \dots, c_d$ are of class $C^2$, and $a_2(r) = O(r^2)$ as $r \to 0$.}
+\label{tab: explicit representors}
+\end{table}
+
+With a constant $a = \sigma^2$, the row $a(U(x))\, I_d$ of Table~\ref{tab: explicit representors} gives $\psi_{\mathcal C} = \sigma^2 \bigl( U - \pi(U) \bigr)$. For a general covariance in dimension $d \Ge 2$, the field $b_{\mathcal C}$ is not a gradient and $\psi_{\mathcal C}$ has no closed form; the extrapolation of Section~\ref{subsec: extrapolation} and the energy \eqref{eq: extrapolated energy} of Section~\ref{subsec: shifting} do not require $\psi_{\mathcal C}$ directly.
+
+\subsection{Richardson--Romberg extrapolation}
+\label{subsec: extrapolation}
+
+Without the representor, the term of order $h$ of the numerical bias of a given test function is removed by extrapolation in the step size, as for the invariant distribution of an ergodic diffusion \citep{lemaire2015invariant} and for SGLD \citep{durmus2016stochastic}. For $h \in (0, h_0/2]$ and a function $f$ with $\norm{\nabla f}_\infty < \infty$, \eqref{eq: kr sglm} at the step sizes $h$ and $2h$ gives
+\begin{equation}
+    \biggl| \frac{\pi_{2h}(f) - \pi_h(f)}{h} - \frac12\, \pi(f \psi_{\mathcal C}) \biggr| \Le C \norm{\nabla f}_\infty\, h^{\frac12} \Bigl( 1 + \log\frac1h \Bigr) ,
+    \label{eq: extrapolation sglm}
+\end{equation}
+so the coefficient $\frac12\, \pi(f \psi_{\mathcal C})$ is approximated by $(\pi_{2h}(f) - \pi_h(f))/h$, computed from the time averages of $f$ along runs of \eqref{eq: sglm} with the step sizes $h$ and $2h$; the error is of order $h$ when the remainder of \eqref{eq: kr sglm} is of order $h^2$, as expected in Remark~\ref{rem: h2}. Subtracting $\pi_{2h}(f) - \pi_h(f)$, which is $h$ times the approximation of $\frac12\, \pi(f \psi_{\mathcal C})$ in \eqref{eq: extrapolation sglm}, from $\pi_h(f)$ gives the approximation $2\pi_h(f) - \pi_{2h}(f)$ of $\pi(f)$, and \eqref{eq: kr sglm} gives
+\begin{equation}
+    \bigl| 2\pi_h(f) - \pi_{2h}(f) - \pi(f) \bigr| \Le C \norm{\nabla f}_\infty\, h^{\frac32} \Bigl( 1 + \log\frac1h \Bigr) ,
+    \label{eq: extrapolation estimate}
+\end{equation}
+and the error is of order $h^2$ when the remainder of \eqref{eq: kr sglm} is of order $h^2$.
+
+Extrapolation corrects the expectations of given test functions but not the samples, whose laws remain $\pi_h$ and $\pi_{2h}$; it does not raise the order of the Wasserstein-1 error in \eqref{eq: w1 limits}. Moreover, \eqref{eq: extrapolation sglm} holds for each given test function and does not mean that the empirical samples of $\pi_h$ and $\pi_{2h}$ approximate $\psi_{\mathcal C}$ itself: for the gradient noise $\sigma \xi$ with $\xi \sim \mathcal N(0, I_d)$, $\psi_{\mathcal C} = \sigma^2 \bigl( U - \pi(U) \bigr)$ by Table~\ref{tab: explicit representors}, which is not read off the samples.
+
+\subsection{Postprocessed shifting correction}
+\label{subsec: shifting}
+
+The extrapolation of Section~\ref{subsec: extrapolation} improves the expectations $\pi_h(f)$, but not the samples of SGLM themselves. We instead define a vector field that shifts the samples of SGLM to more accurate ones. The vector field is $h\, \nabla \varphi_{\mathcal C}$, with $\varphi_{\mathcal C}$ the solution of
+\begin{equation}
+    \mathcal L \varphi_{\mathcal C} = \frac12\, \psi_{\mathcal C} , \qquad \pi(\varphi_{\mathcal C}) = 0 .
+    \label{eq: shift potential}
+\end{equation}
+By \eqref{eq: generator ibp}, $\varphi_{\mathcal C}$ is the minimizer of the functional
+\begin{equation}
+    \mathcal E(\varphi) := \frac12\, \pi\bigl( |\nabla \varphi|^2 \bigr) + \frac12\, \pi\bigl( \psi_{\mathcal C}\, \varphi \bigr) , \qquad \pi(\varphi) = 0 ,
+    \label{eq: shift energy}
+\end{equation}
+and since $\psi_{\mathcal C} \in L^2(\pi)$ and $\pi(\psi_{\mathcal C}) = 0$, the minimizer over the functions $\varphi$ with $\varphi, |\nabla \varphi| \in L^2(\pi)$ exists and is unique by the Poincar\'e inequality \eqref{eq: poincare} and the Riesz representation theorem. The shifting correction replaces a sample $Z \sim \pi_h$ of SGLM by the postprocessed sample
+\begin{equation}
+    Z + h\, \nabla \varphi_{\mathcal C}(Z) ,
+    \label{eq: shifting correction}
+\end{equation}
+where the map $x \mapsto x + h\, \nabla \varphi_{\mathcal C}(x)$ is a postprocessor in the sense of \citep{vilmart2015postprocessed}, that is, a change of variables applied to the samples to raise the order for the invariant distribution. Formally, let $f$ be a smooth test function, and assume that the remainder of \eqref{eq: kr sglm} is of order $h^2$, as expected in Remark~\ref{rem: h2}. A Taylor expansion of $f$ at $x$ gives
+\begin{equation*}
+    f\bigl( x + h \nabla \varphi_{\mathcal C}(x) \bigr) = f(x) + h\, \nabla f(x) \cdot \nabla \varphi_{\mathcal C}(x) + \mathcal O(h^2) ,
+\end{equation*}
+and the expectation under $\pi_h$ gives
+\begin{equation*}
+    \pi_h\bigl( f(x + h \nabla \varphi_{\mathcal C}(x)) \bigr) = \pi_h(f) + h\, \pi_h(\nabla f \cdot \nabla \varphi_{\mathcal C}) + \mathcal O(h^2) .
+\end{equation*}
+By \eqref{eq: kr sglm} applied to $f$ and to $\nabla f \cdot \nabla \varphi_{\mathcal C}$,
+\begin{equation*}
+    \pi_h(f) = \pi(f) + \frac h2\, \pi(f \psi_{\mathcal C}) + \mathcal O(h^2) , \qquad
+    \pi_h(\nabla f \cdot \nabla \varphi_{\mathcal C}) = \pi(\nabla f \cdot \nabla \varphi_{\mathcal C}) + \mathcal O(h) ,
+\end{equation*}
+so that
+\begin{equation*}
+    \pi_h\bigl( f(x + h \nabla \varphi_{\mathcal C}(x)) \bigr) = \pi(f) + \frac h2\, \pi(f \psi_{\mathcal C}) + h\, \pi(\nabla f \cdot \nabla \varphi_{\mathcal C}) + \mathcal O(h^2) .
+\end{equation*}
+By \eqref{eq: generator ibp} with $g_1 = f$ and $g_2 = \varphi_{\mathcal C}$, and by \eqref{eq: shift potential},
+\begin{equation*}
+    \pi(\nabla f \cdot \nabla \varphi_{\mathcal C}) = -\pi(f\, \mathcal L \varphi_{\mathcal C}) = -\frac12\, \pi(f \psi_{\mathcal C}) ,
+\end{equation*}
+so the terms $\frac h2\, \pi(f \psi_{\mathcal C})$ and $h\, \pi(\nabla f \cdot \nabla \varphi_{\mathcal C})$ cancel, and formally
+\begin{equation*}
+    \pi_h\bigl( f(x + h \nabla \varphi_{\mathcal C}(x)) \bigr) = \pi(f) + \mathcal O(h^2) .
+\end{equation*}
+The error of the postprocessed samples is thus of order $h^2$ for every test function at once. The shifting correction formally raises the order of the Wasserstein-1 error in \eqref{eq: w1 limits} to $h^2$. The rigorous study of the shifting correction is left for future work.
+
+When $\psi_{\mathcal C}$ is explicit, as in Section~\ref{subsec: explicit representors}, $\varphi_{\mathcal C}$ is approximated by minimizing \eqref{eq: shift energy} over a class of functions, with $\pi$ replaced by the average over the empirical samples of $\pi_h$. In general, the energy \eqref{eq: shift energy} uses $\psi_{\mathcal C}$ only through $\frac12\, \pi(\psi_{\mathcal C}\, \varphi)$, the coefficient \eqref{eq: coefficients riesz} of the test function $\varphi$, which \eqref{eq: extrapolation sglm} approximates. Replacing $\frac12\, \pi(\psi_{\mathcal C}\, \varphi)$ by $(\pi_{2h}(\varphi) - \pi_h(\varphi))/h$, and $\pi$ by $\pi_h$ in $\frac12\, \pi(|\nabla \varphi|^2)$, gives
+\begin{equation}
+    \mathcal E_h(\varphi) := \frac12\, \pi_h\bigl( |\nabla \varphi|^2 \bigr) + \frac{\pi_{2h}(\varphi) - \pi_h(\varphi)}{h} .
+    \label{eq: extrapolated energy}
+\end{equation}
+The energy $\mathcal E_h$ requires only the empirical samples of $\pi_h$ and $\pi_{2h}$, from runs of \eqref{eq: sglm} with the step sizes $h$ and $2h$, so it is completely data-driven: it involves neither $U$, $\nabla U$ nor $\mathcal C(x)$, and one minimization gives the shift. It does not change when a constant is added to $\varphi$, so its minimization needs no constraint on $\varphi$. A minimizer $\varphi$ of $\mathcal E_h$ satisfies $h\, \pi_h(\nabla f \cdot \nabla \varphi) = \pi_h(f) - \pi_{2h}(f)$ for every $f$, so the shift $x \mapsto x + h \nabla \varphi(x)$ formally carries $\pi_h(f)$ to the approximation $2\pi_h(f) - \pi_{2h}(f)$ of \eqref{eq: extrapolation estimate}, up to terms of order $h^2$, for every $f$ at once. The step size $h$ cannot be too small for the minimization to be stable: the fluctuation of the empirical averages that replace $\pi_{2h}(\varphi)$ and $\pi_h(\varphi)$ is divided by $h$ in \eqref{eq: extrapolated energy}, and the minimizer of $\mathcal E_h$ with these empirical averages fits this fluctuation.
+
+\begin{remark}
+The loss function $\mathcal E_h$ of \eqref{eq: extrapolated energy} is closely related to the loss in action matching \citep{neklyudov2023action}, which learns, from samples of a family of distributions $(q_t)_{t \in [0,1]}$, a vector field $\nabla s_t$ that transports them, by minimizing
+\begin{equation*}
+    q_0(s_0) - q_1(s_1) + \int_0^1 q_t\Bigl( \frac12\, |\nabla s_t|^2 + \partial_t s_t \Bigr)\, \D t
+\end{equation*}
+over functions $s_t(x)$. With $q_0 = \pi_{2h}$, $q_1 = \pi_h$, the function $s_t = h \varphi$ independent of $t$, and $q_t$ replaced by $\pi_h$ in the integral, this loss equals $h^2\, \mathcal E_h(\varphi)$. A loss of the same form, whose $2$ terms are expectations estimated by sampling, is also written in \citep{cao2022learning}. In these works, the vector field transports the samples between the given distributions, while the shifting correction applies it beyond them.
+
+Since $\pi_{2h} - \pi_h$ is of order $h$, a minimizer $\varphi$ of \eqref{eq: extrapolated energy} formally gives $\pi_{2h}\bigl( f(x + h \nabla \varphi(x)) \bigr) = \pi_h(f) + \mathcal O(h^2)$, so the map $x \mapsto x + h \nabla \varphi(x)$ carries $\pi_{2h}$ to $\pi_h$, and the shifting correction applies the same map once more, from $\pi_h$ toward $\pi$. Formally, up to terms of order $h^2$, the shifting correction is thus the extrapolation at the time $2$ of the Wasserstein geodesic from $\pi_{2h}$ at the time $0$ to $\pi_h$ at the time $1$, the operation used in \citep{gallouet2024geodesic, gallouet2025metric} for time discretizations of Wasserstein gradient flows.
+\end{remark}
+
+\subsection{Calculation of the Kantorovich--Rubinstein norm}
+\label{subsec: kr computation}
+
+The coefficients of the Wasserstein-1 errors in Corollary~\ref{cor: w1 limits} are $\frac12 \norm{\psi\,\pi}_{\mathrm{KR}}$, with $\psi = \psi_{\mathcal C}$ for SGLM and $\psi = \psi_{\nabla^2 U} + \psi_{\mathcal C}$ for SGLD, so they require the norm itself and not only the representor. On a convex compact domain, with no flux through its boundary, the supremum that defines the norm in Section~\ref{subsec: notation} equals the least cost of a flux $F$ that carries the negative part of $\psi\pi$ onto its positive part \citep[(2)]{li2018parallel}:
+\begin{equation}
+    \norm{\psi\pi}_{\mathrm{KR}} = \min\Bigl\{ \int_{\mathbb R^d} |F(x)|\, \D x : \operatorname{div} F = -\psi\,\pi \Bigr\} .
+    \label{eq: kr flux}
+\end{equation}
+
+For the computation, $\psi\,\pi$ is restricted to a box centered at the origin that carries all but a negligible part of $\pi$, with $n$ cells per side: the function $f$ of the supremum is placed at the centers of the cells, with forward differences of Euclidean norm at most $1$; the flux $F$ is placed on the faces; and $\psi\,\pi$ is replaced by its cell averages. The primal--dual iteration of \citet{li2018parallel} solves the two discrete problems together, and refining the grid approximates \eqref{eq: kr flux}.
+The grid has $n^d$ cells, so the cost grows exponentially with the dimension: in $d=4$, $n = 100$ already gives $10^8$ cells. Computing Kantorovich--Rubinstein norms in high dimensions is intrinsically difficult, and it is possibly unnecessary in the current setting, because the Wasserstein-1 error is not a \emph{quantity of interest} in real computations: samples are used to estimate the expectations $\pi(f)$ of given test functions, and the bias of each of them is given to first order by the coefficient \eqref{eq: coefficients riesz}, which \eqref{eq: extrapolation sglm} approximates without the norm or the representor.
+
+\section{Numerical experiments}
+\label{sec: numerics}
+
+% toy experiments maintained by XY
+\input{numerical}
+
+% MNIST experiment maintained by Cindy
+\input{mnist}
+
+\section{Conclusion}
+\label{sec: conclusion}
+
+This paper proves MSE bounds for the SGLM integrator and its full gradient form LM, for a potential strongly convex outside a ball. The samples of \eqref{eq: sglm} and \eqref{eq: lm} do not form a Markov chain; the modified class of Section~\ref{sec: modified} moves the analysis to the Markovian forms \eqref{eq: sglm markov} and \eqref{eq: lm markov}, and the discrete Poisson equation of \citep{lu2025mse, ye2026mse} converts their local weak errors against the modified dynamics into the bound $\frac{1}{Nh} + \Sigma^2 h^2 + h^4$ of Theorem~\ref{thm: sglm mse}, with the bound $\frac{1}{Nh} + h^4$ of Theorem~\ref{thm: lm mse} for the full gradient. The stochastic gradient error and the discretization error thus separate for an integrator of the overdamped dynamics, as for SG-UBU \citep{lu2025mse} and unlike \eqref{eq: sgld}, and a batch of size $P \asymp h^{-1}$ recovers the order of \eqref{eq: lm mse}.
+
+The numerical bias of SGLM is of first order in $h$, with the coefficient \eqref{eq: bias coefficient} given by the covariance $\mathcal C(x)$ of the gradient noise. For \eqref{eq: sgld}, the same discrete Poisson equation gives the coefficient \eqref{eq: sgld coefficient}, which carries the Hessian $\nabla^2 U(x)$ besides the covariance $\mathcal C(x)$. This contribution of the discretization error of EM remains at every batch size, while the coefficient of SGLM is divided by the batch size. For a given test function, the two coefficients are not ordered in absolute value, since $\nabla^2 \phi_0$ is indefinite in general. In both coefficients, the gradient noise and the discretization error enter linearly through $\nabla^2 \phi_0$: the Poisson equation describes the structure of the numerical bias of both stochastic gradient integrators, beyond its role in the upper bounds on the MSE. The gap between Theorem~\ref{thm: sgld bias}, which holds at every step size with $\phi_h$, and Corollary~\ref{cor: sgld coefficient}, which reaches the Hessian form with $\phi_0$ only in the limit $h \to 0$, also shows that the discrete Poisson equation requires fewer derivatives than the continuous one for nonasymptotic bounds on the numerical bias.
+
+Through the Riesz representors of $\mathcal C(x)$ and $\nabla^2 U(x)$, the coefficients of $h$ in the Wasserstein-1 errors are explicit: $\mathcal W_1(\pi_h, \pi)/h$ and $\mathcal W_1(\bar\pi_h, \pi)/h$ converge to $\frac12 \norm{\psi_{\mathcal C}\, \pi}_{\mathrm{KR}}$ and $\frac12 \norm{(\psi_{\nabla^2 U} + \psi_{\mathcal C})\, \pi}_{\mathrm{KR}}$ (Corollary~\ref{cor: w1 limits}), as a consequence of the convergence of the normalized biases $(\pi_h - \pi)/h$ and $(\bar\pi_h - \pi)/h$ in the Kantorovich--Rubinstein norm (Theorem~\ref{thm: kr expansion}). For a strongly convex potential, the coefficient of SGLM is at most that of SGLD once the batch size reaches a threshold linear in $\sup_x \norm{\mathcal C(x)}$, with no explicit dependence on the dimension (Theorem~\ref{thm: batch threshold}), and Lemma~\ref{lem: w1 counterexample} shows that the order can be reversed at small batch sizes.
+
+The coefficients also lead to approaches to bias correction in Section~\ref{sec: representors}: the explicit coefficient, Richardson--Romberg extrapolation and the shifting correction. The shifting correction replaces a sample $Z \sim \pi_h$ of SGLM by $Z + h \nabla \varphi_{\mathcal C}(Z)$ and formally removes the first order bias for all test functions at once. It is completely data-driven, since $\varphi_{\mathcal C}$ is approximated by minimizing the energy \eqref{eq: extrapolated energy} with the samples of SGLM at the step sizes $h$ and $2h$.
+
+The numerical experiments of Section~\ref{sec: numerics} illustrate the coefficients, the bias correction and the comparison with SGLD. In a 4D Gaussian mixture, the evaluated coefficients of the numerical bias approach the exact coefficients \eqref{eq: bias coefficient} and \eqref{eq: sgld coefficient}, within $3.8\%$ at $h = 2^{-5}$. For a radial potential, the evaluated coefficients of the Wasserstein-1 errors converge to those of Corollary~\ref{cor: w1 limits} with a remainder of order $h^2$, and the coefficient of SGLM is below that of SGLD for $d = 2, 4, \dots, 256$. In a 16D product of ring distributions, the bias corrections reduce the largest absolute numerical bias of SGLM over the test functions by factors between $14.8$ and $71.1$. In Bayesian logistic regression on MNIST, SGLM has a smaller estimated MSE than SGLD for all test functions and batch sizes, and the median reduction grows with the batch size, from $34.6\%$ at $P = 1024$ to $63.3\%$ at $P = 4096$, mainly through a smaller bias, in line with the coefficient of SGLM being divided by $P$.
+
+Four extensions are possible. The first is variance reduction: with variance-reduced gradients, the first order term of the bias of SG-UBU becomes of second order once $h$ is below a threshold \citep{lu2025mse}, and the same construction applied to \eqref{eq: sglm} would give an integrator of the overdamped dynamics with a bias of second order. The second is the remainder $C h^{\frac32} (1 + \log\frac1h)$ of \eqref{eq: w1 limits}, which is not guaranteed to be sharp in the discretization error, and the error order could be enhanced to $h^2$. The third is the underdamped Langevin dynamics, where a modified class for its stochastic gradient integrators would extend the analysis to that setting. The fourth is a rigorous study of the shifting correction, whose order $h^2$ is formal, together with the stability of the minimization of \eqref{eq: extrapolated energy}, in which the fluctuation of the empirical averages is divided by $h$.
+
+
+\subsection*{Acknowledgments}
+The authors thank Dr. He Zhang for valuable suggestions on this paper.
+
+\subsection*{Data availability}
+
+The code of the numerical experiments is available at \url{https://github.com/xuda-ye-math/Poisson-SGLM}, with the commands that regenerate the numerical results.
+
+\subsection*{Declaration of AI use}
+The authors used Claude Opus 5.5 and GPT-6 Astra in deriving part of the results, in checking the correctness of the proofs, and in writing the code of the numerical experiments. Claude Opus 5.5 provided the counterexample in Lemma~\ref{lem: w1 counterexample}. The authors hold full responsibility for the content of this paper.
+
+\begin{comment}
+\subsection*{Statements and declarations}
+
+\subsubsection*{Use of AI}
+
+The authors used Claude (Opus 5.5) in deriving part of the results and in checking the correctness of the proofs. The authors hold full responsibility for the content of this paper.
+
+\subsubsection*{Competing interests}
+
+The authors have no competing interests to declare.
+
+
+
+\subsubsection*{Author contributions}
+
+Xuda Ye proposed the methodology, wrote all the proofs and the draft of the paper, and completed the numerical experiments in Sections~\ref{subsec: mixture} to~\ref{subsec: rings}. Yuliang Wang reviewed all the proofs and also drafted the paper. Guang Lin supervised the whole project, provided the computing resources, and guided the design of the numerical experiments. Cindy Xiangrui Kong completed the numerical experiments in Section~\ref{sec:mnist} and verified all the numerical results.
+\end{comment}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\renewcommand{\theHsection}{appendix.\Alph{section}}
+\renewcommand{\theHequation}{appendix.\Alph{section}.\arabic{equation}}
+
+\input{appendix}
+
+\end{document}

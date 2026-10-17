@@ -1,0 +1,845 @@
+\begin{thebibliography}{112}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Abdulle et~al.(2014)Abdulle, Vilmart, and Zygalakis]{abdulle2014high}
+Assyr Abdulle, Gilles Vilmart, and Konstantinos~C. Zygalakis.
+\newblock High order numerical approximation of the invariant measure of
+  ergodic {SDEs}.
+\newblock \emph{SIAM Journal on Numerical Analysis}, 52\penalty0 (4):\penalty0
+  1600--1622, 2014.
+\newblock \doi{10.1137/130935616}.
+
+\bibitem[Akyildiz and Sabanis(2024)]{akyildiz2024nonasymptotic}
+{\"O}mer~Deniz Akyildiz and Sotirios Sabanis.
+\newblock Nonasymptotic analysis of stochastic gradient {Hamiltonian} {Monte}
+  {Carlo} under local conditions for nonconvex optimization.
+\newblock \emph{Journal of Machine Learning Research}, 25\penalty0
+  (113):\penalty0 1--34, 2024.
+
+\bibitem[Altschuler and Chewi(2024)]{altschuler2024faster}
+Jason~M. Altschuler and Sinho Chewi.
+\newblock Faster high-accuracy log-concave sampling via algorithmic warm
+  starts.
+\newblock \emph{Journal of the ACM}, 71\penalty0 (3):\penalty0 1--55, 2024.
+\newblock \doi{10.1145/3653446}.
+
+\bibitem[Baker et~al.(2019)Baker, Fearnhead, Fox, and Nemeth]{baker2019control}
+Jack Baker, Paul Fearnhead, Emily~B. Fox, and Christopher Nemeth.
+\newblock Control variates for stochastic gradient {MCMC}.
+\newblock \emph{Statistics and Computing}, 29\penalty0 (3):\penalty0 599--615,
+  2019.
+\newblock \doi{10.1007/s11222-018-9826-2}.
+
+\bibitem[Bakry et~al.(2008)Bakry, Barthe, Cattiaux, and
+  Guillin]{bakry2008simple}
+Dominique Bakry, Franck Barthe, Patrick Cattiaux, and Arnaud Guillin.
+\newblock A simple proof of the {Poincar\'e} inequality for a large class of
+  probability measures including the log-concave case.
+\newblock \emph{Electronic Communications in Probability}, 13:\penalty0 60--66,
+  2008.
+\newblock \doi{10.1214/ECP.v13-1352}.
+
+\bibitem[Bakry et~al.(2014)Bakry, Gentil, and Ledoux]{bakry2014analysis}
+Dominique Bakry, Ivan Gentil, and Michel Ledoux.
+\newblock \emph{Analysis and Geometry of {Markov} Diffusion Operators}, volume
+  348 of \emph{Grundlehren der mathematischen Wissenschaften}.
+\newblock Springer, 2014.
+\newblock \doi{10.1007/978-3-319-00227-9}.
+
+\bibitem[Barkhagen et~al.(2021)Barkhagen, Chau, Moulines, R{\'a}sonyi, Sabanis,
+  and Zhang]{barkhagen2021stochastic}
+Mathias Barkhagen, Ngoc~Huy Chau, {\'E}ric Moulines, Mikl{\'o}s R{\'a}sonyi,
+  Sotirios Sabanis, and Ying Zhang.
+\newblock On stochastic gradient {Langevin} dynamics with dependent data
+  streams in the logconcave case.
+\newblock \emph{Bernoulli}, 27\penalty0 (1):\penalty0 1--33, 2021.
+\newblock \doi{10.3150/19-BEJ1187}.
+
+\bibitem[Bingham et~al.(2019)Bingham, Chen, Jankowiak, Obermeyer, Pradhan,
+  Karaletsos, Singh, Szerlip, Horsfall, and Goodman]{bingham2019pyro}
+Eli Bingham, Jonathan~P. Chen, Martin Jankowiak, Fritz Obermeyer, Neeraj
+  Pradhan, Theofanis Karaletsos, Rohit Singh, Paul Szerlip, Paul Horsfall, and
+  Noah~D. Goodman.
+\newblock Pyro: Deep universal probabilistic programming.
+\newblock \emph{Journal of Machine Learning Research}, 20\penalty0
+  (28):\penalty0 1--6, 2019.
+
+\bibitem[Brosse et~al.(2018)Brosse, Durmus, and Moulines]{brosse2018promises}
+Nicolas Brosse, Alain Durmus, and {\'E}ric Moulines.
+\newblock The promises and pitfalls of stochastic gradient {Langevin} dynamics.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~31, 2018.
+
+\bibitem[Brosse et~al.(2019)Brosse, Durmus, Moulines, and
+  Sabanis]{brosse2019tamed}
+Nicolas Brosse, Alain Durmus, {\'E}ric Moulines, and Sotirios Sabanis.
+\newblock The tamed unadjusted {Langevin} algorithm.
+\newblock \emph{Stochastic Processes and their Applications}, 129\penalty0
+  (10):\penalty0 3638--3663, 2019.
+\newblock \doi{10.1016/j.spa.2018.10.002}.
+
+\bibitem[Bussi and Parrinello(2007)]{bussi2007accurate}
+Giovanni Bussi and Michele Parrinello.
+\newblock Accurate sampling using {Langevin} dynamics.
+\newblock \emph{Physical Review E}, 75\penalty0 (5):\penalty0 056707, 2007.
+\newblock \doi{10.1103/PhysRevE.75.056707}.
+
+\bibitem[Cao and Vanden-Eijnden(2022)]{cao2022learning}
+Yu~Cao and Eric Vanden-Eijnden.
+\newblock Learning optimal flows for non-equilibrium importance sampling.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~35, pages 12352--12364, 2022.
+
+\bibitem[Chada et~al.(2026)Chada, Leimkuhler, Paulin, and
+  Whalley]{chada2026unbiased}
+Neil~K. Chada, Benedict Leimkuhler, Daniel Paulin, and Peter~A. Whalley.
+\newblock Unbiased kinetic {Langevin} {Monte} {Carlo} with inexact gradients.
+\newblock \emph{The Annals of Statistics}, 54\penalty0 (4):\penalty0
+  1895--1922, 2026.
+\newblock \doi{10.1214/26-AOS2630}.
+
+\bibitem[Chak and Monmarch{\'e}(2026)]{chak2023reflection}
+Martin Chak and Pierre Monmarch{\'e}.
+\newblock Reflection coupling for unadjusted generalized {Hamiltonian} {Monte}
+  {Carlo} in the nonconvex stochastic gradient case.
+\newblock \emph{IMA Journal of Numerical Analysis}, 46\penalty0 (4):\penalty0
+  2216--2266, 2026.
+\newblock \doi{10.1093/imanum/draf045}.
+
+\bibitem[Chatterji et~al.(2018)Chatterji, Flammarion, Ma, Bartlett, and
+  Jordan]{chatterji2018theory}
+Niladri~S. Chatterji, Nicolas Flammarion, Yi-An Ma, Peter~L. Bartlett, and
+  Michael~I. Jordan.
+\newblock On the theory of variance reduction for stochastic gradient {Monte}
+  {Carlo}.
+\newblock In \emph{International Conference on Machine Learning}, volume~80 of
+  \emph{Proceedings of Machine Learning Research}, pages 764--773, 2018.
+
+\bibitem[Chatterji et~al.(2022)Chatterji, Bartlett, and
+  Long]{chatterji2022oracle}
+Niladri~S. Chatterji, Peter~L. Bartlett, and Philip~M. Long.
+\newblock Oracle lower bounds for stochastic gradient sampling algorithms.
+\newblock \emph{Bernoulli}, 28\penalty0 (2):\penalty0 1074--1092, 2022.
+\newblock \doi{10.3150/21-BEJ1377}.
+
+\bibitem[Chau et~al.(2021)Chau, Moulines, R{\'a}sonyi, Sabanis, and
+  Zhang]{chau2021stochastic}
+Ngoc~Huy Chau, {\'E}ric Moulines, Mikl{\'o}s R{\'a}sonyi, Sotirios Sabanis, and
+  Ying Zhang.
+\newblock On stochastic gradient {Langevin} dynamics with dependent data
+  streams: the fully nonconvex case.
+\newblock \emph{SIAM Journal on Mathematics of Data Science}, 3\penalty0
+  (3):\penalty0 959--986, 2021.
+\newblock \doi{10.1137/20M1355392}.
+
+\bibitem[Chen et~al.(2015)Chen, Ding, and Carin]{chen2015convergence}
+Changyou Chen, Nan Ding, and Lawrence Carin.
+\newblock On the convergence of stochastic gradient {MCMC} algorithms with
+  high-order integrators.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~28, 2015.
+
+\bibitem[Chen et~al.(2019)Chen, Wang, Zhang, Su, and
+  Carin]{chen2019convergence}
+Changyou Chen, Wenlin Wang, Yizhe Zhang, Qinliang Su, and Lawrence Carin.
+\newblock A convergence analysis for a class of practical variance-reduction
+  stochastic gradient {MCMC}.
+\newblock \emph{Science China Information Sciences}, 62\penalty0 (1):\penalty0
+  12101, 2019.
+\newblock \doi{10.1007/s11432-018-9656-y}.
+
+\bibitem[Chen et~al.(2026{\natexlab{a}})Chen, Chewi, Daskalakis, and
+  Rakhlin]{chen2026high}
+Fan Chen, Sinho Chewi, Constantinos Daskalakis, and Alexander Rakhlin.
+\newblock High-accuracy sampling for diffusion models and log-concave
+  distributions.
+\newblock In \emph{International Conference on Machine Learning}, volume 306 of
+  \emph{Proceedings of Machine Learning Research}, pages 13835--13869,
+  2026{\natexlab{a}}.
+
+\bibitem[Chen et~al.(2026{\natexlab{b}})Chen, Chewi, Daskalakis, and
+  Rakhlin]{chen2026stochastic}
+Fan Chen, Sinho Chewi, Constantinos Daskalakis, and Alexander Rakhlin.
+\newblock High-accuracy log-concave sampling with stochastic queries.
+\newblock In \emph{Conference on Learning Theory}, volume 336 of
+  \emph{Proceedings of Machine Learning Research}, pages 1341--1372,
+  2026{\natexlab{b}}.
+
+\bibitem[Chen et~al.(2014)Chen, Fox, and Guestrin]{chen2014stochastic}
+Tianqi Chen, Emily~B. Fox, and Carlos Guestrin.
+\newblock Stochastic gradient {Hamiltonian} {Monte} {Carlo}.
+\newblock In \emph{International Conference on Machine Learning}, volume~32 of
+  \emph{Proceedings of Machine Learning Research}, pages 1683--1691, 2014.
+
+\bibitem[Chen et~al.(2026{\natexlab{c}})Chen, Cheng, Niles-Weed, and
+  Weare]{chen2026convergence}
+Yifan Chen, Xiaoou Cheng, Jonathan Niles-Weed, and Jonathan Weare.
+\newblock Convergence of unadjusted {Langevin} in high dimensions:
+  delocalization of bias.
+\newblock \emph{Communications on Pure and Applied Mathematics}, 79\penalty0
+  (6):\penalty0 1467--1491, 2026{\natexlab{c}}.
+\newblock \doi{10.1002/cpa.70032}.
+
+\bibitem[Chen et~al.(2026{\natexlab{d}})Chen, Cheng, Niles-Weed, and
+  Weare]{chen2026delocalization}
+Yifan Chen, Xiaoou Cheng, Jonathan Niles-Weed, and Jonathan Weare.
+\newblock Delocalization of bias in unadjusted {Hamiltonian} {Monte} {Carlo}
+  and underdamped {Langevin}.
+\newblock arXiv:2607.15208, 2026{\natexlab{d}}.
+
+\bibitem[Chen et~al.(2022)Chen, Chewi, Salim, and Wibisono]{chen2022improved}
+Yongxin Chen, Sinho Chewi, Adil Salim, and Andre Wibisono.
+\newblock Improved analysis for a proximal algorithm for sampling.
+\newblock In \emph{Conference on Learning Theory}, volume 178 of
+  \emph{Proceedings of Machine Learning Research}, pages 2984--3014, 2022.
+
+\bibitem[Cheng et~al.(2018)Cheng, Chatterji, Abbasi-Yadkori, Bartlett, and
+  Jordan]{cheng2018sharp}
+Xiang Cheng, Niladri~S. Chatterji, Yasin Abbasi-Yadkori, Peter~L. Bartlett, and
+  Michael~I. Jordan.
+\newblock Sharp convergence rates for {Langevin} dynamics in the nonconvex
+  setting.
+\newblock arXiv:1805.01648, 2018.
+
+\bibitem[Dalalyan and Karagulyan(2019)]{dalalyan2017user}
+Arnak~S. Dalalyan and Avetik Karagulyan.
+\newblock User-friendly guarantees for the {Langevin} {Monte} {Carlo} with
+  inaccurate gradient.
+\newblock \emph{Stochastic Processes and their Applications}, 129\penalty0
+  (12):\penalty0 5278--5311, 2019.
+\newblock \doi{10.1016/j.spa.2019.02.016}.
+
+\bibitem[Das et~al.(2023)Das, Nagaraj, and Raj]{das2023utilising}
+Aniket Das, Dheeraj~M. Nagaraj, and Anant Raj.
+\newblock Utilising the {CLT} structure in stochastic gradient based sampling:
+  improved analysis and faster algorithms.
+\newblock In \emph{Conference on Learning Theory}, volume 195 of
+  \emph{Proceedings of Machine Learning Research}, pages 4072--4129, 2023.
+
+\bibitem[Debrabant(2010)]{debrabant2010runge}
+Kristian Debrabant.
+\newblock {Runge--Kutta} methods for third order weak approximation of {SDEs}
+  with multidimensional additive noise.
+\newblock \emph{BIT Numerical Mathematics}, 50\penalty0 (3):\penalty0 541--558,
+  2010.
+\newblock \doi{10.1007/s10543-010-0276-2}.
+
+\bibitem[Debussche and Faou(2012)]{debussche2012weak}
+Arnaud Debussche and Erwan Faou.
+\newblock Weak backward error analysis for {SDEs}.
+\newblock \emph{SIAM Journal on Numerical Analysis}, 50\penalty0 (3):\penalty0
+  1735--1752, 2012.
+\newblock \doi{10.1137/110831544}.
+
+\bibitem[Ding et~al.(2014)Ding, Fang, Babbush, Chen, Skeel, and
+  Neven]{ding2014bayesian}
+Nan Ding, Youhan Fang, Ryan Babbush, Changyou Chen, Robert~D. Skeel, and
+  Hartmut Neven.
+\newblock Bayesian sampling using stochastic gradient thermostats.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~27, 2014.
+
+\bibitem[Dubey et~al.(2016)Dubey, Reddi, Williamson, P{\'o}czos, Smola, and
+  Xing]{dubey2016variance}
+Kumar~Avinava Dubey, Sashank~J. Reddi, Sinead~A. Williamson, Barnab{\'a}s
+  P{\'o}czos, Alexander~J. Smola, and Eric~P. Xing.
+\newblock Variance reduction in stochastic gradient {Langevin} dynamics.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~29, 2016.
+
+\bibitem[Durmus and Moulines(2017)]{durmus2017nonasymptotic}
+Alain Durmus and {\'E}ric Moulines.
+\newblock Nonasymptotic convergence analysis for the unadjusted {Langevin}
+  algorithm.
+\newblock \emph{The Annals of Applied Probability}, 27\penalty0 (3):\penalty0
+  1551--1587, 2017.
+\newblock \doi{10.1214/16-AAP1238}.
+
+\bibitem[Durmus and Moulines(2019)]{durmus2019high}
+Alain Durmus and {\'E}ric Moulines.
+\newblock High-dimensional {Bayesian} inference via the unadjusted {Langevin}
+  algorithm.
+\newblock \emph{Bernoulli}, 25\penalty0 (4A):\penalty0 2854--2882, 2019.
+\newblock \doi{10.3150/18-BEJ1073}.
+
+\bibitem[Durmus et~al.(2016)Durmus, Simsekli, Moulines, Badeau, and
+  Richard]{durmus2016stochastic}
+Alain Durmus, Umut Simsekli, {\'E}ric Moulines, Roland Badeau, and Ga{\"e}l
+  Richard.
+\newblock Stochastic gradient {Richardson}--{Romberg} {Markov} chain {Monte}
+  {Carlo}.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~29, 2016.
+
+\bibitem[Durmus et~al.(2019)Durmus, Majewski, and
+  Miasojedow]{durmus2019analysis}
+Alain Durmus, Szymon Majewski, and B{\l}a{\.z}ej Miasojedow.
+\newblock Analysis of {Langevin} {Monte} {Carlo} via convex optimization.
+\newblock \emph{Journal of Machine Learning Research}, 20\penalty0
+  (73):\penalty0 1--46, 2019.
+
+\bibitem[Eberle(2016)]{eberle2016reflection}
+Andreas Eberle.
+\newblock Reflection couplings and contraction rates for diffusions.
+\newblock \emph{Probability Theory and Related Fields}, 166\penalty0
+  (3--4):\penalty0 851--886, 2016.
+\newblock \doi{10.1007/s00440-015-0673-1}.
+
+\bibitem[Elworthy and Li(1994)]{elworthy1994formulae}
+K.~David Elworthy and Xue-Mei Li.
+\newblock Formulae for the derivatives of heat semigroups.
+\newblock \emph{Journal of Functional Analysis}, 125\penalty0 (1):\penalty0
+  252--286, 1994.
+\newblock \doi{10.1006/jfan.1994.1124}.
+
+\bibitem[Gallou{\"e}t et~al.(2024)Gallou{\"e}t, Natale, and
+  Todeschi]{gallouet2024geodesic}
+Thomas~O. Gallou{\"e}t, Andrea Natale, and Gabriele Todeschi.
+\newblock From geodesic extrapolation to a variational {BDF2} scheme for
+  {Wasserstein} gradient flows.
+\newblock \emph{Mathematics of Computation}, 93\penalty0 (350):\penalty0
+  2769--2810, 2024.
+\newblock \doi{10.1090/mcom/3951}.
+
+\bibitem[Gallou{\"e}t et~al.(2025)Gallou{\"e}t, Natale, and
+  Todeschi]{gallouet2025metric}
+Thomas~O. Gallou{\"e}t, Andrea Natale, and Gabriele Todeschi.
+\newblock Metric extrapolation in the {Wasserstein} space.
+\newblock \emph{Calculus of Variations and Partial Differential Equations},
+  64\penalty0 (5):\penalty0 147, 2025.
+\newblock \doi{10.1007/s00526-025-02996-6}.
+
+\bibitem[Gao et~al.(2022)Gao, G{\"u}rb{\"u}zbalaban, and Zhu]{gao2022global}
+Xuefeng Gao, Mert G{\"u}rb{\"u}zbalaban, and Lingjiong Zhu.
+\newblock Global convergence of stochastic gradient {Hamiltonian} {Monte}
+  {Carlo} for nonconvex stochastic optimization: nonasymptotic performance
+  bounds and momentum-based acceleration.
+\newblock \emph{Operations Research}, 70\penalty0 (5):\penalty0 2931--2947,
+  2022.
+\newblock \doi{10.1287/opre.2021.2162}.
+
+\bibitem[Giles et~al.(2016)Giles, Nagapetyan, Szpruch, Vollmer, and
+  Zygalakis]{giles2016multilevel}
+Michael~B. Giles, Tigran Nagapetyan, {\L}ukasz Szpruch, Sebastian~J. Vollmer,
+  and Konstantinos~C. Zygalakis.
+\newblock Multilevel {Monte} {Carlo} for scalable {Bayesian} computations.
+\newblock arXiv:1609.06144, 2016.
+
+\bibitem[Giles et~al.(2020)Giles, Majka, Szpruch, Vollmer, and
+  Zygalakis]{giles2020multilevel}
+Michael~B. Giles, Mateusz~B. Majka, {\L}ukasz Szpruch, Sebastian~J. Vollmer,
+  and Konstantinos~C. Zygalakis.
+\newblock Multi-level {Monte} {Carlo} methods for the approximation of
+  invariant measures of stochastic differential equations.
+\newblock \emph{Statistics and Computing}, 30\penalty0 (3):\penalty0 507--524,
+  2020.
+\newblock \doi{10.1007/s11222-019-09890-0}.
+
+\bibitem[Gouraud et~al.(2025)Gouraud, Le~Bris, Majka, and
+  Monmarch{\'e}]{gouraud2025hmc}
+Nicola{\"\i} Gouraud, Pierre Le~Bris, Adrien Majka, and Pierre Monmarch{\'e}.
+\newblock {HMC} and underdamped {Langevin} united in the unadjusted convex
+  smooth case.
+\newblock \emph{SIAM/ASA Journal on Uncertainty Quantification}, 13\penalty0
+  (1):\penalty0 278--303, 2025.
+\newblock \doi{10.1137/23M1608963}.
+
+\bibitem[Green(1954)]{green1954markoff}
+Melville~S. Green.
+\newblock Markoff random processes and the statistical mechanics of
+  time-dependent phenomena. {II}. {Irreversible} processes in fluids.
+\newblock \emph{The Journal of Chemical Physics}, 22\penalty0 (3):\penalty0
+  398--413, 1954.
+\newblock \doi{10.1063/1.1740082}.
+
+\bibitem[Hairer and Majda(2010)]{hairer2010simple}
+Martin Hairer and Andrew~J. Majda.
+\newblock A simple framework to justify linear response theory.
+\newblock \emph{Nonlinearity}, 23\penalty0 (4):\penalty0 909--922, 2010.
+\newblock \doi{10.1088/0951-7715/23/4/008}.
+
+\bibitem[Hairer and Mattingly(2011)]{hairer2008yet}
+Martin Hairer and Jonathan~C. Mattingly.
+\newblock Yet another look at {Harris}' ergodic theorem for {Markov} chains.
+\newblock In Robert~C. Dalang, Marco Dozzi, and Francesco Russo, editors,
+  \emph{Seminar on Stochastic Analysis, Random Fields and Applications {VI}},
+  volume~63 of \emph{Progress in Probability}, pages 109--117.
+  Birkh{\"a}user/Springer Basel, 2011.
+\newblock \doi{10.1007/978-3-0348-0021-1_7}.
+
+\bibitem[Hoffman and Gelman(2014)]{hoffman2014no}
+Matthew~D. Hoffman and Andrew Gelman.
+\newblock The {No-U-Turn} sampler: adaptively setting path lengths in
+  {Hamiltonian} {Monte} {Carlo}.
+\newblock \emph{Journal of Machine Learning Research}, 15\penalty0
+  (47):\penalty0 1593--1623, 2014.
+
+\bibitem[Kinoshita and Suzuki(2022)]{kinoshita2022improved}
+Yuri Kinoshita and Taiji Suzuki.
+\newblock Improved convergence rate of stochastic gradient {Langevin} dynamics
+  with variance reduction and its application to optimization.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~35, 2022.
+
+\bibitem[Kloeden and Platen(1992)]{kloeden1992numerical}
+Peter~E. Kloeden and Eckhard Platen.
+\newblock \emph{Numerical Solution of Stochastic Differential Equations},
+  volume~23 of \emph{Applications of Mathematics (New York)}.
+\newblock Springer, 1992.
+\newblock \doi{10.1007/978-3-662-12616-5}.
+
+\bibitem[Kopec(2015)]{kopec2013weak}
+Marie Kopec.
+\newblock Weak backward error analysis for overdamped {Langevin} processes.
+\newblock \emph{IMA Journal of Numerical Analysis}, 35\penalty0 (2):\penalty0
+  583--614, 2015.
+\newblock \doi{10.1093/imanum/dru016}.
+
+\bibitem[Kubo(1957)]{kubo1957statistical}
+Ryogo Kubo.
+\newblock Statistical-mechanical theory of irreversible processes. {I}.
+  {General} theory and simple applications to magnetic and conduction problems.
+\newblock \emph{Journal of the Physical Society of Japan}, 12\penalty0
+  (6):\penalty0 570--586, 1957.
+\newblock \doi{10.1143/JPSJ.12.570}.
+
+\bibitem[Lamberton and Pag{\`e}s(2002)]{lamberton2002recursive}
+Damien Lamberton and Gilles Pag{\`e}s.
+\newblock Recursive computation of the invariant distribution of a diffusion.
+\newblock \emph{Bernoulli}, 8\penalty0 (3):\penalty0 367--405, 2002.
+
+\bibitem[LeCun et~al.(1998)LeCun, Bottou, Bengio, and
+  Haffner]{lecun1998gradient}
+Yann LeCun, L{\'e}on Bottou, Yoshua Bengio, and Patrick Haffner.
+\newblock Gradient-based learning applied to document recognition.
+\newblock \emph{Proceedings of the IEEE}, 86\penalty0 (11):\penalty0
+  2278--2324, 1998.
+\newblock \doi{10.1109/5.726791}.
+
+\bibitem[Lee et~al.(2021)Lee, Shen, and Tian]{lee2021structured}
+Yin~Tat Lee, Ruoqi Shen, and Kevin Tian.
+\newblock Structured logconcave sampling with a restricted {Gaussian} oracle.
+\newblock In \emph{Conference on Learning Theory}, volume 134 of
+  \emph{Proceedings of Machine Learning Research}, pages 2993--3050, 2021.
+
+\bibitem[Leimkuhler and Matthews(2013)]{leimkuhler2013rational}
+Benedict Leimkuhler and Charles Matthews.
+\newblock Rational construction of stochastic numerical methods for molecular
+  sampling.
+\newblock \emph{Applied Mathematics Research eXpress}, 2013\penalty0
+  (1):\penalty0 34--56, 2013.
+\newblock \doi{10.1093/amrx/abs010}.
+
+\bibitem[Leimkuhler and Matthews(2015)]{leimkuhler2015molecular}
+Benedict Leimkuhler and Charles Matthews.
+\newblock \emph{Molecular Dynamics: With Deterministic and Stochastic Numerical
+  Methods}, volume~39 of \emph{Interdisciplinary Applied Mathematics}.
+\newblock Springer, 2015.
+\newblock \doi{10.1007/978-3-319-16375-8}.
+
+\bibitem[Leimkuhler and Shang(2016)]{leimkuhler2016adaptive}
+Benedict Leimkuhler and Xiaocheng Shang.
+\newblock Adaptive thermostats for noisy gradient systems.
+\newblock \emph{SIAM Journal on Scientific Computing}, 38\penalty0
+  (2):\penalty0 A712--A736, 2016.
+\newblock \doi{10.1137/15M102318X}.
+
+\bibitem[Leimkuhler et~al.(2014)Leimkuhler, Matthews, and
+  Tretyakov]{leimkuhler2014long}
+Benedict Leimkuhler, Charles Matthews, and Michael~V. Tretyakov.
+\newblock On the long-time integration of stochastic gradient systems.
+\newblock \emph{Proceedings of the Royal Society A: Mathematical, Physical and
+  Engineering Sciences}, 470\penalty0 (2170):\penalty0 20140120, 2014.
+\newblock \doi{10.1098/rspa.2014.0120}.
+
+\bibitem[Leimkuhler et~al.(2016)Leimkuhler, Matthews, and
+  Stoltz]{leimkuhler2015computation}
+Benedict Leimkuhler, Charles Matthews, and Gabriel Stoltz.
+\newblock The computation of averages from equilibrium and nonequilibrium
+  {Langevin} molecular dynamics.
+\newblock \emph{IMA Journal of Numerical Analysis}, 36\penalty0 (1):\penalty0
+  13--79, 2016.
+\newblock \doi{10.1093/imanum/dru056}.
+
+\bibitem[Leimkuhler et~al.(2020)Leimkuhler, Sachs, and
+  Stoltz]{leimkuhler2020hypocoercivity}
+Benedict Leimkuhler, Matthias Sachs, and Gabriel Stoltz.
+\newblock Hypocoercivity properties of adaptive {Langevin} dynamics.
+\newblock \emph{SIAM Journal on Applied Mathematics}, 80\penalty0 (3):\penalty0
+  1197--1222, 2020.
+\newblock \doi{10.1137/19M1291649}.
+
+\bibitem[Leimkuhler et~al.(2024)Leimkuhler, Paulin, and
+  Whalley]{leimkuhler2023contraction}
+Benedict Leimkuhler, Daniel Paulin, and Peter~A. Whalley.
+\newblock Contraction rate estimates of stochastic gradient kinetic {Langevin}
+  integrators.
+\newblock \emph{ESAIM: Mathematical Modelling and Numerical Analysis},
+  58\penalty0 (6):\penalty0 2255--2286, 2024.
+\newblock \doi{10.1051/m2an/2024038}.
+
+\bibitem[Leli{\`e}vre and Stoltz(2016)]{lelievre2016partial}
+Tony Leli{\`e}vre and Gabriel Stoltz.
+\newblock Partial differential equations and stochastic methods in molecular
+  dynamics.
+\newblock \emph{Acta Numerica}, 25:\penalty0 681--880, 2016.
+\newblock \doi{10.1017/S0962492916000039}.
+
+\bibitem[Lemaire et~al.(2015)Lemaire, Pag{\`e}s, and
+  Panloup]{lemaire2015invariant}
+Vincent Lemaire, Gilles Pag{\`e}s, and Fabien Panloup.
+\newblock Invariant measure of duplicated diffusions and application to
+  {Richardson}--{Romberg} extrapolation.
+\newblock \emph{Annales de l'Institut Henri Poincar{\'e}, Probabilit{\'e}s et
+  Statistiques}, 51\penalty0 (4):\penalty0 1562--1596, 2015.
+\newblock \doi{10.1214/13-AIHP591}.
+
+\bibitem[Li and Wang(2025)]{li2022sharp}
+Lei Li and Yuliang Wang.
+\newblock A sharp uniform-in-time error estimate for stochastic gradient
+  {Langevin} dynamics.
+\newblock \emph{CSIAM Transactions on Applied Mathematics}, 6\penalty0
+  (4):\penalty0 711--759, 2025.
+\newblock \doi{10.4208/csiam-am.SO-2024-0039}.
+
+\bibitem[Li et~al.(2024)Li, Liu, and Wang]{li2024geometric}
+Lei Li, Jian-Guo Liu, and Yuliang Wang.
+\newblock Geometric ergodicity of {SGLD} via reflection coupling.
+\newblock \emph{Stochastics and Dynamics}, 24\penalty0 (5):\penalty0 2450035,
+  2024.
+\newblock \doi{10.1142/S0219493724500357}.
+
+\bibitem[Li et~al.(2023)Li, Wang, Zha, and Tao]{li2023improving}
+Ruilin Li, Xin Wang, Hongyuan Zha, and Molei Tao.
+\newblock Improving sampling accuracy of stochastic gradient {MCMC} methods via
+  non-uniform subsampling of gradients.
+\newblock \emph{Discrete and Continuous Dynamical Systems -- Series S},
+  16\penalty0 (2):\penalty0 329--360, 2023.
+\newblock \doi{10.3934/dcdss.2021157}.
+
+\bibitem[Li et~al.(2018)Li, Ryu, Osher, Yin, and Gangbo]{li2018parallel}
+Wuchen Li, Ernest~K. Ryu, Stanley Osher, Wotao Yin, and Wilfrid Gangbo.
+\newblock A parallel method for {Earth} {Mover}'s distance.
+\newblock \emph{Journal of Scientific Computing}, 75\penalty0 (1):\penalty0
+  182--197, 2018.
+\newblock \doi{10.1007/s10915-017-0529-1}.
+
+\bibitem[Li et~al.(2019{\natexlab{a}})Li, Wu, Mackey, and
+  Erdogdu]{li2019stochastic}
+Xuechen Li, Yi~Wu, Lester Mackey, and Murat~A. Erdogdu.
+\newblock Stochastic {Runge--Kutta} accelerates {Langevin} {Monte} {Carlo} and
+  beyond.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~32, 2019{\natexlab{a}}.
+
+\bibitem[Li et~al.(2019{\natexlab{b}})Li, Zhang, Cheng, Zhu, and
+  Li]{li2019variance}
+Zhize Li, Tianyi Zhang, Shuyu Cheng, Jun Zhu, and Jian Li.
+\newblock Stochastic gradient {Hamiltonian} {Monte} {Carlo} with variance
+  reduction for {Bayesian} inference.
+\newblock \emph{Machine Learning}, 108\penalty0 (8--9):\penalty0 1701--1727,
+  2019{\natexlab{b}}.
+\newblock \doi{10.1007/s10994-019-05825-y}.
+
+\bibitem[Lu et~al.(2025)Lu, Ye, and Zhou]{lu2025mse}
+Jianfeng Lu, Xuda Ye, and Zhennan Zhou.
+\newblock Mean square error analysis of stochastic gradient and
+  variance-reduced sampling algorithms.
+\newblock arXiv:2511.04413, 2025.
+
+\bibitem[Ma et~al.(2015)Ma, Chen, and Fox]{ma2015complete}
+Yi-An Ma, Tianqi Chen, and Emily~B. Fox.
+\newblock A complete recipe for stochastic gradient {MCMC}.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~28, 2015.
+
+\bibitem[Majka et~al.(2020)Majka, Mijatovi{\'c}, and
+  Szpruch]{majka2020nonasymptotic}
+Mateusz~B. Majka, Aleksandar Mijatovi{\'c}, and {\L}ukasz Szpruch.
+\newblock Nonasymptotic bounds for sampling algorithms without log-concavity.
+\newblock \emph{The Annals of Applied Probability}, 30\penalty0 (4):\penalty0
+  1534--1581, 2020.
+\newblock \doi{10.1214/19-AAP1535}.
+
+\bibitem[Majka et~al.(2026)Majka, Nagapetyan, Szpruch, Wu, and
+  Zhuang]{majka2026computational}
+Mateusz~B. Majka, Tigran Nagapetyan, {\L}ukasz Szpruch, Yue Wu, and Danqi
+  Zhuang.
+\newblock On the computational cost of stochastic gradient {Langevin} dynamics.
+\newblock arXiv:2609.17750, 2026.
+
+\bibitem[Mannella(2025)]{mannella2025numerical}
+Riccardo Mannella.
+\newblock Numerical integration of stochastic differential equations: the
+  {Heun} algorithm revisited and the {It\^o}--{Stratonovich} calculus.
+\newblock \emph{Entropy}, 27\penalty0 (9):\penalty0 910, 2025.
+\newblock \doi{10.3390/e27090910}.
+
+\bibitem[Matthews and Weare(2018)]{matthews2018langevin}
+Charles Matthews and Jonathan Weare.
+\newblock {Langevin} {Markov} chain {Monte} {Carlo} with stochastic gradients.
+\newblock arXiv:1805.08863, 2018.
+
+\bibitem[Mattingly et~al.(2010)Mattingly, Stuart, and
+  Tretyakov]{mattingly2010convergence}
+Jonathan~C. Mattingly, Andrew~M. Stuart, and Michael~V. Tretyakov.
+\newblock Convergence of numerical time-averaging and stationary measures via
+  {Poisson} equations.
+\newblock \emph{SIAM Journal on Numerical Analysis}, 48\penalty0 (2):\penalty0
+  552--577, 2010.
+\newblock \doi{10.1137/090770527}.
+
+\bibitem[Meyn and Tweedie(1992)]{meyn1992stability}
+Sean~P. Meyn and Richard~L. Tweedie.
+\newblock Stability of {Markovian} processes {I}: Criteria for discrete-time
+  chains.
+\newblock \emph{Advances in Applied Probability}, 24\penalty0 (3):\penalty0
+  542--574, 1992.
+\newblock \doi{10.2307/1427479}.
+
+\bibitem[Meyn and Tweedie(1993)]{meyn1993markov}
+Sean~P. Meyn and Richard~L. Tweedie.
+\newblock \emph{Markov Chains and Stochastic Stability}.
+\newblock Springer-Verlag, London, 1993.
+\newblock \doi{10.1007/978-1-4471-3267-7}.
+
+\bibitem[Milstein and Tretyakov(2004)]{milstein2004stochastic}
+Grigori~N. Milstein and Michael~V. Tretyakov.
+\newblock \emph{Stochastic Numerics for Mathematical Physics}.
+\newblock Scientific Computation. Springer, 2004.
+\newblock \doi{10.1007/978-3-662-10063-9}.
+
+\bibitem[Monmarch{\'e}(2021)]{monmarche2021high}
+Pierre Monmarch{\'e}.
+\newblock High-dimensional {MCMC} with a standard splitting scheme for the
+  underdamped {Langevin} diffusion.
+\newblock \emph{Electronic Journal of Statistics}, 15\penalty0 (2):\penalty0
+  4117--4166, 2021.
+\newblock \doi{10.1214/21-EJS1888}.
+
+\bibitem[Nagapetyan et~al.(2017)Nagapetyan, Duncan, Hasenclever, Vollmer,
+  Szpruch, and Zygalakis]{nagapetyan2017true}
+Tigran Nagapetyan, Andrew~B. Duncan, Leonard Hasenclever, Sebastian~J. Vollmer,
+  {\L}ukasz Szpruch, and Konstantinos~C. Zygalakis.
+\newblock The true cost of stochastic gradient {Langevin} dynamics.
+\newblock arXiv:1706.02692, 2017.
+
+\bibitem[Neklyudov et~al.(2023)Neklyudov, Brekelmans, Severo, and
+  Makhzani]{neklyudov2023action}
+Kirill Neklyudov, Rob Brekelmans, Daniel Severo, and Alireza Makhzani.
+\newblock Action matching: Learning stochastic dynamics from samples.
+\newblock In \emph{International Conference on Machine Learning}, volume 202 of
+  \emph{Proceedings of Machine Learning Research}, pages 25858--25889, 2023.
+
+\bibitem[Nemeth and Fearnhead(2021)]{nemeth2021stochastic}
+Christopher Nemeth and Paul Fearnhead.
+\newblock Stochastic gradient {Markov} chain {Monte} {Carlo}.
+\newblock \emph{Journal of the American Statistical Association}, 116\penalty0
+  (533):\penalty0 433--450, 2021.
+\newblock \doi{10.1080/01621459.2020.1847120}.
+
+\bibitem[Paulin and Whalley(2024)]{paulin2024correction}
+Daniel Paulin and Peter~A. Whalley.
+\newblock Correction to ``{Wasserstein} distance estimates for the
+  distributions of numerical approximations to ergodic stochastic differential
+  equations''.
+\newblock \emph{Journal of Machine Learning Research}, 25\penalty0
+  (376):\penalty0 1--9, 2024.
+
+\bibitem[Paulin and Whalley(2026{\natexlab{a}})]{paulin2026sgld}
+Daniel Paulin and Peter~A. Whalley.
+\newblock Theoretical guarantees for stochastic gradient {Langevin} dynamics.
+\newblock arXiv:2610.01651, 2026{\natexlab{a}}.
+
+\bibitem[Paulin and Whalley(2026{\natexlab{b}})]{paulin2026theoretical}
+Daniel Paulin and Peter~A. Whalley.
+\newblock Theoretical guarantees for stochastic gradient sampling methods via
+  {Gaussian} convolution inequalities.
+\newblock arXiv:2604.24632, 2026{\natexlab{b}}.
+
+\bibitem[Paulin et~al.(2025)Paulin, Whalley, Chada, and
+  Leimkuhler]{paulin2025sampling}
+Daniel Paulin, Peter~A. Whalley, Neil~K. Chada, and Benedict Leimkuhler.
+\newblock Sampling from {Bayesian} neural network posteriors with symmetric
+  minibatch splitting {Langevin} dynamics.
+\newblock In \emph{International Conference on Artificial Intelligence and
+  Statistics}, volume 258 of \emph{Proceedings of Machine Learning Research},
+  pages 5014--5022, 2025.
+
+\bibitem[Raginsky et~al.(2017)Raginsky, Rakhlin, and
+  Telgarsky]{raginsky2017nonconvex}
+Maxim Raginsky, Alexander Rakhlin, and Matus Telgarsky.
+\newblock Non-convex learning via stochastic gradient {Langevin} dynamics: a
+  nonasymptotic analysis.
+\newblock In \emph{Conference on Learning Theory}, volume~65 of
+  \emph{Proceedings of Machine Learning Research}, pages 1674--1703, 2017.
+
+\bibitem[Roberts and Tweedie(1996)]{roberts1996exponential}
+Gareth~O. Roberts and Richard~L. Tweedie.
+\newblock Exponential convergence of {Langevin} distributions and their
+  discrete approximations.
+\newblock \emph{Bernoulli}, 2\penalty0 (4):\penalty0 341--363, 1996.
+\newblock \doi{10.2307/3318418}.
+
+\bibitem[R{\"o}{\ss}ler(2010)]{rossler2010runge}
+Andreas R{\"o}{\ss}ler.
+\newblock {Runge--Kutta} methods for the strong approximation of solutions of
+  stochastic differential equations.
+\newblock \emph{SIAM Journal on Numerical Analysis}, 48\penalty0 (3):\penalty0
+  922--952, 2010.
+\newblock \doi{10.1137/09076636X}.
+
+\bibitem[Sanz-Serna and Zygalakis(2021)]{sanz2021wasserstein}
+Jes{\'u}s~Mar{\'\i}a Sanz-Serna and Konstantinos~C. Zygalakis.
+\newblock Wasserstein distance estimates for the distributions of numerical
+  approximations to ergodic stochastic differential equations.
+\newblock \emph{Journal of Machine Learning Research}, 22\penalty0
+  (242):\penalty0 1--37, 2021.
+
+\bibitem[Sato and Nakagawa(2014)]{sato2014approximation}
+Issei Sato and Hiroshi Nakagawa.
+\newblock Approximation analysis of stochastic gradient {Langevin} dynamics by
+  using {Fokker--Planck} equation and {Ito} process.
+\newblock In \emph{International Conference on Machine Learning}, volume~32 of
+  \emph{Proceedings of Machine Learning Research}, pages 982--990, 2014.
+
+\bibitem[Sekkat and Stoltz(2023)]{sekkat2023minibatching}
+Inass Sekkat and Gabriel Stoltz.
+\newblock Mini-batching error and adaptive {Langevin} dynamics.
+\newblock \emph{Journal of Machine Learning Research}, 24\penalty0
+  (329):\penalty0 1--58, 2023.
+
+\bibitem[Shang et~al.(2015)Shang, Zhu, Leimkuhler, and
+  Storkey]{shang2015covariance}
+Xiaocheng Shang, Zhanxing Zhu, Benedict Leimkuhler, and Amos~J. Storkey.
+\newblock Covariance-controlled adaptive {Langevin} thermostat for large-scale
+  {Bayesian} sampling.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~28, 2015.
+
+\bibitem[Shaw and Whalley(2025)]{shaw2025random}
+Luke Shaw and Peter~A. Whalley.
+\newblock Random reshuffling for stochastic gradient {Langevin} dynamics.
+\newblock arXiv:2501.16055, 2025.
+
+\bibitem[Talay(1990)]{talay1990second}
+Denis Talay.
+\newblock Second-order discretization schemes of stochastic differential
+  systems for the computation of the invariant law.
+\newblock \emph{Stochastics and Stochastic Reports}, 29\penalty0 (1):\penalty0
+  13--36, 1990.
+\newblock \doi{10.1080/17442509008833606}.
+
+\bibitem[Talay and Tubaro(1990)]{talay1990expansion}
+Denis Talay and Luciano Tubaro.
+\newblock Expansion of the global error for numerical schemes solving
+  stochastic differential equations.
+\newblock \emph{Stochastic Analysis and Applications}, 8\penalty0 (4):\penalty0
+  483--509, 1990.
+\newblock \doi{10.1080/07362999008809220}.
+
+\bibitem[Teh et~al.(2016)Teh, Thiery, and Vollmer]{teh2016consistency}
+Yee~Whye Teh, Alexandre~H. Thiery, and Sebastian~J. Vollmer.
+\newblock Consistency and fluctuations for stochastic gradient {Langevin}
+  dynamics.
+\newblock \emph{Journal of Machine Learning Research}, 17\penalty0
+  (7):\penalty0 1--33, 2016.
+
+\bibitem[Vempala and Wibisono(2019)]{vempala2019rapid}
+Santosh~S. Vempala and Andre Wibisono.
+\newblock Rapid convergence of the unadjusted {Langevin} algorithm:
+  isoperimetry suffices.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~32, 2019.
+
+\bibitem[Vilmart(2015)]{vilmart2015postprocessed}
+Gilles Vilmart.
+\newblock Postprocessed integrators for the high order integration of ergodic
+  {SDEs}.
+\newblock \emph{SIAM Journal on Scientific Computing}, 37\penalty0
+  (1):\penalty0 A201--A220, 2015.
+\newblock \doi{10.1137/140974328}.
+
+\bibitem[Vollmer et~al.(2016)Vollmer, Zygalakis, and
+  Teh]{vollmer2016exploration}
+Sebastian~J. Vollmer, Konstantinos~C. Zygalakis, and Yee~Whye Teh.
+\newblock Exploration of the (non-)asymptotic bias and variance of stochastic
+  gradient {Langevin} dynamics.
+\newblock \emph{Journal of Machine Learning Research}, 17\penalty0
+  (159):\penalty0 1--48, 2016.
+
+\bibitem[Welling and Teh(2011)]{welling2011bayesian}
+Max Welling and Yee~Whye Teh.
+\newblock {Bayesian} learning via stochastic gradient {Langevin} dynamics.
+\newblock In \emph{International Conference on Machine Learning}, pages
+  681--688, 2011.
+
+\bibitem[Xu et~al.(2018)Xu, Chen, Zou, and Gu]{xu2018global}
+Pan Xu, Jinghui Chen, Difan Zou, and Quanquan Gu.
+\newblock Global convergence of {Langevin} dynamics based algorithms for
+  nonconvex optimization.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~31, 2018.
+
+\bibitem[Yang and Wang(2026)]{yang2026accelerating}
+Bin Yang and Xiaojie Wang.
+\newblock Accelerating {Langevin} {Monte} {Carlo} via efficient stochastic
+  {Runge--Kutta} methods beyond log-concavity.
+\newblock In \emph{International Conference on Machine Learning}, volume 306 of
+  \emph{Proceedings of Machine Learning Research}, pages 146170--146197, 2026.
+
+\bibitem[Ye(2026)]{ye2026mse}
+Xuda Ye.
+\newblock Mean square error analysis of stochastic {Runge--Kutta} integrators.
+\newblock arXiv:2609.11528, 2026.
+
+\bibitem[Zhang et~al.(2023)Zhang, Akyildiz, Damoulas, and
+  Sabanis]{zhang2023nonasymptotic}
+Ying Zhang, {\"O}mer~Deniz Akyildiz, Theodoros Damoulas, and Sotirios Sabanis.
+\newblock Nonasymptotic estimates for stochastic gradient {Langevin} dynamics
+  under local conditions in nonconvex optimization.
+\newblock \emph{Applied Mathematics and Optimization}, 87\penalty0
+  (2):\penalty0 25, 2023.
+\newblock \doi{10.1007/s00245-022-09932-6}.
+
+\bibitem[Zou and Gu(2021)]{zou2021convergence}
+Difan Zou and Quanquan Gu.
+\newblock On the convergence of {Hamiltonian} {Monte} {Carlo} with stochastic
+  gradients.
+\newblock In \emph{International Conference on Machine Learning}, volume 139 of
+  \emph{Proceedings of Machine Learning Research}, pages 13012--13022, 2021.
+
+\bibitem[Zou et~al.(2018)Zou, Xu, and Gu]{zou2018stochastic}
+Difan Zou, Pan Xu, and Quanquan Gu.
+\newblock Stochastic variance-reduced {Hamilton} {Monte} {Carlo} methods.
+\newblock In \emph{International Conference on Machine Learning}, volume~80 of
+  \emph{Proceedings of Machine Learning Research}, pages 6028--6037, 2018.
+
+\bibitem[Zou et~al.(2019{\natexlab{a}})Zou, Xu, and Gu]{zou2019sampling}
+Difan Zou, Pan Xu, and Quanquan Gu.
+\newblock Sampling from non-log-concave distributions via variance-reduced
+  gradient {Langevin} dynamics.
+\newblock In \emph{International Conference on Artificial Intelligence and
+  Statistics}, volume~89 of \emph{Proceedings of Machine Learning Research},
+  pages 2936--2945, 2019{\natexlab{a}}.
+
+\bibitem[Zou et~al.(2019{\natexlab{b}})Zou, Xu, and Gu]{zou2019stochastic}
+Difan Zou, Pan Xu, and Quanquan Gu.
+\newblock Stochastic gradient {Hamiltonian} {Monte} {Carlo} methods with
+  recursive variance reduction.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~32, 2019{\natexlab{b}}.
+
+\bibitem[Zou et~al.(2021)Zou, Xu, and Gu]{zou2021faster}
+Difan Zou, Pan Xu, and Quanquan Gu.
+\newblock Faster convergence of stochastic gradient {Langevin} dynamics for
+  non-log-concave sampling.
+\newblock In \emph{Conference on Uncertainty in Artificial Intelligence},
+  volume 161 of \emph{Proceedings of Machine Learning Research}, pages
+  1152--1162, 2021.
+
+\end{thebibliography}
