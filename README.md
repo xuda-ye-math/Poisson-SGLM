@@ -1,5 +1,11 @@
 # Stochastic gradient Leimkuhler–Matthews integrator with second order discretization error
 
+[![arXiv](https://img.shields.io/badge/arXiv-2610.24781-b31b1b.svg)](https://arxiv.org/abs/2610.24781)
+[![Paper: CC BY 4.0](https://img.shields.io/badge/Paper-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![Code: MIT](https://img.shields.io/badge/Code-MIT-yellow.svg)](Codes/LICENSE)
+[![Julia 1.13.1](https://img.shields.io/badge/Julia-1.13.1-9558B2.svg)](https://julialang.org)
+[![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB.svg)](https://www.python.org)
+
 The manuscript and the source code for the numerical experiments of the paper *Stochastic Gradient
 Leimkuhler–Matthews Integrator with Second Order Discretization Error* by Xuda Ye, Yuliang Wang, Guang Lin and
 Cindy Xiangrui Kong.
