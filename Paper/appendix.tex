@@ -676,7 +676,7 @@ The proof uses the bounds \eqref{eq: exact sizes} on one step of the modified dy
         \max\bigl\{ \mathbb E |D_k|^{2q} ,\; \mathbb E |\tilde Y_k(h) - Y_k|^{2q} \bigr\} \Le C h^{q} + C h^{2q}\, \mathbb E \bigl( 1 + |Y_k| \bigr)^{2q} \Le C h^{q} \bigl( 1 + |Y_0| \bigr)^{2q} .
     \end{equation*}
 
-    The argument carries over to the stochastic gradient chain \eqref{eq: sglm markov}, with $\hat{\mathbb E}_k$ of \eqref{eq: sg filtration} in place of $\mathbb E_k$, once the displacement bounds and the drift condition are verified for it. The step of this chain is
+    The argument carries over to the stochastic gradient chain \eqref{eq: sglm markov}, with $\hat{\mathbb E}_k$ of \eqref{eq: sg filtration} in place of $\mathbb E_k$, once the displacement bounds and the drift condition are verified for it. The step \eqref{eq: sg chain step} of this chain, at the index $k$, is
     \begin{equation*}
         D_k = Y_{k+1} - Y_k = \sqrt{2h}\, \chi_k - h\, \nabla \hat U(Z_k; \xi_k) .
     \end{equation*}
@@ -765,7 +765,7 @@ The proof compares the moments of $\tilde W_h$ in Lemma~\ref{lem: exact moments}
     \begin{equation*}
         (Y_1 - Y_0)^{\otimes 2} = 2h\, \chi_0^{\otimes 2} - 2h\sqrt{2h}\, \mathrm{Sym}\bigl( \chi_0 \otimes \nabla U(Z_0) \bigr) + h^2\, \nabla U(Z_0)^{\otimes 2} .
     \end{equation*}
-    Here $\mathrm{Sym}$ is essential to ensure that both sides are symmetric matrices. The term $2h\, \chi_0^{\otimes 2}$ has conditional mean $2h I_d$. For the cross term $-2h\sqrt{2h}\, \mathrm{Sym}( \chi_0 \otimes \nabla U(Z_0) )$, insert \eqref{eq: gradient taylor} into $\chi_0 \otimes \nabla U(Z_0)$. The terms $\chi_0 \otimes \nabla U$ and $\chi_0 \otimes \nabla^3 U[\chi_0^{\otimes 2}]$ have odd degree and mean zero, $\mathbb E_0[\chi_0 \otimes \nabla^2 U\, \chi_0] = \nabla^2 U$ since $\mathbb E_0[\chi_0^{\otimes 2}] = I_d$ and $\nabla^2 U$ is symmetric, and the terms $\frac16 (\frac h2)^{\frac32}\, \chi_0 \otimes \nabla^4 U[\chi_0^{\otimes 3}]$ and $\chi_0 \otimes \varrho_4$ have conditional means of norm at most $C h^{\frac32}$. Hence
+    The term $2h\, \chi_0^{\otimes 2}$ has conditional mean $2h I_d$. For the cross term $-2h\sqrt{2h}\, \mathrm{Sym}( \chi_0 \otimes \nabla U(Z_0) )$, insert \eqref{eq: gradient taylor} into $\chi_0 \otimes \nabla U(Z_0)$. The terms $\chi_0 \otimes \nabla U$ and $\chi_0 \otimes \nabla^3 U[\chi_0^{\otimes 2}]$ have odd degree and mean zero, $\mathbb E_0[\chi_0 \otimes \nabla^2 U\, \chi_0] = \nabla^2 U$ since $\mathbb E_0[\chi_0^{\otimes 2}] = I_d$ and $\nabla^2 U$ is symmetric, and the terms $\frac16 (\frac h2)^{\frac32}\, \chi_0 \otimes \nabla^4 U[\chi_0^{\otimes 3}]$ and $\chi_0 \otimes \varrho_4$ have conditional means of norm at most $C h^{\frac32}$. Hence
     \begin{equation*}
         \mathbb E_0\bigl[ \chi_0 \otimes \nabla U(Z_0) \bigr] = \sqrt{\frac h2}\, \nabla^2 U + \mathcal O\bigl( h^{\frac32} \bigr) , \qquad
         -2h\sqrt{2h}\, \mathrm{Sym}\, \mathbb E_0\bigl[ \chi_0 \otimes \nabla U(Z_0) \bigr] = -2h^2\, \nabla^2 U + \mathcal O( h^3 ) .
@@ -955,11 +955,7 @@ For $|x - x'| > 1$, since $\mathcal C(x)$ and $\mathcal C(x')$ are positive semi
 \begin{equation*}
     \norm{\mathcal C(x) - \mathcal C(x')} \Le \mathrm{Tr}\bigl[ \mathcal C(x) \bigr] + \mathrm{Tr}\bigl[ \mathcal C(x') \bigr] \Le 2\Sigma \Le 2\Sigma\, |x - x'| .
 \end{equation*}
-Since $\Sigma \Le M^2$,
-\begin{equation*}
-    4 \Sigma^{\frac12} M \Le 4 M^2 , \qquad 2\Sigma \Le 4 M^2 ,
-\end{equation*}
-so in both cases
+Since $\Sigma \Le M^2$, both cases give
 \begin{equation}
     \norm{\mathcal C(x) - \mathcal C(x')} \Le 4 M^2 |x - x'| , \qquad x, x' \in \mathbb R^d .
     \label{eq: covariance lipschitz}
@@ -971,7 +967,7 @@ Writing $\mathcal C(x) = \sum_{i=1}^d \lambda_i\, u_i \otimes u_i$ with $\lambda
 \end{equation}
 
 \begin{proof}[Proof of Lemma~\ref{lem: sg weak}]
-    Work at the index $0$, where $\hat{\mathbb E}_0$ and $\mathbb E_0$ agree on functions of $Y_0$ and $(B_s)_{s \Le h}$, both fixing $Y_0$ and averaging over $(B_s)_{s \Le h}$. With $D_0 = \sqrt{2h}\, \chi_0 - h\, \nabla U(Z_0)$, the right side of \eqref{eq: chain step}, the step of \eqref{eq: sglm markov} adds the gradient noise $\eta_0$ at $Z_0$, multiplied by $-h$,
+    Work at the index $0$, where $\hat{\mathbb E}_0$ and $\mathbb E_0$ agree on functions of $Y_0$ and $(B_s)_{s \Le h}$, both fixing $Y_0$ and averaging over $(B_s)_{s \Le h}$. With $D_0 = \sqrt{2h}\, \chi_0 - h\, \nabla U(Z_0)$, the right side of \eqref{eq: chain step}, the step \eqref{eq: sg chain step} adds the gradient noise $\eta_0$ at $Z_0$, multiplied by $-h$,
     \begin{equation*}
         Y_1 = Y_0 + D_0 - h \eta_0 , \qquad \eta_0 := \eta(Z_0;\xi_0) = \nabla \hat U(Z_0;\xi_0) - \nabla U(Z_0) .
     \end{equation*}
@@ -1014,14 +1010,9 @@ Writing $\mathcal C(x) = \sum_{i=1}^d \lambda_i\, u_i \otimes u_i$ with $\lambda
     \end{equation}
     Assumption~\ref{ass: U} gives
     \begin{equation*}
-        |\nabla U(Z_0)| \Le M \bigl( 1 + |Z_0| \bigr) \Le M \Bigl( 1 + |Y_0| + \sqrt{\frac h2}\, |\chi_0| \Bigr) ,
+        |\nabla U(Z_0)| \Le M \bigl( 1 + |Z_0| \bigr) \Le M \Bigl( 1 + |Y_0| + \sqrt{\frac h2}\, |\chi_0| \Bigr) .
     \end{equation*}
-    hence
-    \begin{equation}
-        \hat{\mathbb E}_0 |D_0|^2 \Le 4h\, \hat{\mathbb E}_0 |\chi_0|^2 + 2h^2\, \hat{\mathbb E}_0 |\nabla U(Z_0)|^2 \Le C h (1+|Y_0|)^2 .
-        \label{eq: sg step second moment}
-    \end{equation}
-    By \eqref{eq: trace bound}, $\Sigma \Le M^2$ and \eqref{eq: sg step second moment}, the terms of \eqref{eq: sg hessian split} carrying $\varrho_2^{D_0}$ and $\nabla U(Z_0)$ contribute
+    By \eqref{eq: trace bound}, $\Sigma \Le M^2$, the bound on $|\nabla U(Z_0)|$ and \eqref{eq: sizes} for the step $D_0$ of \eqref{eq: chain step}, the terms of \eqref{eq: sg hessian split} carrying $\varrho_2^{D_0}$ and $\nabla U(Z_0)$ contribute
     \begin{equation}
     \begin{aligned}
         & \bigl| \hat{\mathbb E}_0[\varrho_2^{D_0} : \mathcal C(Z_0)] \bigr| \Le \frac12 \norm{\nabla^4 G}_\infty\, \Sigma\, \hat{\mathbb E}_0 |D_0|^2 \Le C h \norm{\nabla^4 G}_\infty (1+|Y_0|)^2 , \\
@@ -1463,7 +1454,7 @@ Throughout this appendix, $(Y_k)_{k \Ge 0}$ is the chain \eqref{eq: sglm markov}
     \end{equation*}
     The bound on $\tilde Y_0(s) - Y_0$ in \eqref{eq: exact sizes} gives, for $0 \Le s \Le h \Le 1$,
     \begin{equation*}
-        \mathbb E |\tilde Y_0(s) - Y_0| \Le C \sqrt h (1+|Y_0|) , \qquad \mathbb E |\tilde Y_0(s) - Y_0|^2 \Le C h (1+|Y_0|)^2 \Le C \sqrt h (1+|Y_0|)^2 .
+        \mathbb E |\tilde Y_0(s) - Y_0| \Le C \sqrt h (1+|Y_0|) , \qquad \mathbb E |\tilde Y_0(s) - Y_0|^2 \Le C h (1+|Y_0|)^2 .
     \end{equation*}
     Taking the expectation of the bound on $|\tilde g_h(\tilde Y_0(s)) - \tilde g_h(Y_0)|$ and inserting the bounds on $\mathbb E |\tilde Y_0(s) - Y_0|$ and $\mathbb E |\tilde Y_0(s) - Y_0|^2$ gives
     \begin{equation*}
@@ -1588,7 +1579,7 @@ Throughout this appendix, $(Z_k)_{k \Ge 0}$ is the chain \eqref{eq: sgld} and $\
     Z_1 = Z_0 + D_0 - h\, \eta_0 , \qquad D_0 := \sqrt2\, B_h - h\, \nabla U(Z_0) , \qquad \eta_0 := \eta(Z_0;\xi_0) = \nabla \hat U(Z_0;\xi_0) - \nabla U(Z_0) ,
     \label{eq: sgld step}
 \end{equation}
-where $Z_0 + D_0$ is the one-step update of EM from $Z_0$ and $\eta_0$ is the gradient noise $\eta(x;\xi)$ of Appendix~\ref{sec: sg weak proof} evaluated at $Z_0$ and $\xi_0$.
+where $Z_0 + D_0$ is the state after one step of EM from $Z_0$, and $\eta$ is the gradient noise of Appendix~\ref{sec: sg weak proof}.
 
 \subsection{Invariant distribution of SGLD}
 \label{sec: sgld invariant proof}
@@ -1626,7 +1617,7 @@ where $Z_0 + D_0$ is the one-step update of EM from $Z_0$ and $\eta_0$ is the gr
     \end{equation*}
     which is the minorization, with $\alpha_h$ the minimum of $\frac12$ and the factor of $\nu(A)$.
 
-    Harris's ergodic theorem then gives the unique invariant distribution $\bar\pi_h$ and \eqref{eq: harris} with $\bar\pi_h$ in place of $\mu_h$. The moment bound follows from the truncations $\min\bigl\{ |x|^{12}, \ell \bigr\}$, and the almost sure limit from the Harris recurrence and the strong law of large numbers \citep[Theorem~17.0.1(i)]{meyn1993markov}, which use only the drift condition and the minorization, applied to $g = f$, which is Lipschitz by Assumption~\ref{ass: f}, both as in Appendix~\ref{sec: invariant proof}. The passage from \eqref{eq: sglm markov} to the samples of \eqref{eq: sglm} is not needed, since $(Z_k)_{k \Ge 0}$ is itself the chain.
+    Harris's ergodic theorem then gives the unique invariant distribution $\bar\pi_h$ and \eqref{eq: harris} with $\bar\pi_h$ in place of $\mu_h$. The moment bound follows from the truncations $\min\bigl\{ |x|^{12}, \ell \bigr\}$, and the almost sure limit from the Harris recurrence and the strong law of large numbers \citep[Theorem~17.0.1(i)]{meyn1993markov} applied to $g = f$, which is Lipschitz by Assumption~\ref{ass: f}. Both arguments are those of Appendix~\ref{sec: invariant proof}, with the bound on $\mathbb E |Z_k|^{12}$ above, at $Z_0 = 0$, in place of Lemma~\ref{lem: moments}. The passage from \eqref{eq: sglm markov} to the samples of \eqref{eq: sglm} is not needed, since $(Z_k)_{k \Ge 0}$ is itself the chain.
 \end{proof}
 
 \subsection{Proof of Theorem~\ref{thm: sgld bias}: numerical bias of SGLD}
@@ -1647,7 +1638,7 @@ The proof uses the local weak error of \eqref{eq: sgld} against \eqref{eq: lange
 \end{lemma}
 
 \begin{proof}
-    By time homogeneity, it suffices to take $k = 0$. The proof expands $G(Z_1)$ about $Z_0 + D_0$ to the order $2$ in $h\eta_0$, replaces $\nabla^2 G(Z_0 + D_0)$ by $\nabla^2 G(Z_0)$ in the term of order $h^2$, and compares $G(Z_0 + D_0)$ with $G(X_h)$ through the moments of $D_0$ and $X_h - Z_0$. Let $\hat{\mathcal H}_0 := \sigma\bigl( \hat{\mathcal F}_0, (B_s)_{s \Le h} \bigr)$. Then $Z_0$, the increment $D_0$ of \eqref{eq: sgld step} and the solution $X_h$ are $\hat{\mathcal H}_0$-measurable, and $\xi_0$ is independent of $\hat{\mathcal H}_0$, so Assumption~\ref{ass: sg} and \eqref{eq: covariance} give
+    By time homogeneity, it suffices to take $k = 0$. The proof expands $G(Z_1)$ about $Z_0 + D_0$ to the order $2$ in $h\eta_0$, replaces $\nabla^2 G(Z_0 + D_0)$ by $\nabla^2 G(Z_0)$ in the term of order $h^2$, and compares $G(Z_0 + D_0)$ with $G(X_h)$ through the moments of $D_0$ and $X_h - Z_0$. With $\hat{\mathcal H}_0 = \sigma\bigl( \hat{\mathcal F}_0, (B_s)_{s \Le h} \bigr)$ as in the proof of Lemma~\ref{lem: sg weak}, $Z_0$, the increment $D_0$ of \eqref{eq: sgld step} and the solution $X_h$ are $\hat{\mathcal H}_0$-measurable, and $\xi_0$ is independent of $\hat{\mathcal H}_0$, so Assumption~\ref{ass: sg} and \eqref{eq: covariance} give
     \begin{equation*}
         \mathbb E\bigl[ \eta_0 \,\big|\, \hat{\mathcal H}_0 \bigr] = 0 , \qquad \mathbb E\bigl[ \eta_0 \otimes \eta_0 \,\big|\, \hat{\mathcal H}_0 \bigr] = \mathcal C(Z_0) .
     \end{equation*}
@@ -1683,15 +1674,15 @@ The proof uses the local weak error of \eqref{eq: sgld} against \eqref{eq: lange
     \end{equation}
     With $Z_0$, $Z_0 + D_0$, $X_h$ and $X_h - Z_0$ in place of $Y_0$, $Y_1$, $\tilde Y_0(h)$ and $\tilde W_h$, the expansion \eqref{eq: G expansion full} reads
     \begin{equation}
-        G(Z_0 + D_0) - G(X_h) = \sum_{j=1}^{3} \frac{1}{j!}\, \nabla^j G(Z_0) : \Bigl( D_0^{\otimes j} - (X_h - Z_0)^{\otimes j} \Bigr) + \varrho_4 ,
+        G(Z_0 + D_0) - G(X_h) = \sum_{j=1}^{3} \frac{1}{j!}\, \nabla^j G(Z_0) : \Bigl( D_0^{\otimes j} - (X_h - Z_0)^{\otimes j} \Bigr) + \varrho_4^{D_0} ,
         \label{eq: sgld G expansion}
     \end{equation}
-    with a remainder $\varrho_4$ that satisfies
+    with a remainder $\varrho_4^{D_0}$ that satisfies
     \begin{equation}
-        |\varrho_4| \Le \frac16\, \norm{\nabla^4 G}_\infty\, \bigl| Z_0 + D_0 - X_h \bigr|\, \max\bigl\{ |D_0| ,\, |X_h - Z_0| \bigr\}^3 .
+        |\varrho_4^{D_0}| \Le \frac16\, \norm{\nabla^4 G}_\infty\, \bigl| Z_0 + D_0 - X_h \bigr|\, \max\bigl\{ |D_0| ,\, |X_h - Z_0| \bigr\}^3 .
         \label{eq: sgld remainder}
     \end{equation}
-    Taking $\hat{\mathbb E}_0$ in \eqref{eq: sgld G expansion}, H\"older's inequality with \eqref{eq: sgld remainder} and \eqref{eq: sgld sizes} gives $\hat{\mathbb E}_0 |\varrho_4| \Le C h^3 \norm{\nabla^4 G}_\infty \bigl( 1 + |Z_0| \bigr)^4$, so
+    Taking $\hat{\mathbb E}_0$ in \eqref{eq: sgld G expansion}, H\"older's inequality with \eqref{eq: sgld remainder} and \eqref{eq: sgld sizes} gives $\hat{\mathbb E}_0 |\varrho_4^{D_0}| \Le C h^3 \norm{\nabla^4 G}_\infty \bigl( 1 + |Z_0| \bigr)^4$, so
     \begin{equation}
         \biggl| \hat{\mathbb E}_0\bigl[ G(Z_0 + D_0) - G(X_h) \bigr] - \sum_{j=1}^{3} \frac{1}{j!}\, \nabla^j G(Z_0) : \hat{\mathbb E}_0\Bigl[ D_0^{\otimes j} - (X_h - Z_0)^{\otimes j} \Bigr] \biggr| \Le C h^3 \norm{\nabla^4 G}_\infty \bigl( 1 + |Z_0| \bigr)^4 .
         \label{eq: sgld em expansion}
@@ -1706,17 +1697,17 @@ The proof uses the local weak error of \eqref{eq: sgld} against \eqref{eq: lange
     \end{equation*}
     The moments of $X_h - Z_0$ are expanded in \eqref{eq: exact m1}--\eqref{eq: exact m3} of Lemma~\ref{lem: exact moments} for \eqref{eq: langevin}, with $U$, $Z_0$, $X_h$ and $\hat{\mathbb E}_0$ in place of $\tilde U_h$, $Y_0$, $\tilde Y_0(h)$ and $\mathbb E_0$. Next we subtract them from the moments of $D_0$, for $j = 1, 2, 3$.
     \begin{enumerate}
-    \item For $j = 1$, the terms $-h\, \nabla U$ cancel, and the term of order $h^2$ in \eqref{eq: exact m1} remains:
+    \item For $j = 1$, the terms $-h\, \nabla U$ cancel, and the term of order $h^2$ in \eqref{eq: exact m1} remains with the opposite sign:
     \begin{equation}
         \Bigl| \hat{\mathbb E}_0\bigl[ D_0 - (X_h - Z_0) \bigr] + \frac{h^2}{2} \bigl( \nabla^2 U\, \nabla U - \nabla \Delta U \bigr) \Bigr| \Le C h^3 \bigl( 1 + |Z_0| \bigr)^3 .
         \label{eq: sgld m1}
     \end{equation}
-    \item For $j = 2$, the terms $2h\, I_d$ and $h^2\, \nabla U^{\otimes 2}$ cancel, and the term $-2h^2\, \nabla^2 U$ in \eqref{eq: exact m2} remains:
+    \item For $j = 2$, the terms $2h\, I_d$ and $h^2\, \nabla U^{\otimes 2}$ cancel, and the term $-2h^2\, \nabla^2 U$ in \eqref{eq: exact m2} remains with the opposite sign:
     \begin{equation}
         \Bigl\| \hat{\mathbb E}_0\bigl[ D_0^{\otimes 2} - (X_h - Z_0)^{\otimes 2} \bigr] - 2h^2\, \nabla^2 U \Bigr\| \Le C h^3 \bigl( 1 + |Z_0| \bigr)^4 .
         \label{eq: sgld m2}
     \end{equation}
-    \item For $j = 3$, the terms of order $h^2$ cancel, and $h^3 |\nabla U(Z_0)|^3 \Le C h^3 \bigl( 1 + |Z_0| \bigr)^3$ bounds the term $-h^3\, \partial_i U\, \partial_j U\, \partial_l U$ of $\hat{\mathbb E}_0\bigl[ D_0^{\otimes 3} \bigr]$:
+    \item For $j = 3$, the terms of order $h^2$ cancel, and the term $-h^3\, \nabla U^{\otimes 3}$ of $\hat{\mathbb E}_0\bigl[ D_0^{\otimes 3} \bigr]$ has norm $h^3 |\nabla U(Z_0)|^3 \Le C h^3 \bigl( 1 + |Z_0| \bigr)^3$:
     \begin{equation}
         \Bigl\| \hat{\mathbb E}_0\bigl[ D_0^{\otimes 3} - (X_h - Z_0)^{\otimes 3} \bigr] \Bigr\| \Le C h^3 \bigl( 1 + |Z_0| \bigr)^6 .
         \label{eq: sgld m3}
@@ -1732,7 +1723,7 @@ The proof uses the local weak error of \eqref{eq: sgld} against \eqref{eq: lange
 \end{proof}
 
 \begin{proof}[Proof of Theorem~\ref{thm: sgld bias}]
-    Here $\phi_h$ is the solution \eqref{eq: discrete poisson solution} of the discrete Poisson equation \eqref{eq: discrete poisson} of \eqref{eq: langevin}, with $\mathcal L$, $\pi$ and $f$, and not the modified solution $\tilde\phi_h$ of \eqref{eq: modified poisson} used for \eqref{eq: sglm markov}. Let $h_0 \Le \lambda^{-1}$, with $\lambda$ the rate of Theorem~\ref{thm: u decay}, so that \eqref{eq: poisson bound} holds. Let $Z_0 \sim \bar\pi_h$, independent of $(B_t)_{t \Ge 0}$ and of $(\xi_k)_{k \Ge 0}$, so that $Z_1 \sim \bar\pi_h$, and add $Z_0$ to the generators of $\hat{\mathcal F}_k$ in \eqref{eq: sg filtration}, as in the proof of Theorem~\ref{thm: numerical bias}, so that $\hat{\mathcal F}_0 = \sigma(Z_0)$. The discrete Poisson equation \eqref{eq: discrete poisson} at $Z_0$, with $(e^{h\mathcal L} \phi_h)(Z_0) = \hat{\mathbb E}_0[\phi_h(X_h)]$, gives after taking expectations
+    Here $\phi_h$ is the solution \eqref{eq: discrete poisson solution} of \eqref{eq: discrete poisson}. Let $h_0 \Le \lambda^{-1}$, with $\lambda$ the rate of Theorem~\ref{thm: u decay}, so that \eqref{eq: poisson bound} holds. Let $Z_0 \sim \bar\pi_h$, independent of $(B_t)_{t \Ge 0}$ and of $(\xi_k)_{k \Ge 0}$, so that $Z_1 \sim \bar\pi_h$, and add $Z_0$ to the generators of $\hat{\mathcal F}_k$ in \eqref{eq: sg filtration}, as in the proof of Theorem~\ref{thm: numerical bias}, so that $\hat{\mathcal F}_0 = \sigma(Z_0)$. The discrete Poisson equation \eqref{eq: discrete poisson} at $Z_0$, with $(e^{h\mathcal L} \phi_h)(Z_0) = \hat{\mathbb E}_0[\phi_h(X_h)]$, gives after taking expectations
     \begin{equation}
         \bar\pi_h(f) - \pi(f) = \frac1h\, \mathbb E\bigl[ \phi_h(Z_0) - \phi_h(X_h) \bigr] = \frac1h\, \mathbb E\bigl[ \phi_h(Z_1) - \phi_h(X_h) \bigr] ,
         \label{eq: sgld bias identity}
@@ -1761,16 +1752,16 @@ The proof uses the local weak error of \eqref{eq: sgld} against \eqref{eq: lange
     Let
     \begin{equation}
     \begin{aligned}
-        A_h(x) & := \nabla^2 \phi_h(x) : \bigl( 2\nabla^2 U(x) + \mathcal C(x) \bigr) - \nabla \phi_h(x) \cdot \bigl( \nabla^2 U(x)\, \nabla U(x) - \nabla \Delta U(x) \bigr) , \\
-        A_0(x) & := \nabla^2 \phi_0(x) : \bigl( 2\nabla^2 U(x) + \mathcal C(x) \bigr) - \nabla \phi_0(x) \cdot \bigl( \nabla^2 U(x)\, \nabla U(x) - \nabla \Delta U(x) \bigr) ,
+        \bar A_h(x) & := \nabla^2 \phi_h(x) : \bigl( 2\nabla^2 U(x) + \mathcal C(x) \bigr) - \nabla \phi_h(x) \cdot \bigl( \nabla^2 U(x)\, \nabla U(x) - \nabla \Delta U(x) \bigr) , \\
+        \bar A_0(x) & := \nabla^2 \phi_0(x) : \bigl( 2\nabla^2 U(x) + \mathcal C(x) \bigr) - \nabla \phi_0(x) \cdot \bigl( \nabla^2 U(x)\, \nabla U(x) - \nabla \Delta U(x) \bigr) ,
     \end{aligned}
         \label{eq: sgld coefficient integrand}
     \end{equation}
     so that dividing \eqref{eq: sgld bias} by $h$ gives
     \begin{equation*}
-        \Bigl| \frac{\bar\pi_h(f) - \pi(f)}{h} - \frac12\, \bar\pi_h(A_h) \Bigr| \Le C L h .
+        \Bigl| \frac{\bar\pi_h(f) - \pi(f)}{h} - \frac12\, \bar\pi_h(\bar A_h) \Bigr| \Le C L h .
     \end{equation*}
-    It suffices to prove $\bar\pi_h(A_h) \to \pi(A_0)$ and to compute $\pi(A_0)$.
+    It suffices to prove $\bar\pi_h(\bar A_h) \to \pi(\bar A_0)$ and to compute $\pi(\bar A_0)$.
 
     The measures $\bar\pi_h$ converge weakly to $\pi$ as $h \to 0$. For $\varphi \in C_c^\infty(\mathbb R^d)$, which satisfies Assumption~\ref{ass: f} with some constant $L_\varphi$, Theorem~\ref{thm: sgld bias} gives $|\bar\pi_h(\varphi) - \pi(\varphi)| \Le C L_\varphi h$, and Lemma~\ref{lem: sgld invariant} gives, uniformly in $h$,
     \begin{equation}
@@ -1779,40 +1770,40 @@ The proof uses the local weak error of \eqref{eq: sgld} against \eqref{eq: lange
     \end{equation}
     The approximation of a bounded continuous $b$ by $\varphi \in C_c^\infty(\mathbb R^d)$ in Appendix~\ref{sec: bias coefficient proof}, with $\bar\pi_h$ and \eqref{eq: sgld tail} in place of $\mu_h$ and \eqref{eq: mu tail}, then gives $\bar\pi_h(b) \to \pi(b)$ for every bounded continuous $b$.
 
-    The gradient and the Hessian of $\phi_h$ converge to those of $\phi_0$ uniformly on compact sets. The argument for the convergence of $\nabla^2 \tilde\phi_h$ in Appendix~\ref{sec: bias coefficient proof}, through \eqref{eq: modified dynkin} and \eqref{eq: g consistency}, applies with $U$, $\mathcal L$, $f$ and $\pi(f)$ in place of $\tilde U_h$, $\tilde{\mathcal L}_h$, $\tilde f_h$ and $\tilde\pi_h(\tilde f_h)$, with $\phi_h$, the solution $X_s$ of \eqref{eq: langevin} and its initial value $X_0$ in place of $\tilde\phi_h$, $\tilde Y_0(s)$ and $Y_0$, and with \eqref{eq: discrete poisson}, \eqref{eq: poisson bound} and Assumption~\ref{ass: U} in place of \eqref{eq: modified poisson}, \eqref{eq: modified poisson bound} and Lemma~\ref{lem: modified class}; the differences $\nabla \tilde U_h - \nabla U$, $\tilde f_h - f$ and $\tilde\pi_h(\tilde f_h) - \pi(f)$ estimated there are then $0$. It gives, for every sequence $h_n \to 0$, a subsequence along which the derivatives of $\phi_{h_n}$ of orders $1$ to $3$ converge uniformly on compact sets to those of a function that differs from $\phi_0$ by a constant, hence
+    The gradient and the Hessian of $\phi_h$ converge to those of $\phi_0$ uniformly on compact sets. The argument for the convergence of $\nabla^2 \tilde\phi_h$ in Appendix~\ref{sec: bias coefficient proof}, through \eqref{eq: modified dynkin} and \eqref{eq: g consistency}, applies with $U$, $\mathcal L$, $f$, $\pi(f)$, $\phi_h$, the solution $X_s$ of \eqref{eq: langevin} and its initial value $X_0$ in place of $\tilde U_h$, $\tilde{\mathcal L}_h$, $\tilde f_h$, $\tilde\pi_h(\tilde f_h)$, $\tilde\phi_h$, $\tilde Y_0(s)$ and $Y_0$. It then uses \eqref{eq: discrete poisson}, \eqref{eq: poisson bound} and Assumption~\ref{ass: U} in place of \eqref{eq: modified poisson}, \eqref{eq: modified poisson bound} and Lemma~\ref{lem: modified class}, and the differences $\nabla \tilde U_h - \nabla U$, $\tilde f_h - f$ and $\tilde\pi_h(\tilde f_h) - \pi(f)$ estimated there are $0$. It gives, for every sequence $h_n \to 0$, a subsequence along which the derivatives of $\phi_{h_n}$ of orders $1$ to $3$ converge uniformly on compact sets to those of a function that differs from $\phi_0$ by a constant, hence
     \begin{equation*}
         \sup_{|x| \Le \rho} \Bigl( |\nabla \phi_h(x) - \nabla \phi_0(x)| + \norm{\nabla^2 \phi_h(x) - \nabla^2 \phi_0(x)} \Bigr) \to 0 , \qquad h \to 0 , \quad \rho > 0 .
     \end{equation*}
     By \eqref{eq: sgld coefficient integrand}, \eqref{eq: trace bound}, $\Sigma \Le M^2$ and Assumption~\ref{ass: U},
     \begin{equation*}
-        |A_h(x) - A_0(x)| \Le C \norm{\nabla^2 \phi_h(x) - \nabla^2 \phi_0(x)} + C \bigl( 1 + |x| \bigr) |\nabla \phi_h(x) - \nabla \phi_0(x)| ,
+        |\bar A_h(x) - \bar A_0(x)| \Le C \norm{\nabla^2 \phi_h(x) - \nabla^2 \phi_0(x)} + C \bigl( 1 + |x| \bigr) |\nabla \phi_h(x) - \nabla \phi_0(x)| ,
     \end{equation*}
-    so $A_h \to A_0$ uniformly on compact sets, and \eqref{eq: poisson bound} and \eqref{eq: continuous poisson bound} give
+    so $\bar A_h \to \bar A_0$ uniformly on compact sets, and \eqref{eq: poisson bound} and \eqref{eq: continuous poisson bound} give
     \begin{equation*}
-        |A_h(x)| + |A_0(x)| \Le C L \bigl( 1 + |x| \bigr) , \qquad x \in \mathbb R^d .
+        |\bar A_h(x)| + |\bar A_0(x)| \Le C L \bigl( 1 + |x| \bigr) , \qquad x \in \mathbb R^d .
     \end{equation*}
-    The function $A_0$ is continuous, since $\nabla \phi_0$, $\nabla^2 \phi_0$ and the derivatives of $U$ are continuous and $\mathcal C(x)$ is Lipschitz by \eqref{eq: covariance lipschitz}. For every $\rho > 0$,
+    The function $\bar A_0$ is continuous, since $\nabla \phi_0$, $\nabla^2 \phi_0$ and the derivatives of $U$ are continuous and $\mathcal C(x)$ is Lipschitz by \eqref{eq: covariance lipschitz}. For every $\rho > 0$,
     \begin{equation*}
-        \bigl| \bar\pi_h(A_h) - \pi(A_0) \bigr| \Le \sup_{|x| \Le \rho} |A_h(x) - A_0(x)| + C L\, \bar\pi_h\Bigl( \bigl( 1 + |x| \bigr)\, \mathbf 1_{\{|x| > \rho\}} \Bigr) + \bigl| \bar\pi_h(A_0) - \pi(A_0) \bigr| .
+        \bigl| \bar\pi_h(\bar A_h) - \pi(\bar A_0) \bigr| \Le \sup_{|x| \Le \rho} |\bar A_h(x) - \bar A_0(x)| + C L\, \bar\pi_h\Bigl( \bigl( 1 + |x| \bigr)\, \mathbf 1_{\{|x| > \rho\}} \Bigr) + \bigl| \bar\pi_h(\bar A_0) - \pi(\bar A_0) \bigr| .
     \end{equation*}
-    The weak convergence of $\bar\pi_h$ to $\pi$, with the uniform integrability of $1 + |x|$ under $\bar\pi_h$ that \eqref{eq: sgld tail} provides, gives $\bar\pi_h(A_0) \to \pi(A_0)$, and \eqref{eq: sgld tail} bounds the term carrying $\mathbf 1_{\{|x| > \rho\}}$, so
+    The bounded continuous function $\max\bigl\{ -C L (1+\rho), \min\{ \bar A_0, C L (1+\rho) \} \bigr\}$ equals $\bar A_0$ on $\{|x| \Le \rho\}$ and differs from $\bar A_0$ by at most $C L (1 + |x|)\, \mathbf 1_{\{|x| > \rho\}}$, so the weak convergence of $\bar\pi_h$ to $\pi$, \eqref{eq: sgld tail} and the moments of $\pi$ in Lemma~\ref{lem: dissipative} give $\limsup_{h \to 0} |\bar\pi_h(\bar A_0) - \pi(\bar A_0)| \Le C L \rho^{-11}$. With \eqref{eq: sgld tail} for $C L\, \bar\pi_h\bigl( (1 + |x|)\, \mathbf 1_{\{|x| > \rho\}} \bigr)$,
     \begin{equation*}
-        \limsup_{h \to 0}\, \bigl| \bar\pi_h(A_h) - \pi(A_0) \bigr| \Le C L \rho^{-11} , \qquad \rho > 0 ,
+        \limsup_{h \to 0}\, \bigl| \bar\pi_h(\bar A_h) - \pi(\bar A_0) \bigr| \Le C L \rho^{-11} , \qquad \rho > 0 ,
     \end{equation*}
-    and letting $\rho \to \infty$ gives $\bar\pi_h(A_h) \to \pi(A_0)$.
+    and letting $\rho \to \infty$ gives $\bar\pi_h(\bar A_h) \to \pi(\bar A_0)$.
 
-    It remains to compute $\pi(A_0)$ for $A_0$ of \eqref{eq: sgld coefficient integrand}. Since $\phi_0$ has bounded derivatives of orders $1$ to $3$ by \eqref{eq: continuous poisson bound}, \eqref{eq: sgld integration by parts} with $\psi = \phi_0$ gives
+    It remains to compute $\pi(\bar A_0)$. Since $\phi_0$ has bounded derivatives of orders $1$ to $3$ by \eqref{eq: continuous poisson bound}, \eqref{eq: sgld integration by parts} with $\psi = \phi_0$ gives
     \begin{equation*}
-        \pi(A_0) = \pi\Bigl( \nabla^2 \phi_0(x) : \bigl( 2\nabla^2 U(x) + \mathcal C(x) \bigr) \Bigr) - \pi\bigl( \nabla^2 \phi_0(x) : \nabla^2 U(x) \bigr) = \pi\Bigl( \nabla^2 \phi_0(x) : \bigl( \nabla^2 U(x) + \mathcal C(x) \bigr) \Bigr) ,
+        \pi(\bar A_0) = \pi\Bigl( \nabla^2 \phi_0(x) : \bigl( 2\nabla^2 U(x) + \mathcal C(x) \bigr) \Bigr) - \pi\bigl( \nabla^2 \phi_0(x) : \nabla^2 U(x) \bigr) = \pi\Bigl( \nabla^2 \phi_0(x) : \bigl( \nabla^2 U(x) + \mathcal C(x) \bigr) \Bigr) ,
     \end{equation*}
-    which with $\bar\pi_h(A_h) \to \pi(A_0)$ proves \eqref{eq: sgld coefficient}.
+    which with $\bar\pi_h(\bar A_h) \to \pi(\bar A_0)$ proves \eqref{eq: sgld coefficient}.
 \end{proof}
 
 
 \section{Proofs for the explicit coefficient in Wasserstein-1 error}
 \label{app: w1}
 
-Throughout this appendix, the constant $C$ depends only on $m$, $M$, $R$ and $d$, and
+Throughout this appendix, the constant $C$ depends only on $m$, $M$, $R$ and $d$. Let
 \begin{equation}
     \mathcal D := \bigl\{ \omega \in C^4(\mathbb R^d) : \norm{\nabla^j \omega}_\infty < \infty ,\ j = 1, 2, 3, 4 \bigr\} , \qquad L^2_0(\pi) := \bigl\{ g \in L^2(\pi) : \pi(g) = 0 \bigr\} ,
     \label{eq: test class}
@@ -1822,9 +1813,7 @@ so $\mathcal D$ is the set of the test functions $\omega$ of \eqref{eq: riesz}, 
 \subsection{Proof of Theorem~\ref{thm: riesz}: well-posedness of the Riesz representor}
 \label{sec: riesz well-posedness}
 
-Theorem~\ref{thm: riesz} constructs the Riesz representor $\psi_{\mathcal A}$ of \eqref{eq: riesz} in $L^2_0(\pi)$ from a bound of $\pi(|\nabla \omega|^2)$ by $\pi((\mathcal L \omega)^2)$ for $\omega \in \mathcal D$, which follows from the Poincar\'e inequality \eqref{eq: poincare} of Lemma~\ref{lem: poincare}. The constant $C_P$ of \eqref{eq: poincare} therefore enters the bound on $\pi(\psi_{\mathcal A}^2)$ in Theorem~\ref{thm: riesz} and the constant of Theorem~\ref{thm: kr expansion}.
-
-By \eqref{eq: dissipative bounds}, $U$ is bounded from below, and $\langle x, \nabla U(x) \rangle \Ge \frac m4 |x|^2 - C \Ge |x|$ for $|x| \Ge \rho$, with $\rho$ depending only on $m$, $M$, $R$ and $d$. Hence $U$ satisfies the drift condition of \citep[Corollary~1.6]{bakry2008simple}, and \citep[Theorem~1.4]{bakry2008simple} gives \eqref{eq: poincare} for smooth $g$. The constant $C_P$ depends only on the Lyapunov function of \citep[Corollary~1.6]{bakry2008simple} and on the Poincar\'e constant of $\pi$ restricted to the ball $\{|x| < \rho\}$, hence only on $m$, $M$, $R$ and $d$. Mollification and dominated convergence, with the moments of Lemma~\ref{lem: dissipative}, extend \eqref{eq: poincare} to every $g \in C^1(\mathbb R^d)$ with a bounded gradient. The next lemma is the identity of Bochner under $\pi$, used in the proofs of Theorems~\ref{thm: riesz} and \ref{thm: batch threshold}.
+Lemma~\ref{lem: poincare} follows from \citep{bakry2008simple}. By \eqref{eq: dissipative bounds}, $U$ is bounded from below, and $\langle x, \nabla U(x) \rangle \Ge \frac m4 |x|^2 - C \Ge |x|$ outside a ball whose radius depends only on $m$, $M$, $R$ and $d$. Hence $U$ satisfies the drift condition of \citep[Corollary~1.6]{bakry2008simple}, and \citep[Theorem~1.4]{bakry2008simple} gives \eqref{eq: poincare} for smooth $g$. In the proof of \citep[Corollary~1.6]{bakry2008simple}, the Lyapunov function is an exponential of $|x|$ outside a larger ball, whose radius depends only on the previous radius and on $d$, and the constants of the inequality \citep[(1.3)]{bakry2008simple} that it satisfies depend on $U$ only through $\nabla U$ on that ball. By \citep[Theorem~1.4]{bakry2008simple}, $C_P$ depends only on these constants and on the Poincar\'e constant of $\pi$ restricted to the same ball, which \citep[Section~1]{bakry2008simple} bounds through the oscillation of $U$ on the ball. Since $|\nabla U(x)| \Le M(1 + |x|)$, $C_P$ depends only on $m$, $M$, $R$ and $d$. Mollification and dominated convergence, with the moments of Lemma~\ref{lem: dissipative}, extend \eqref{eq: poincare} to every $g \in C^1(\mathbb R^d)$ with a bounded gradient. The next lemma is the identity of Bochner under $\pi$, used in the proofs of Theorems~\ref{thm: riesz} and \ref{thm: batch threshold}.
 
 \begin{lemma}
 \label{lem: bochner}
@@ -1856,11 +1845,7 @@ By \eqref{eq: dissipative bounds}, $U$ is bounded from below, and $\langle x, \n
         \pi\bigl( \nabla^2 \omega : \nabla^2 \omega \bigr) \Le \pi\bigl( (\mathcal L \omega)^2 \bigr) + M\, \pi\bigl( |\nabla \omega|^2 \bigr) \Le (1 + M C_P)\, \pi\bigl( (\mathcal L \omega)^2 \bigr) .
         \label{eq: hessian l2}
     \end{equation}
-    For every symmetric matrix $B$, the Cauchy--Schwarz inequality for the inner product $B : \mathcal A(x)$ and $\mathcal A(x) : \mathcal A(x) \Le d\, \norm{\mathcal A(x)}^2$ give $|B : \mathcal A(x)| \Le \sqrt d\, \norm{\mathcal A(x)}\, (B : B)^{\frac12}$. With $B = \nabla^2 \omega(x)$, this is the pointwise bound
-    \begin{equation*}
-        \bigl| \nabla^2 \omega(x) : \mathcal A(x) \bigr| \Le \sqrt d\, \norm{\mathcal A}_\infty \bigl( \nabla^2 \omega(x) : \nabla^2 \omega(x) \bigr)^{\frac12} , \qquad x \in \mathbb R^d .
-    \end{equation*}
-    Integrating it against $\pi$, the Cauchy--Schwarz inequality under $\pi$ gives
+    Since $\mathcal A(x) : \mathcal A(x) \Le d\, \norm{\mathcal A(x)}^2$, the Cauchy--Schwarz inequality under $\pi$ gives
     \begin{equation*}
         \bigl| \pi\bigl( \nabla^2 \omega : \mathcal A \bigr) \bigr| \Le \sqrt d\, \norm{\mathcal A}_\infty\, \pi\Bigl( \bigl( \nabla^2 \omega : \nabla^2 \omega \bigr)^{\frac12} \Bigr) \Le \sqrt d\, \norm{\mathcal A}_\infty\, \pi\bigl( \nabla^2 \omega : \nabla^2 \omega \bigr)^{\frac12} ,
     \end{equation*}
@@ -1870,7 +1855,7 @@ By \eqref{eq: dissipative bounds}, $U$ is bounded from below, and $\langle x, \n
         \label{eq: riesz functional bound}
     \end{equation}
 
-    The functions $-\mathcal L \omega$, $\omega \in \mathcal D$, which lie in $L^2_0(\pi)$ by their linear growth and \eqref{eq: generator ibp} with $g_1 = 1$, are dense in $L^2_0(\pi)$. Every $g \in C_c^\infty(\mathbb R^d)$ satisfies Assumption~\ref{ass: f}, so the solution $\phi_0$ of the continuous Poisson equation \eqref{eq: continuous poisson} with $g$ in place of $f$ belongs to $\mathcal D$ by \eqref{eq: continuous poisson bound}, and $g - \pi(g) = -\mathcal L \phi_0$. The functions $g - \pi(g)$, $g \in C_c^\infty(\mathbb R^d)$, are dense in $L^2_0(\pi)$. By \eqref{eq: riesz functional bound}, $-\mathcal L \omega \mapsto \pi(\nabla^2 \omega : \mathcal A)$ is a well-defined linear functional on this dense set, bounded in the norm of $L^2_0(\pi)$, and linear in $\mathcal A$. It extends to $L^2_0(\pi)$, and the Riesz representation theorem gives the unique $\psi_{\mathcal A} \in L^2_0(\pi)$ that satisfies \eqref{eq: riesz} for every $\omega \in \mathcal D$, and \eqref{eq: riesz functional bound} gives \eqref{eq: riesz bound}.
+    The functions $-\mathcal L \omega$, $\omega \in \mathcal D$, lie in $L^2_0(\pi)$ by their linear growth and \eqref{eq: generator ibp} with $g_1 = 1$. Every $g \in C_c^\infty(\mathbb R^d)$ satisfies Assumption~\ref{ass: f}, so the solution $\phi_0$ of the continuous Poisson equation \eqref{eq: continuous poisson} with $g$ in place of $f$ belongs to $\mathcal D$ by \eqref{eq: continuous poisson bound}, and $g - \pi(g) = -\mathcal L \phi_0$. Since the functions $g - \pi(g)$, $g \in C_c^\infty(\mathbb R^d)$, are dense in $L^2_0(\pi)$, so are the functions $-\mathcal L \omega$, $\omega \in \mathcal D$. By \eqref{eq: riesz functional bound}, $-\mathcal L \omega \mapsto \pi(\nabla^2 \omega : \mathcal A)$ is a well-defined linear functional on the functions $-\mathcal L \omega$, $\omega \in \mathcal D$, bounded in the norm of $L^2_0(\pi)$, and linear in $\mathcal A$. It extends to $L^2_0(\pi)$, and the Riesz representation theorem gives the unique $\psi_{\mathcal A} \in L^2_0(\pi)$ that satisfies \eqref{eq: riesz} for every $\omega \in \mathcal D$. By this uniqueness and the linearity of the functional in $\mathcal A$, the map $\mathcal A \mapsto \psi_{\mathcal A}$ is linear, and \eqref{eq: riesz functional bound} gives \eqref{eq: riesz bound}.
 \end{proof}
 
 
@@ -1882,9 +1867,9 @@ Throughout this subsection and the next, $h \Le h_0$ with $h_0 \Le \lambda^{-1}$
     \norm{\nu}_{\mathrm{KR}} = \sup\biggl\{ \int_{\mathbb R^d} f\, \D\nu : f \text{ satisfies Assumption~\ref{ass: f}},\ \norm{\nabla f}_\infty \Le 1 \biggr\} .
     \label{eq: kr test functions}
 \end{equation}
-The supremum on the right side of \eqref{eq: kr test functions} is at most $\norm{\nu}_{\mathrm{KR}}$, since its functions $f$ are Lipschitz with $\norm{\nabla f}_\infty \Le 1$, and it equals $\norm{\nu}_{\mathrm{KR}}$, since the mollifications of a Lipschitz function $g$ with $\norm{\nabla g}_\infty \Le 1$ satisfy Assumption~\ref{ass: f} with the same bound on the gradient and converge to $g$ uniformly.
+The supremum on the right side of \eqref{eq: kr test functions} is at most $\norm{\nu}_{\mathrm{KR}}$, since its functions $f$ are Lipschitz with $\norm{\nabla f}_\infty \Le 1$, and it is at least $\norm{\nu}_{\mathrm{KR}}$, since the mollifications of a Lipschitz function $g$ with $\norm{\nabla g}_\infty \Le 1$ satisfy Assumption~\ref{ass: f} with the same bound on the gradient and converge to $g$ uniformly.
 
-In the proofs of Theorems~\ref{thm: kr expansion} and \ref{thm: batch threshold}, the test function $f$ satisfies Assumption~\ref{ass: f} and $\norm{\nabla f}_\infty \Le 1$, and the estimates do not depend on the constant $L$ of Assumption~\ref{ass: f}. The modified test function \eqref{eq: heat shift} is $\tilde f_h = f * \mathcal N(0, \frac h2 I_d)$, where we informally use $\mathcal N(0, \frac h2 I_d)$ also for the density of this Gaussian distribution, so
+In the proofs of Theorems~\ref{thm: kr expansion} and \ref{thm: batch threshold}, the test function $f$ satisfies Assumption~\ref{ass: f} and $\norm{\nabla f}_\infty \Le 1$, and the estimates do not depend on the constant $L$ of Assumption~\ref{ass: f}. The modified test function \eqref{eq: heat shift} is $\tilde f_h = f * \mathcal N(0, \frac h2 I_d)$, where $\mathcal N(0, \frac h2 I_d)$ also denotes the density of this Gaussian distribution, so
 \begin{equation*}
     \nabla^j \tilde f_h = (\nabla f) * \nabla^{j-1}\mathcal N\Bigl( 0, \frac h2 I_d \Bigr) , \qquad \int_{\mathbb R^d} \Bigl\| \nabla^{j-1}\mathcal N\Bigl( 0, \frac h2 I_d \Bigr)(y) \Bigr\| \,\D y \Le C h^{-\frac{j-1}{2}} , \qquad j = 1, 2, 3, 4 ,
 \end{equation*}
@@ -1917,7 +1902,7 @@ The semigroup estimates of Appendix~\ref{sec: semigroup} and Lemma~\ref{lem: fou
     \end{equation*}
     Since $\min(1,t) = 1$ for $t > 1$, this is \eqref{eq: smoothing} for $e^{t\mathcal L}$ with $C e^{\lambda}$ in place of $C$.
 
-    The same argument applies to $e^{t\tilde{\mathcal L}_h}$, since $\tilde U_h$ satisfies the conditions of Assumption~\ref{ass: U} that this argument uses uniformly in $h$. Lemmas~\ref{lem: semigroup}, \ref{lem: short time} and \ref{lem: fourth from lipschitz} use only the bounds of Assumption~\ref{ass: U} up to the order $5$ and the convexity outside the ball of radius $R$, and by Lemma~\ref{lem: modified class}, for every $h \in (0, h_0]$, $\tilde U_h$ satisfies them with $2M$ and $\frac m2$ in place of $M$ and $m$. These lemmas therefore hold for $e^{t\tilde{\mathcal L}_h}$ with a rate and a constant that depend only on $m$, $M$, $R$ and $d$, as in Corollary~\ref{cor: modified poisson}. Since the left side of \eqref{eq: smoothing} is the sum of the norms for $e^{t\mathcal L}$ and for $e^{t\tilde{\mathcal L}_h}$, \eqref{eq: smoothing} holds with $\lambda$ the smaller of the rates for $U$ and for $\tilde U_h$, and $C$ twice the larger of the constants.
+    The same argument applies to $e^{t\tilde{\mathcal L}_h}$. Lemmas~\ref{lem: semigroup}, \ref{lem: short time} and \ref{lem: fourth from lipschitz} use only the bounds of Assumption~\ref{ass: U} up to the order $5$ and the convexity outside the ball of radius $R$, and by Lemma~\ref{lem: modified class}, for every $h \in (0, h_0]$, $\tilde U_h$ satisfies them with $2M$ and $\frac m2$ in place of $M$ and $m$. These lemmas therefore hold for $e^{t\tilde{\mathcal L}_h}$ with a rate and a constant that depend only on $m$, $M$, $R$ and $d$, as in Corollary~\ref{cor: modified poisson}. Since the left side of \eqref{eq: smoothing} is the sum of the norms for $e^{t\mathcal L}$ and for $e^{t\tilde{\mathcal L}_h}$, \eqref{eq: smoothing} holds with $\lambda$ the smaller of the rates for $U$ and for $\tilde U_h$, and $C$ twice the larger of the constants.
 \end{proof}
 
 In the proofs of Theorem~\ref{thm: kr expansion}, the bounds \eqref{eq: smoothing} at the times $t = ih$ are summed over $i \Ge 0$ through the following elementary bounds.
@@ -1956,7 +1941,7 @@ In the proofs of Theorem~\ref{thm: kr expansion}, the bounds \eqref{eq: smoothin
     Adding the bound $2/\lambda$ gives \eqref{eq: time sums}.
 \end{proof}
 
-For a Lipschitz test function, a step of \eqref{eq: sgld} and a step of \eqref{eq: langevin} from the same state $Z_0$ give expectations that differ by at most $C h^{\frac32} (1 + |Z_0|)$, although the gradient noise enters the step with the factor $h$: the Gaussian increment of the step smooths the test function, and the noise has mean $0$.
+The gradient noise enters a step of \eqref{eq: sgld} with the factor $h$, but in the next lemma it contributes only at the order $h^{\frac32}$: the Gaussian increment of the step smooths the test function, and the noise has mean $0$.
 
 \begin{lemma}
 \label{lem: sgld lipschitz step}
@@ -2004,7 +1989,6 @@ In the proof of \eqref{eq: kr sgld}, the integrand of the sum in \eqref{eq: sgld
     \end{equation}
     Then $|\mu(F) - \nu(F)| \Le 3 K \bigl( 1 + \mu(|x|^{12}) + \nu(|x|^{12}) \bigr)\, \mathcal W_1(\mu, \nu)^{\frac{10}{11}}$.
 \end{lemma}
-Without the factor $1 + |x| + |x'|$ in \eqref{eq: local lipschitz}, $F$ is Lipschitz and $|\mu(F) - \nu(F)| \Le K\, \mathcal W_1(\mu, \nu)$ directly; with this factor, the moments of order $12$ of $\mu$ and $\nu$ compensate its growth, at the cost of the reduced exponent $\frac{10}{11}$.
 
 \begin{proof}
     If $\mathcal W_1(\mu,\nu) = 0$, then $\mu = \nu$. Otherwise let $\rho := \mathcal W_1(\mu,\nu)^{-\frac1{11}} \Ge 1$, and let $T_\rho(x) := x$ for $|x| \Le \rho$ and $T_\rho(x) := \rho x / |x|$ for $|x| > \rho$, the retraction onto the closed ball of radius $\rho$, which is $1$-Lipschitz. By \eqref{eq: local lipschitz}, $F \circ T_\rho$ is Lipschitz with constant $K(1 + 2\rho) \Le 3K\rho$, so the Kantorovich--Rubinstein duality gives
@@ -2037,10 +2021,10 @@ Since $\mathcal C(x)$ is positive semidefinite, $\norm{\mathcal C}_\infty \Le \S
         \tilde{\mathcal V}_i := e^{ih\tilde{\mathcal L}_h} \tilde f_h , \qquad i = 0, 1, 2, \dots ,
         \label{eq: propagated test functions}
     \end{equation}
-    moves the leading term of each from the law of $Y_0$ to $\pi$, and sums the series through \eqref{eq: riesz} into $\frac h2\, \pi(f \psi_{\mathcal C})$.
+    moves the leading term of each to an integral against $\pi$, and sums the series through \eqref{eq: riesz} into $\frac h2\, \pi(f \psi_{\mathcal C})$.
     
     Let $f$ satisfy Assumption~\ref{ass: f} and $\norm{\nabla f}_\infty \Le 1$.
-    Let $Y_0 \sim \mu_h$, independent of $(B_t)_{t \Ge 0}$ and $(\xi_k)_{k \Ge 0}$, so that $Y_1 \sim \mu_h$, and add $Y_0$ to the generators of $\hat{\mathcal F}_k$ in \eqref{eq: sg filtration}, as in the proof of Theorem~\ref{thm: numerical bias}, so that $\hat{\mathcal F}_0 = \sigma(Y_0)$, while $\chi_0$ and $\xi_0$ remain independent of $\hat{\mathcal F}_0$; then $Z_0 = Y_0 + \sqrt{h/2}\, \chi_0 \sim \pi_h$. By \eqref{eq: heat shift invariant}, $\pi_h(f) = \mu_h(\tilde f_h)$, so
+    Let $Y_0 \sim \mu_h$, independent of $(B_t)_{t \Ge 0}$ and $(\xi_k)_{k \Ge 0}$, so that $Y_1 \sim \mu_h$. As in the proof of Theorem~\ref{thm: numerical bias}, add $Y_0$ to the generators of $\hat{\mathcal F}_k$ in \eqref{eq: sg filtration}, so that $\hat{\mathcal F}_0 = \sigma(Y_0)$, while $\chi_0$ and $\xi_0$ remain independent of $\hat{\mathcal F}_0$. Then $Z_0 = Y_0 + \sqrt{h/2}\, \chi_0 \sim \pi_h$. By \eqref{eq: heat shift invariant}, $\pi_h(f) = \mu_h(\tilde f_h)$, so
     \begin{equation}
         \pi_h(f) - \pi(f) = \bigl( \mu_h(\tilde f_h) - \tilde\pi_h(\tilde f_h) \bigr) + \bigl( \tilde\pi_h(\tilde f_h) - \pi(f) \bigr) ,
         \label{eq: sglm split}
@@ -2146,7 +2130,7 @@ Since $\mathcal C(x)$ is positive semidefinite, $\norm{\mathcal C}_\infty \Le \S
         \label{eq: sglm modified generator}
     \end{equation}
 
-    It remains to sum $h (-\tilde{\mathcal L}_h \tilde{\mathcal V}_i)$ over $i$. For this sum, fix a deterministic initial point $Y_0 \in \mathbb R^d$. By \eqref{eq: modified dynkin}, with $\tilde{\mathcal V}_i$ and $\tilde{\mathcal L}_h \tilde{\mathcal V}_i$ in place of $\tilde\phi_h$ and $\tilde g_h$, which applies since $\nabla \tilde{\mathcal V}_i$ is bounded, and $e^{h\tilde{\mathcal L}_h} \tilde{\mathcal V}_i = \tilde{\mathcal V}_{i+1}$,
+    It remains to sum $h (-\tilde{\mathcal L}_h \tilde{\mathcal V}_i)$ over $i$ in \eqref{eq: sglm modified generator}. For this sum, $Y_0 \in \mathbb R^d$ is a deterministic initial point of $\tilde Y_0(s)$, in place of $Y_0 \sim \mu_h$. By \eqref{eq: modified dynkin}, with $\tilde{\mathcal V}_i$ and $\tilde{\mathcal L}_h \tilde{\mathcal V}_i$ in place of $\tilde\phi_h$ and $\tilde g_h$, which applies since $\nabla \tilde{\mathcal V}_i$ is bounded, and $e^{h\tilde{\mathcal L}_h} \tilde{\mathcal V}_i = \tilde{\mathcal V}_{i+1}$,
     \begin{equation*}
         \tilde{\mathcal V}_i(Y_0) - \tilde{\mathcal V}_{i+1}(Y_0) = \int_0^h \mathbb E\bigl[ (-\tilde{\mathcal L}_h \tilde{\mathcal V}_i)(\tilde Y_0(s)) \bigr] \D s ,
     \end{equation*}
@@ -2165,10 +2149,10 @@ Since $\mathcal C(x)$ is positive semidefinite, $\norm{\mathcal C}_\infty \Le \S
     \end{equation*}
     Hence, for $z \in \mathbb R^d$ and $0 \Le s \Le h$,
     \begin{equation*}
-    \begin{aligned}
-        & \bigl| \nabla (\tilde{\mathcal L}_h \tilde{\mathcal V}_i)(z) \bigr| \Le C (1 + |z|) \sum_{j=1}^{3} \norm{\nabla^j \tilde{\mathcal V}_i}_\infty , \\[-8pt]
-        & \bigl| (\tilde{\mathcal L}_h \tilde{\mathcal V}_i)(\tilde Y_0(s)) - (\tilde{\mathcal L}_h \tilde{\mathcal V}_i)(Y_0) \bigr| \Le C \bigl( 1 + |Y_0| + |\tilde Y_0(s) - Y_0| \bigr) |\tilde Y_0(s) - Y_0| \sum_{j=1}^{3} \norm{\nabla^j \tilde{\mathcal V}_i}_\infty .
-    \end{aligned}
+    \begin{gathered}
+        \bigl| \nabla (\tilde{\mathcal L}_h \tilde{\mathcal V}_i)(z) \bigr| \Le C (1 + |z|) \sum_{j=1}^{3} \norm{\nabla^j \tilde{\mathcal V}_i}_\infty , \\[-8pt]
+        \bigl| (\tilde{\mathcal L}_h \tilde{\mathcal V}_i)(\tilde Y_0(s)) - (\tilde{\mathcal L}_h \tilde{\mathcal V}_i)(Y_0) \bigr| \Le C \bigl( 1 + |Y_0| + |\tilde Y_0(s) - Y_0| \bigr) |\tilde Y_0(s) - Y_0| \sum_{j=1}^{3} \norm{\nabla^j \tilde{\mathcal V}_i}_\infty .
+    \end{gathered}
     \end{equation*}
     The bound on $\tilde Y_0(s) - Y_0$ in \eqref{eq: exact sizes} with $p = 2$ gives
     \begin{equation*}
@@ -2178,7 +2162,7 @@ Since $\mathcal C(x)$ is positive semidefinite, $\norm{\mathcal C}_\infty \Le \S
     \begin{equation*}
         \Bigl| h\, (-\tilde{\mathcal L}_h \tilde{\mathcal V}_i)(Y_0) - \bigl( \tilde{\mathcal V}_i(Y_0) - \tilde{\mathcal V}_{i+1}(Y_0) \bigr) \Bigr| \Le C h^{\frac32} \bigl( 1 + |Y_0| \bigr)^2 \sum_{j=1}^{3} \norm{\nabla^j \tilde{\mathcal V}_i}_\infty .
     \end{equation*}
-    By \eqref{eq: psi moments}, \eqref{eq: propagated derivatives} and \eqref{eq: time sums} at $j = 1, 2, 3$,
+    Integrating this bound in $Y_0$ against $|\psi_{\mathcal C}|\, \pi$, with \eqref{eq: psi moments}, \eqref{eq: propagated derivatives} and \eqref{eq: time sums} at $j = 1, 2, 3$,
     \begin{equation*}
         \frac h2 \sum_{i=0}^{\infty} \Bigl| \pi\Bigl( \psi_{\mathcal C}\, \bigl( h\, (-\tilde{\mathcal L}_h \tilde{\mathcal V}_i) - \tilde{\mathcal V}_i + \tilde{\mathcal V}_{i+1} \bigr) \Bigr) \Bigr| \Le C h^{\frac32} \Bigl( 1 + \log\frac1h \Bigr) .
     \end{equation*}
@@ -2239,12 +2223,12 @@ Since $\mathcal C(x)$ is positive semidefinite, $\norm{\mathcal C}_\infty \Le \S
         \biggl| \bar\pi_h(f) - \pi(f) - \frac{h^2}{2} \sum_{i=1}^{\infty} \bar\pi_h\Bigl( \nabla^2 \mathcal V_i : \bigl( 2 \nabla^2 U + \mathcal C \bigr) - \nabla \mathcal V_i \cdot \bigl( \nabla^2 U\, \nabla U - \nabla \Delta U \bigr) \Bigr) \biggr| \Le C h^{\frac32} .
         \label{eq: sgld leading}
     \end{equation}
-    By Assumption~\ref{ass: U}, \eqref{eq: trace bound} and $|A : B| \Le d \norm{A} \norm{B}$ for $A, B \in \mathbb R^{d \times d}$, for every $x \in \mathbb R^d$ and every symmetric matrix $A$,
+    By Assumption~\ref{ass: U} and \eqref{eq: trace bound}, for every $x \in \mathbb R^d$ and every symmetric matrix $A$,
     \begin{equation*}
-    \begin{aligned}
-        & \bigl| \nabla^2 U(x)\, \nabla U(x) - \nabla \Delta U(x) \bigr| \Le M^2 (1 + |x|) + d M \Le C (1 + |x|) , \\
-        & \bigl| A : \bigl( 2 \nabla^2 U(x) + \mathcal C(x) \bigr) \bigr| \Le (2 d M + \Sigma) \norm{A} .
-    \end{aligned}
+    \begin{gathered}
+        \bigl| \nabla^2 U(x)\, \nabla U(x) - \nabla \Delta U(x) \bigr| \Le M^2 (1 + |x|) + d M \Le C (1 + |x|) , \\
+        \bigl| A : \bigl( 2 \nabla^2 U(x) + \mathcal C(x) \bigr) \bigr| \Le (2 d M + \Sigma) \norm{A} .
+    \end{gathered}
     \end{equation*}
     Hence the integrand in \eqref{eq: sgld leading} satisfies
     \begin{equation*}
@@ -2260,12 +2244,12 @@ Since $\mathcal C(x)$ is positive semidefinite, $\norm{\mathcal C}_\infty \Le \S
         \label{eq: w1 rough sgld}
     \end{equation}
 
-    In the coefficient of $\frac{h^2}{2}$ in \eqref{eq: sgld leading}, the measure $\bar\pi_h$ can be replaced by $\pi$. By Assumption~\ref{ass: U}, the derivatives of $U$ of orders $2$ to $7$ are bounded, so $\nabla^2 U$ and $\nabla \Delta U$ are bounded and Lipschitz, and
+    In the coefficient of $\frac{h^2}{2}$ in \eqref{eq: sgld leading}, the measure $\bar\pi_h$ can be replaced by $\pi$. By Assumption~\ref{ass: U}, the derivatives of $U$ of orders $2$ to $4$ are bounded, so $\nabla^2 U$ and $\nabla \Delta U$ are bounded and Lipschitz, and
     \begin{equation}
-        \bigl| \bigl( \nabla^2 U\, \nabla U - \nabla \Delta U \bigr)(x) - \bigl( \nabla^2 U\, \nabla U - \nabla \Delta U \bigr)(x') \bigr| \Le C \bigl( 1 + |x| + |x'| \bigr) |x - x'| , \qquad x, x' \in \mathbb R^d ,
+        \bigl| \bigl( \nabla^2 U\, \nabla U - \nabla \Delta U \bigr)(x) - \bigl( \nabla^2 U\, \nabla U - \nabla \Delta U \bigr)(x') \bigr| \Le C \bigl( 1 + |x| + |x'| \bigr) |x - x'| , \qquad x, x' \in \mathbb R^d .
         \label{eq: drift correction lipschitz}
     \end{equation}
-    where the factor $1 + |x| + |x'|$ comes entirely from the linear growth of $\nabla U$. With \eqref{eq: drift correction lipschitz}, \eqref{eq: trace bound}, \eqref{eq: covariance lipschitz} and $|A : B| \Le d \norm{A} \norm{B}$, for each $i$, the integrand in the $\bar\pi_h$ bracket of \eqref{eq: sgld leading} satisfies \eqref{eq: local lipschitz} with $K = C \sum_{j=1}^{3} \norm{\nabla^j \mathcal V_i}_\infty$. Lemma~\ref{lem: local lipschitz}, with $\mu = \bar\pi_h$, $\nu = \pi$, the moments of Lemmas~\ref{lem: sgld invariant} and \ref{lem: dissipative}, and $\mathcal W_1(\bar\pi_h, \pi) \Le C h \Le 1$ by \eqref{eq: w1 rough sgld} with $C h_0 \Le 1$, gives, for $i \Ge 1$,
+    With \eqref{eq: drift correction lipschitz}, \eqref{eq: trace bound}, \eqref{eq: covariance lipschitz} and $|A : B| \Le d \norm{A} \norm{B}$, for each $i$, the integrand in the $\bar\pi_h$ bracket of \eqref{eq: sgld leading} satisfies \eqref{eq: local lipschitz} with $K = C \sum_{j=1}^{3} \norm{\nabla^j \mathcal V_i}_\infty$. Lemma~\ref{lem: local lipschitz}, with $\mu = \bar\pi_h$, $\nu = \pi$, the moments of Lemmas~\ref{lem: sgld invariant} and \ref{lem: dissipative}, and $\mathcal W_1(\bar\pi_h, \pi) \Le C h \Le 1$ by \eqref{eq: w1 rough sgld} with $C h_0 \Le 1$, gives, for $i \Ge 1$,
     \begin{equation}
     \begin{aligned}
         & \Bigl| (\bar\pi_h - \pi)\Bigl( \nabla^2 \mathcal V_i : \bigl( 2 \nabla^2 U + \mathcal C \bigr) - \nabla \mathcal V_i \cdot \bigl( \nabla^2 U\, \nabla U - \nabla \Delta U \bigr) \Bigr) \Bigr| \\
@@ -2287,7 +2271,7 @@ Since $\mathcal C(x)$ is positive semidefinite, $\norm{\mathcal C}_\infty \Le \S
         \label{eq: sgld under pi}
     \end{equation}
 
-    The sum in \eqref{eq: sgld under pi} telescopes as in the proof of \eqref{eq: kr sglm}, with \eqref{eq: langevin}, $\mathcal L$, $\mathcal V_i = e^{ih\mathcal L} f$, the solution $X_s$ of \eqref{eq: langevin} and its initial value $X_0$ in place of \eqref{eq: modified langevin}, $\tilde{\mathcal L}_h$, $\tilde{\mathcal V}_i = e^{ih\tilde{\mathcal L}_h} \tilde f_h$, $\tilde Y_0(s)$ and $Y_0$, with $\psi_{\nabla^2 U} + \psi_{\mathcal C}$ in place of $\psi_{\mathcal C}$, and with \eqref{eq: sgld propagated} and Assumption~\ref{ass: U} in place of \eqref{eq: propagated derivatives} and \eqref{eq: modified class bounds}. The identity \eqref{eq: dynkin error} and the bound on its integral hold in this form, and since the sum starts at $i = 1$, the partial sums of the telescoping series are $\pi((\psi_{\nabla^2 U} + \psi_{\mathcal C})\, \mathcal V_1) - \pi((\psi_{\nabla^2 U} + \psi_{\mathcal C})\, \mathcal V_N)$, where $\pi((\psi_{\nabla^2 U} + \psi_{\mathcal C})\, \mathcal V_N) \to 0$ as $N \to \infty$ by $\pi(\psi_{\nabla^2 U} + \psi_{\mathcal C}) = 0$, the bound $|\mathcal V_N(x) - \pi(f)| \Le C e^{-\lambda N h} (1 + |x|)$ and \eqref{eq: psi moments}. Hence
+    The sum in \eqref{eq: sgld under pi} telescopes as in the proof of \eqref{eq: kr sglm}, with $\mathcal L$, $\mathcal V_i$ of \eqref{eq: sgld test functions}, the solution $X_s$ of \eqref{eq: langevin} and its initial value $X_0$ in place of $\tilde{\mathcal L}_h$, $\tilde{\mathcal V}_i$ of \eqref{eq: propagated test functions}, $\tilde Y_0(s)$ and $Y_0$, with $\psi_{\nabla^2 U} + \psi_{\mathcal C}$ in place of $\psi_{\mathcal C}$, and with \eqref{eq: sgld propagated} and Assumption~\ref{ass: U} in place of \eqref{eq: propagated derivatives} and \eqref{eq: modified class bounds}. The identity \eqref{eq: dynkin error} holds in this form, and so does the bound on its left side by $C h^{\frac32} (1 + |X_0|)^2 \sum_{j=1}^{3} \norm{\nabla^j \mathcal V_i}_\infty$. Since the sum starts at $i = 1$, the partial sums of the telescoping series are $\pi((\psi_{\nabla^2 U} + \psi_{\mathcal C})\, \mathcal V_1) - \pi((\psi_{\nabla^2 U} + \psi_{\mathcal C})\, \mathcal V_N)$. By $\pi(\psi_{\nabla^2 U} + \psi_{\mathcal C}) = 0$, the bound $|\mathcal V_N(x) - \pi(f)| \Le C e^{-\lambda N h} (1 + |x|)$ and \eqref{eq: psi moments}, $\pi((\psi_{\nabla^2 U} + \psi_{\mathcal C})\, \mathcal V_N) \to 0$ as $N \to \infty$. Hence
     \begin{equation*}
         \biggl| \frac{h^2}{2} \sum_{i=1}^{\infty} \pi\bigl( ( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, (-\mathcal L \mathcal V_i) \bigr) - \frac h2\, \pi\bigl( ( \psi_{\nabla^2 U} + \psi_{\mathcal C} )\, \mathcal V_1 \bigr) \biggr| \Le C h^{\frac32} \Bigl( 1 + \log\frac1h \Bigr) .
     \end{equation*}
@@ -2311,10 +2295,10 @@ Since $\mathcal C(x)$ is positive semidefinite, $\norm{\mathcal C}_\infty \Le \S
     \end{equation}
     so that $\varphi_r \in \mathcal D$ and
     \begin{equation}
-    \begin{aligned}
-        & |\nabla \varphi_r| \Le 1 , \qquad \nabla^2 \varphi_r = \frac{\varphi_r^2 I_d - x \otimes x}{\varphi_r^3} \succeq \frac{r^2 I_d}{\varphi_r^3} , \qquad \norm{\nabla^2 \varphi_r} \Le \frac{1}{\varphi_r} , \\
-        & \Delta \varphi_r = \frac{d-1}{\varphi_r} + \frac{r^2}{\varphi_r^3} , \qquad |\nabla \Delta \varphi_r| = \frac{(d-1)\, |x|}{\varphi_r^3} + \frac{3 r^2 |x|}{\varphi_r^5} \Le \frac{d+1}{2 r^2} .
-    \end{aligned}
+    \begin{gathered}
+        |\nabla \varphi_r| \Le 1 , \qquad \nabla^2 \varphi_r = \frac{\varphi_r^2 I_d - x \otimes x}{\varphi_r^3} \succeq \frac{r^2 I_d}{\varphi_r^3} , \qquad \norm{\nabla^2 \varphi_r} \Le \frac{1}{\varphi_r} , \\
+        \Delta \varphi_r = \frac{d-1}{\varphi_r} + \frac{r^2}{\varphi_r^3} , \qquad |\nabla \Delta \varphi_r| = \frac{(d-1)\, |x|}{\varphi_r^3} + \frac{3 r^2 |x|}{\varphi_r^5} \Le \frac{d+1}{2 r^2} .
+    \end{gathered}
         \label{eq: phi r bounds}
     \end{equation}
     Since $|\nabla U(x)| \Le M(1 + |x|) \Le \sqrt2\, M \varphi_1(x)$, the gradient of $\mathcal L \varphi_1 = \Delta \varphi_1 - \nabla U \cdot \nabla \varphi_1$ satisfies, by \eqref{eq: phi r bounds}, $|\nabla (\mathcal L \varphi_1)| \Le \frac{d+1}{2} + M + \sqrt2\, M \Le d + 3M$. With \eqref{eq: riesz} for $\omega = \varphi_1$ and $\mathcal C(x)$ positive semidefinite,
@@ -2329,7 +2313,7 @@ Since $\mathcal C(x)$ is positive semidefinite, $\norm{\mathcal C}_\infty \Le \S
 \label{sec: w1 counterexample proof}
 
 \begin{proof}[Proof of Lemma~\ref{lem: w1 counterexample}]
-    The proof checks the assumptions, writes the Kantorovich--Rubinstein norm in dimension $1$ through primitives in \eqref{eq: kr one dimension}, computes $\psi_{\mathcal C}$ explicitly, and evaluates both norms of Lemma~\ref{lem: w1 counterexample} by quadrature. Assumption~\ref{ass: U} holds with $m = 1$, $R = 0$ and every $M \Ge 1$. The estimator is unbiased, $|\nabla \hat U(x;\xi)| \Le |x| + 10$, its Hessian $1 + 10\, \xi\, a'(x)$ is bounded by $1 + 10 \norm{a'}_\infty$, and its variance is $100\, a(x)^2 \Le 100$, so Assumption~\ref{ass: sg} holds for $M$ large enough.
+    The proof checks the assumptions, writes the Kantorovich--Rubinstein norm in dimension $1$ as the integral \eqref{eq: kr one dimension}, computes $\psi_{\mathcal C}$ explicitly, and evaluates both norms of Lemma~\ref{lem: w1 counterexample} by quadrature. Assumption~\ref{ass: U} holds with $m = 1$, $R = 0$ and every $M \Ge 1$. The estimator is unbiased, $|\nabla \hat U(x;\xi)| \Le |x| + 10$, its Hessian $1 + 10\, \xi\, a'(x)$ is bounded by $1 + 10 \norm{a'}_\infty$, and its variance is $100\, a(x)^2 \Le 100$, so Assumption~\ref{ass: sg} holds for $M$ large enough.
 
     Here $\pi$ is the standard Gaussian distribution, with $\pi'(x) = -x\, \pi(x)$. For $\psi \in L^2_0(\pi)$ and $s \in \mathbb R$, the Cauchy--Schwarz inequality on $(-\infty, s]$ for $s \Le 0$, and on $[s, \infty)$ for $s > 0$ since $\pi(\psi) = 0$, gives
     \begin{equation*}
