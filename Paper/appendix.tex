@@ -1549,19 +1549,19 @@ The next lemma is the counterpart of Lemma~\ref{lem: sgld weak} for a Lipschitz 
     \end{equation*}
     Let $h_0$ also satisfy $3 M h_0 \Le 1$, so that $\norm{\Gamma - 2h I_d} \Le 3 M h^2 \Le h$. For $\theta \in [0,1]$, let
     \begin{equation*}
-        \Gamma_\theta := 2h I_d + \theta ( \Gamma - 2h I_d ) \succeq h I_d , \qquad g_\theta := f * \mathcal N(0, \Gamma_\theta) ,
+        \Gamma_\theta := 2h I_d + \theta ( \Gamma - 2h I_d ) \succeq h I_d , \qquad F_\theta := f * \mathcal N(0, \Gamma_\theta) ,
     \end{equation*}
-    so that $g_0 = e^{h\Delta} f$ and
+    so that $F_0 = e^{h\Delta} f$ and
     \begin{equation*}
-        \mathbb E_0\bigl[ f(\Lambda_0) - f(Z_0 + D_0) \bigr] = \bigl( g_1 - e^{h\Delta} f \bigr)\bigl( Z_0 - h\, \nabla U(Z_0) \bigr) .
+        \mathbb E_0\bigl[ f(\Lambda_0) - f(Z_0 + D_0) \bigr] = \bigl( F_1 - e^{h\Delta} f \bigr)\bigl( Z_0 - h\, \nabla U(Z_0) \bigr) .
     \end{equation*}
-    Since $g_\theta = e^{\frac h4 \Delta} \bigl( f * \mathcal N(0, \Gamma_\theta - \frac h2 I_d) \bigr)$, the bound \eqref{eq: heat derivatives} at $j = 4$ gives $\norm{\nabla^4 g_\theta}_\infty \Le C h^{-\frac32} \norm{\nabla f}_\infty$. The derivatives of $g_\theta$ in $\theta$ are
+    Since $F_\theta = e^{\frac h4 \Delta} \bigl( f * \mathcal N(0, \Gamma_\theta - \frac h2 I_d) \bigr)$, the bound \eqref{eq: heat derivatives} at $j = 4$ gives $\norm{\nabla^4 F_\theta}_\infty \Le C h^{-\frac32} \norm{\nabla f}_\infty$. The derivatives of $F_\theta$ in $\theta$ are
     \begin{equation*}
-        \partial_\theta g_\theta = \frac12\, \nabla^2 g_\theta : ( \Gamma - 2h I_d ) , \qquad \partial_\theta^2 g_\theta = \frac14\, \nabla^4 g_\theta : ( \Gamma - 2h I_d )^{\otimes 2} ,
+        \partial_\theta F_\theta = \frac12\, \nabla^2 F_\theta : ( \Gamma - 2h I_d ) , \qquad \partial_\theta^2 F_\theta = \frac14\, \nabla^4 F_\theta : ( \Gamma - 2h I_d )^{\otimes 2} ,
     \end{equation*}
     so Taylor's formula in $\theta$ gives
     \begin{equation}
-        \Bigl\| g_1 - e^{h\Delta} f - \frac12\, \nabla^2 ( e^{h\Delta} f ) : ( \Gamma - 2h I_d ) \Bigr\|_\infty \Le C h^{-\frac32} \norm{\nabla f}_\infty\, \norm{\Gamma - 2h I_d}^2 \Le C h^{\frac52} \norm{\nabla f}_\infty .
+        \Bigl\| F_1 - e^{h\Delta} f - \frac12\, \nabla^2 ( e^{h\Delta} f ) : ( \Gamma - 2h I_d ) \Bigr\|_\infty \Le C h^{-\frac32} \norm{\nabla f}_\infty\, \norm{\Gamma - 2h I_d}^2 \Le C h^{\frac52} \norm{\nabla f}_\infty .
         \label{eq: sgld covariance interpolation}
     \end{equation}
     By the definition of $\Gamma$, the bounds \eqref{eq: gaussian derivatives} at $j = 2$ and $j = 3$, the linear growth of $\nabla U$ and the bound on $\nabla^2 U$ from Assumption~\ref{ass: U},
