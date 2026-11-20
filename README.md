@@ -39,9 +39,10 @@ order.
 
 ## Main results
 
-- For a potential strongly convex outside a ball, the mean square error (MSE) of the time averages of SGLM over
-  $`N`$ steps of size $`h`$ is $`\mathcal O\bigl(\frac{1}{Nh} + \Sigma^2 h^2 + h^4\bigr)`$, where $`\Sigma`$ bounds the
-  variance of the gradient noise. The discretization error enters this bound as $`h^4`$ and the MSE bound of SGLD as
+- For a potential strongly convex outside a ball and a Lipschitz test function, the mean square error (MSE) of the
+  time averages of SGLM over $`N`$ steps of size $`h`$ is
+  $`\mathcal O\bigl(\frac{1}{Nh} + \Sigma^2 h^2 + h^4 \log^2\frac1h\bigr)`$, where $`\Sigma`$ bounds the variance of the
+  gradient noise. The discretization error enters this bound as $`h^4 \log^2\frac1h`$ and the MSE bound of SGLD as
   $`h^2`$, while a larger batch reduces only the term $`\Sigma^2 h^2`$ in both bounds.
 - In Bayesian logistic regression on MNIST, SGLM has a smaller estimated MSE than SGLD.
 - The coefficient of $`h`$ in the numerical bias of SGLM is given explicitly by the covariance of the gradient noise

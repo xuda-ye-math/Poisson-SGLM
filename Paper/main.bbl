@@ -1,4 +1,4 @@
-\begin{thebibliography}{112}
+\begin{thebibliography}{111}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -592,14 +592,6 @@ Jonathan~C. Mattingly, Andrew~M. Stuart, and Michael~V. Tretyakov.
 \newblock \emph{SIAM Journal on Numerical Analysis}, 48\penalty0 (2):\penalty0
   552--577, 2010.
 \newblock \doi{10.1137/090770527}.
-
-\bibitem[Meyn and Tweedie(1992)]{meyn1992stability}
-Sean~P. Meyn and Richard~L. Tweedie.
-\newblock Stability of {Markovian} processes {I}: Criteria for discrete-time
-  chains.
-\newblock \emph{Advances in Applied Probability}, 24\penalty0 (3):\penalty0
-  542--574, 1992.
-\newblock \doi{10.2307/1427479}.
 
 \bibitem[Meyn and Tweedie(1993)]{meyn1993markov}
 Sean~P. Meyn and Richard~L. Tweedie.

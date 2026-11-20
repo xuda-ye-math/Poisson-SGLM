@@ -8,7 +8,7 @@ Bayesian logistic regression is applied to the handwritten digits $4$ and $9$ of
 \end{equation}
 The stochastic gradient averages $P$ indices $\xi = (\xi_1, \dots, \xi_P)$, drawn independently and uniformly from $\{1, \dots, n\}$ at every step, independently of the Gaussian variables of the integrator:
 \begin{equation}
-    \nabla \hat U(x;\xi) = \frac{x}{\sigma_0^2} + \frac{n}{P} \sum_{p=1}^{P} \Bigl( \frac{1}{1 + e^{-a_{\xi_p} \cdot x}} - y_{\xi_p} \Bigr)\, a_{\xi_p} .
+    \hat g(x;\xi) = \frac{x}{\sigma_0^2} + \frac{n}{P} \sum_{p=1}^{P} \Bigl( \frac{1}{1 + e^{-a_{\xi_p} \cdot x}} - y_{\xi_p} \Bigr)\, a_{\xi_p} .
     \label{eq:mnist-minibatch-gradient}
 \end{equation}
 
@@ -95,4 +95,4 @@ A positive MSE reduction and ratios below $1$ favor SGLM. Table~\ref{tab:mnist-e
 	\label{tab:mnist-endpoint}
 \end{table}
 
-The median MSE reduction grows with the batch size, from $34.6\%$ to $63.3\%$, while the median variance ratio stays close to $1$ and the median bias ratio decreases from $0.784$ to $0.516$: the gain of SGLM comes from smaller finite-time biases, not from smaller fluctuations. This trend in $P$ is consistent with the separation of the errors in Theorem~\ref{thm: sglm mse}: a batch of $P$ independent stochastic gradients reduces the contribution of the gradient noise to $\Sigma^2 h^2 / P^2$, while the discretization error contributes $h^4$ for SGLM and $h^2$ for SGLD in \eqref{eq: sgld mse}. In the bias, the coefficient \eqref{eq: bias coefficient} of SGLM is divided by $P$, while the coefficient \eqref{eq: sgld coefficient} of SGLD keeps the contribution of the discretization error of EM at every batch size.
+The median MSE reduction grows with the batch size, from $34.6\%$ to $63.3\%$, while the median variance ratio stays close to $1$ and the median bias ratio decreases from $0.784$ to $0.516$: the gain of SGLM comes from smaller finite-time biases, not from smaller fluctuations. This trend in $P$ is consistent with the separation of the errors in Theorem~\ref{thm: sglm mse}: a batch of $P$ independent stochastic gradients reduces the contribution of the gradient noise to $\Sigma^2 h^2 / P^2$, while the discretization error contributes $h^4 \log^2\frac1h$ for SGLM and $h^2$ for SGLD in \eqref{eq: sgld mse}. In the bias, the coefficient \eqref{eq: bias coefficient} of SGLM is divided by $P$, while the coefficient \eqref{eq: sgld coefficient} of SGLD keeps the contribution of the discretization error of EM at every batch size.
